@@ -6,7 +6,8 @@ import (
 
 	"google.golang.org/grpc"
 
-	"RoomStatus"
+	RoomStatus "RoomStatus/pkg/protos"
+
 	"github.com/lileio/lile"
 )
 
