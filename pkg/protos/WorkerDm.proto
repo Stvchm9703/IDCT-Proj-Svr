@@ -1,0 +1,5 @@
+// # hello.proto
+syntax = "proto3";
+package WorkerDm;
+option csharp_namespace = "PlayCli.ProtoMod";
+option go_package  = "protos";

@@ -1,0 +1,52 @@
+// # hello.proto
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+
+
+package RoomStatus;
+option csharp_namespace = "PlayCli.ProtoMod";
+option go_package  = "proto";
+
+
+message RoomListRequest{
+    string requirement = 1;
+}
+
+message RoomListResponse {
+    repeated Room result = 1;
+}
+
+message RoomRequest {
+    string key = 1;
+}
+enum Status {
+    ON_START = 0;
+    ON_WAIT = 1 ;
+    ON_HOST_TURN = 2;
+    ON_DUEL_TURN = 3;
+    ON_END = 4;
+}
+message Room {
+    string key = 1;
+    string host_id = 2; 
+    Status status = 3;
+    int32 round = 4;
+    int32 cell = 5;
+    repeated CellStatus cell_status = 6;
+}
+
+message CellStatus{
+    string key = 1;
+    int32 turn = 2; // turn 1 = host / -1 = duel
+    int32 cell_num = 3;
+}
+
+service RoomStatus {
+    rpc CreateRoom (google.protobuf.Empty) returns (Room){ };
+    rpc GetRoomList(RoomListRequest) returns (RoomListResponse){ }; 
+    rpc GetRoomCurrentInfo (RoomRequest) returns (Room){ };
+    rpc GetRoomStream (RoomRequest) returns (stream CellStatus);
+    rpc UpdateRoomStatus (CellStatus) returns (google.protobuf.Empty);
+    rpc DeleteRoom (RoomRequest) returns (google.protobuf.Empty);
+}

@@ -1,0 +1,137 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "GameCtl.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "RoomStatusCellStatus": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "turn": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "cell_num": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "RoomStatusRoom": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "host_id": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/RoomStatusStatus"
+        },
+        "round": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "cell": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "cell_status": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RoomStatusCellStatus"
+          }
+        }
+      }
+    },
+    "RoomStatusRoomListResponse": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RoomStatusRoom"
+          }
+        }
+      }
+    },
+    "RoomStatusStatus": {
+      "type": "string",
+      "enum": [
+        "ON_START",
+        "ON_WAIT",
+        "ON_HOST_TURN",
+        "ON_DUEL_TURN",
+        "ON_END"
+      ],
+      "default": "ON_START"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "runtimeStreamError": {
+      "type": "object",
+      "properties": {
+        "grpc_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "http_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "http_status": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  },
+  "x-stream-definitions": {
+    "RoomStatusCellStatus": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/RoomStatusCellStatus"
+        },
+        "error": {
+          "$ref": "#/definitions/runtimeStreamError"
+        }
+      },
+      "title": "Stream result of RoomStatusCellStatus"
+    }
+  }
+}

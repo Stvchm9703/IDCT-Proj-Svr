@@ -2,7 +2,7 @@
 syntax = "proto3";
 package RoomStatus;
 option csharp_namespace = "PlayCli.ProtoMod";
-option go_package  = "pkg";
+option go_package  = "protos";
 message Empty {}
 
 message RoomListRequest{
