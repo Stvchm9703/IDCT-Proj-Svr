@@ -6,7 +6,7 @@ Package example is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
-package example
+package proto
 
 import (
 	"context"

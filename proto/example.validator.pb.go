@@ -6,7 +6,7 @@
 // This example is used to show how to use gRPC and
 // gRPC-Gateway with GoGo Protobuf.
 
-package example
+package proto
 
 import (
 	fmt "fmt"
