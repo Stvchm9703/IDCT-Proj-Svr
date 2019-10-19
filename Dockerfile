@@ -1,4 +1,4 @@
-FROM golang:alpine AS build-env
+FROM golang:1.13.1 AS build-env
 WORKDIR /RoomStatus
 RUN apk update && apk upgrade && \
     apk add --no-cache bash git openssh
