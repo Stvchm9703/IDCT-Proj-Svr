@@ -1,4 +1,4 @@
-generate:
+
 	# Generate gogo, gRPC-Gateway, swagger, go-validators output.
 	#
 	# -I declares import folders, in order of importance
@@ -19,6 +19,14 @@ generate:
 	# since we've specified a go_package option relative to that directory.
 	#
 	# proto/example.proto is the location of the protofile we use.
+echo:
+	echo $(CURDIR)
+	ls -a $$GOPATH/src/
+	cp $$GOPATH/src/GameCtl.pb.go $(CURDIR)/proto/
+	cp $$GOPATH/src/GameCtl.validator.pb.go $(CURDIR)/proto/
+	rm $$GOPATH/src/GameCtl.pb.go
+	rm $$GOPATH/src/GameCtl.validator.pb.go
+generate:
 	protoc \
 		-I proto \
 		-I vendor/github.com/grpc-ecosystem/grpc-gateway/ \
@@ -31,7 +39,7 @@ Mgoogle/protobuf/empty.proto=github.com/gogo/protobuf/types,\
 Mgoogle/api/annotations.proto=github.com/gogo/googleapis/google/api,\
 Mgoogle/protobuf/field_mask.proto=github.com/gogo/protobuf/types:\
 $$GOPATH/src/ \
-		--grpc-gateway_out=allow_patch_feature=false,\
+		--grpc-gateway_out=allow_patch_feature=true,\
 Mgoogle/protobuf/timestamp.proto=github.com/gogo/protobuf/types,\
 Mgoogle/protobuf/duration.proto=github.com/gogo/protobuf/types,\
 Mgoogle/protobuf/empty.proto=github.com/gogo/protobuf/types,\
@@ -45,13 +53,16 @@ Mgoogle/protobuf/duration.proto=github.com/gogo/protobuf/types,\
 Mgoogle/protobuf/empty.proto=github.com/gogo/protobuf/types,\
 Mgoogle/api/annotations.proto=github.com/gogo/googleapis/google/api,\
 Mgoogle/protobuf/field_mask.proto=github.com/gogo/protobuf/types:\
-$$GOPATH/src \
-		proto/example.proto
+$$GOPATH/src/ \
+		proto/GameCtl.proto
+	# gvm issue :  move the genrated file to current directory
+	mv $$GOPATH/src/GameCtl.pb.go $(CURDIR)/proto/
+	mv $$GOPATH/src/GameCtl.validator.pb.go $(CURDIR)/proto/
+	mv $$GOPATH/src/GameCtl.pb.gw.go $(CURDIR)/proto/
+	## Workaround for https://github.com/grpc-ecosystem/grpc-gateway/issues/229.
+	sed -i.bak "s/empty.Empty/types.Empty/g" proto/GameCtl.pb.gw.go && rm proto/GameCtl.pb.gw.go.bak
 
-	# Workaround for https://github.com/grpc-ecosystem/grpc-gateway/issues/229.
-	sed -i.bak "s/empty.Empty/types.Empty/g" proto/example.pb.gw.go && rm proto/example.pb.gw.go.bak
-
-	# Generate static assets for OpenAPI UI
+	## Generate static assets for OpenAPI UI
 	statik -m -f -src third_party/OpenAPI/
 
 install:

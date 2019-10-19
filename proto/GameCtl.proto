@@ -1,8 +1,7 @@
 // # hello.proto
 syntax = "proto3";
 import "google/protobuf/empty.proto";
-
-
+import "google/api/annotations.proto";
 
 package RoomStatus;
 option csharp_namespace = "PlayCli.ProtoMod";
@@ -43,10 +42,40 @@ message CellStatus{
 }
 
 service RoomStatus {
-    rpc CreateRoom (google.protobuf.Empty) returns (Room){ };
-    rpc GetRoomList(RoomListRequest) returns (RoomListResponse){ }; 
-    rpc GetRoomCurrentInfo (RoomRequest) returns (Room){ };
-    rpc GetRoomStream (RoomRequest) returns (stream CellStatus);
-    rpc UpdateRoomStatus (CellStatus) returns (google.protobuf.Empty);
-    rpc DeleteRoom (RoomRequest) returns (google.protobuf.Empty);
+    rpc CreateRoom (google.protobuf.Empty) returns (Room){ 
+        option (google.api.http) = {
+            post: "/v1/room/create"
+            body: "*"
+        };  
+    };
+    rpc GetRoomList(RoomListRequest) returns (RoomListResponse){ 
+        option (google.api.http) = {
+            post: "/v1/room/list"
+            body: "*"
+        }; 
+    }; 
+    rpc GetRoomCurrentInfo (RoomRequest) returns (Room){ 
+        option (google.api.http) = {
+            post: "/v1/room/info"
+            body: "*"
+        }; 
+    };
+    rpc GetRoomStream (RoomRequest) returns (stream CellStatus){
+        option (google.api.http) = {
+            post: "/v1/room/stream"
+            body: "*"
+        }; 
+    };
+    rpc UpdateRoomStatus (CellStatus) returns (google.protobuf.Empty){
+        option (google.api.http) = {
+            post: "/v1/room/update"
+            body: "*"
+        }; 
+    };
+    rpc DeleteRoom (RoomRequest) returns (google.protobuf.Empty){
+        option (google.api.http) = {
+            post: "/v1/room/delete"
+            body: "*"
+        }; 
+    };
 }

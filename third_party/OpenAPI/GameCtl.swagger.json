@@ -14,7 +14,164 @@
   "produces": [
     "application/json"
   ],
-  "paths": {},
+  "paths": {
+    "/v1/room/create": {
+      "post": {
+        "operationId": "CreateRoom",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/RoomStatusRoom"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "properties": {}
+            }
+          }
+        ],
+        "tags": [
+          "RoomStatus"
+        ]
+      }
+    },
+    "/v1/room/delete": {
+      "post": {
+        "operationId": "DeleteRoom",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RoomStatusRoomRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoomStatus"
+        ]
+      }
+    },
+    "/v1/room/info": {
+      "post": {
+        "operationId": "GetRoomCurrentInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/RoomStatusRoom"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RoomStatusRoomRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoomStatus"
+        ]
+      }
+    },
+    "/v1/room/list": {
+      "post": {
+        "operationId": "GetRoomList",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/RoomStatusRoomListResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RoomStatusRoomListRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoomStatus"
+        ]
+      }
+    },
+    "/v1/room/stream": {
+      "post": {
+        "operationId": "GetRoomStream",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "$ref": "#/x-stream-definitions/RoomStatusCellStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RoomStatusRoomRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoomStatus"
+        ]
+      }
+    },
+    "/v1/room/update": {
+      "post": {
+        "operationId": "UpdateRoomStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RoomStatusCellStatus"
+            }
+          }
+        ],
+        "tags": [
+          "RoomStatus"
+        ]
+      }
+    }
+  },
   "definitions": {
     "RoomStatusCellStatus": {
       "type": "object",
@@ -60,6 +217,14 @@
         }
       }
     },
+    "RoomStatusRoomListRequest": {
+      "type": "object",
+      "properties": {
+        "requirement": {
+          "type": "string"
+        }
+      }
+    },
     "RoomStatusRoomListResponse": {
       "type": "object",
       "properties": {
@@ -68,6 +233,14 @@
           "items": {
             "$ref": "#/definitions/RoomStatusRoom"
           }
+        }
+      }
+    },
+    "RoomStatusRoomRequest": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
         }
       }
     },

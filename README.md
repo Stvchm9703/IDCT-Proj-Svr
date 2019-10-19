@@ -110,3 +110,23 @@ sed -i.bak "s/empty.Empty/types.Empty/g" proto/example.pb.gw.go && rm proto/exam
 # Generate static assets for OpenAPI UI
 statik -m -f -src third_party/OpenAPI/
 ```
+
+
+
+===
+
+# protoc for golang
+```
+protoc -I .\pkg\protos\ .\pkg\protos\*.proto  --go_out=plugins=grpc:.\pkg
+```
+
+===
+
+# golang 
+
+## Sync.RWMutex
+
+[](https://wizardforcel.gitbooks.io/gopl-zh/ch9/ch9-03.html)
+
+
+## golang worker

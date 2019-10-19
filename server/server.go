@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	pbExample "github.com/gogo/grpc-example/proto"
+	pbExample "RoomStatus/proto"
 )
 
 type Backend struct {

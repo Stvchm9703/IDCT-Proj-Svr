@@ -15,8 +15,8 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/grpclog"
 
-	"github.com/gogo/grpc-example/insecure"
-	pbExample "github.com/gogo/grpc-example/proto"
+	"RoomStatus/insecure"
+	pbExample "RoomStatus/proto"
 )
 
 var addr = flag.String("addr", "localhost", "The address of the server to connect to")
