@@ -12,7 +12,7 @@ import (
 	"os"
 
 	"github.com/gogo/gateway"
-	"github.com/grpc-ecosystem/go-grpc-middleware/validator"
+	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/rakyll/statik/fs"
 	"google.golang.org/grpc"
