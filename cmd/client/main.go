@@ -33,8 +33,13 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	conn, err := grpc.DialContext(ctx, net.JoinHostPort(*addr, *port),
-		grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(insecure.CertPool, "")),
+	conn, err := grpc.DialContext(
+		ctx,
+		net.JoinHostPort(*addr, *port),
+		grpc.WithTransportCredentials(
+			credentials.NewClientTLSFromCert(
+				insecure.CertPool, ""),
+		),
 	)
 	if err != nil {
 		log.Fatalln("Failed to dial server:", err)

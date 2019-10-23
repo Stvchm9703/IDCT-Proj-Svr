@@ -1,11 +1,11 @@
 package redis_test
 
 import (
+	cm "RoomStatus/common"
 	cf "RoomStatus/config"
 	pb "RoomStatus/proto"
 	rd "RoomStatus/store/redis"
 	"encoding/json"
-	"hash/fnv"
 	"log"
 	"strconv"
 	"testing"
@@ -158,7 +158,7 @@ func TestCleanRem(t *testing.T) {
 	// insert testing data
 	for i := 0; i < 50; i++ {
 		var testObjLoop = pb.Room{
-			Key:        "Rm" + hash_text("num"+strconv.Itoa(i)+"test"),
+			Key:        "Rm" + cm.HashText("num"+strconv.Itoa(i)+"test"),
 			HostId:     "192.180.0." + strconv.Itoa(i),
 			Status:     0,
 			Round:      1,
@@ -187,10 +187,4 @@ func TestCleanRem(t *testing.T) {
 	}
 	log.Println("end ", t.Name())
 	t.Log("end ", t.Name())
-}
-
-func hash_text(s string) string {
-	h := fnv.New32a()
-	h.Write([]byte(s))
-	return strconv.FormatUint(uint64(h.Sum32()), 16)
 }

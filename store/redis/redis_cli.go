@@ -55,6 +55,7 @@ func (rc *RdsCliBox) Disconn() (bool, error) {
 	// if _, err := rc.CleanRem(); err != nil {
 	// 	return false, err
 	// }
+
 	// unregister
 	if _, err := rc.unregister(); err != nil {
 		return false, err
