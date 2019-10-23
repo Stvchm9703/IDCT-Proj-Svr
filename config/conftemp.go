@@ -14,11 +14,12 @@ import (
 
 // ConfTmp : System Configuration object
 type ConfTmp struct {
-	Server   CfTServer   `toml:"server" json:"server" yaml:"server"`
-	Database CfTDatabase `toml:"database" json:"database" yaml:"database"`
+	TemplServer CfTemplServer `toml:"tmpl_server" json:"tmpl_server" yaml:"tmpl_server"`
+	APIServer   CfAPIServer   `toml:"api_server" json:"api_server" yaml:"api_server"`
+	Database    CfTDatabase   `toml:"database" json:"database" yaml:"database"`
 }
 
-type CfTServer struct {
+type CfTemplServer struct {
 	IP               string `toml:"ip" json:"ip" yaml:"ip"`
 	Port             int    `toml:"port" json:"port" yaml:"port"`
 	RootFilePath     string `toml:"root_path" json:"root_path" yaml:"root_path"`
@@ -27,8 +28,15 @@ type CfTServer struct {
 	StaticOutpath    string `toml:"static_outpath" json:"static_outpath" yaml:"static_outpath"`
 	TemplateFilepath string `toml:"template_filepath" json:"template_filepath" yaml:"template_filepath"`
 	TemplateOutpath  string `toml:"template_outpath" json:"template_outpath" yaml:"template_outpath"`
-	APITablePath     string `toml:"api_table_filepath" json:"api_table_filepath" yaml:"api_table_filepath"`
-	APIOutpath       string `toml:"api_outpath" json:"api_outpath" yaml:"api_outpath"`
+}
+
+type CfAPIServer struct {
+	ConnType     string `toml:"conn_type" json:"conn_type" yaml:"conn_type"`
+	IP           string `toml:"ip" json:"ip" yaml:"ip"`
+	Port         int    `toml:"port" json:"port" yaml:"port"`
+	APIReferType string `toml:"api_refer_type" json:"api_refer_type" yaml:"api_refer_type"`
+	APITablePath string `toml:"api_table_filepath" json:"api_table_filepath" yaml:"api_table_filepath"`
+	APIOutpath   string `toml:"api_outpath" json:"api_outpath" yaml:"api_outpath"`
 }
 
 type CfTDatabase struct {

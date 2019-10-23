@@ -30,6 +30,9 @@ func (this *RoomListResponse) Validate() error {
 	}
 	return nil
 }
+func (this *RoomCreateRequest) Validate() error {
+	return nil
+}
 func (this *RoomRequest) Validate() error {
 	return nil
 }

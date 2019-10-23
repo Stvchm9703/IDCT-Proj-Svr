@@ -32,7 +32,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "properties": {}
+              "$ref": "#/definitions/RoomStatusRoomCreateRequest"
             }
           }
         ],
@@ -198,6 +198,9 @@
         "host_id": {
           "type": "string"
         },
+        "dueler_id": {
+          "type": "string"
+        },
         "status": {
           "$ref": "#/definitions/RoomStatusStatus"
         },
@@ -214,6 +217,14 @@
           "items": {
             "$ref": "#/definitions/RoomStatusCellStatus"
           }
+        }
+      }
+    },
+    "RoomStatusRoomCreateRequest": {
+      "type": "object",
+      "properties": {
+        "HostId": {
+          "type": "string"
         }
       }
     },

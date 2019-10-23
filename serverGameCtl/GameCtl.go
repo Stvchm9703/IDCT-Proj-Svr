@@ -6,8 +6,11 @@ import (
 	pb "RoomStatus/proto"
 	rd "RoomStatus/store/redis"
 	"context"
+	"encoding/json"
+	"log"
 	"strconv"
 	"sync"
+	"time"
 
 	types "github.com/gogo/protobuf/types"
 	"github.com/gogo/status"
@@ -15,17 +18,25 @@ import (
 )
 
 type Backend struct {
-	mu       *sync.RWMutex
-	Roomlist []*pb.Room
-	redhdlr  []*rd.RdsCliBox
-	CoreKey  string
+	pb.UnimplementedRoomStatusServer
+	mu *sync.RWMutex
+	// Roomlist []*pb.Room
+	redhdlr []*rd.RdsCliBox
+	CoreKey string
 }
 
-var _ pb.RoomStatusServer = (*Backend)(nil)
+// https://gobyexample.com/worker-pools
+// https://www.atatus.com/blog/goroutines-error-handling/
+// https://michaelchen.tech/golang-programming/concurrency/
+// https://mgleon08.github.io/blog/2018/05/17/golang-goroutine-channel-worker-pool-select-mutex/
+// https://eli.thegreenplace.net/2019/on-concurrency-in-go-http-servers/
+
+// Remark: the framework make consider "instant" request
+//
 
 // New : Create new backend
 func New(conf *cf.ConfTmp) *Backend {
-	ck := "RSCore" + cm.HashText(conf.Server.IP)
+	ck := "RSCore" + cm.HashText(conf.APIServer.IP)
 	rdfl := []*rd.RdsCliBox{}
 	for i := 0; i < conf.Database.WorkerNode; i++ {
 		rdf := rd.RdsCliBox{
@@ -38,9 +49,8 @@ func New(conf *cf.ConfTmp) *Backend {
 	}
 
 	return &Backend{
-		mu:       &sync.RWMutex{},
-		Roomlist: nil,
-		redhdlr:  rdfl,
+		mu:      &sync.RWMutex{},
+		redhdlr: rdfl,
 	}
 }
 
@@ -52,9 +62,67 @@ func New(conf *cf.ConfTmp) *Backend {
 // 		UpdateRoomStatus(context.Context, *CellStatus) (*types.Empty, error)
 // 		DeleteRoom(context.Context, *RoomRequest) (*types.Empty, error)
 
+// checkAliveClient
+func (b *Backend) checkAliveClient() *rd.RdsCliBox {
+	for _, v := range b.redhdlr {
+		if !v.IsRunning {
+			return v
+		}
+	}
+	return nil
+}
+
+// printReqLog
+func printReqLog(ctx context.Context, req interface{}) {
+	jsoon, _ := json.Marshal(ctx)
+	log.Println(string(jsoon))
+
+	jsoon, _ = json.Marshal(req)
+	log.Println(string(jsoon))
+}
+
 // CreateRoom :
-func (b *Backend) CreateRoom(context.Context, *types.Empty) (*pb.Room, error) {
-	return nil, nil
+func (b *Backend) CreateRoom(ctx context.Context, req *pb.RoomCreateRequest) (*pb.Room, error) {
+	printReqLog(ctx, req)
+	// b.mu.Lock()
+	// search free box
+	wkbox := b.checkAliveClient()
+	if wkbox == nil {
+		// busy
+		log.Println("busy at " + time.Now().String())
+		return nil, nil
+	}
+	tmptime := time.Now().String() + req.HostId
+
+	// for loop it
+	var f = ""
+	for {
+		f = cm.HashText(tmptime)
+		l, err := wkbox.ListRem(&f)
+		if err != nil {
+			log.Fatal(err)
+			return nil, err
+		}
+		if len(*l) == 0 {
+			break
+		}
+	}
+
+	rmTmp := pb.Room{
+		Key:        "Rm" + f,
+		HostId:     req.HostId,
+		DuelerId:   "",
+		Status:     0,
+		Round:      0,
+		Cell:       -1,
+		CellStatus: nil,
+	}
+	if _, err := wkbox.SetPara(&f, rmTmp); err != nil {
+		log.Fatalln(err)
+		return &rmTmp, err
+	}
+	// b.mu.Unlock()
+	return &rmTmp, nil
 }
 
 // GetRoomList :
@@ -80,4 +148,13 @@ func (b *Backend) UpdateRoomStatus(ctx context.Context, req *pb.CellStatus) (*ty
 // DeleteRoom:
 func (b *Backend) DeleteRoom(ctx context.Context, req *pb.RoomRequest) (*types.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteRoom not implemented")
+}
+
+type workerResultBox struct {
+	Result interface{}
+	Error  error
+}
+
+func workerCreateRoom(procID int, reqJob <-chan *pb.RoomCreateRequest, room chan<- workerResultBox) {
+
 }

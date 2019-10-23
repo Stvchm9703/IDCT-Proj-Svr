@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"log"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/go-redis/redis"
 	// rejson "github.com/nitishm/go-rejson"
@@ -18,9 +20,10 @@ import (
 
 // RdsCliBox : Redis client box custom interface
 type RdsCliBox struct {
-	conn    *redis.Client
-	CoreKey string
-	Key     string // redis-worker-cli
+	conn      *redis.Client
+	CoreKey   string
+	Key       string // redis-worker-cli
+	IsRunning bool
 }
 
 const (
@@ -65,6 +68,24 @@ func (rc *RdsCliBox) Disconn() (bool, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+// Recover:
+func (rc *RdsCliBox) Recover() (*RdsCliBox, error) {
+	optionBu := rc.conn.Options()
+	if err := rc.conn.Close(); err != nil {
+		return nil, err
+	}
+	time.Sleep(50000)
+	log.Println("re-create the redis client")
+	newConn := redis.NewClient(optionBu)
+	log.Println("try ping")
+	_, err := newConn.Ping().Result()
+	if err != nil {
+		return nil, err
+	}
+	rc.conn = newConn
+	return rc, nil
 }
 
 // register : push self working id into temp pool
@@ -143,67 +164,100 @@ func (rc *RdsCliBox) unregister() (bool, error) {
 
 // GetPara : get the value by key
 func (rc *RdsCliBox) GetPara(key *string, target interface{}) (*interface{}, error) {
+	rc.IsRunning = true
 	keystr := rc.CoreKey + "/_" + rc.Key + "." + *key
 	res, err := rc.conn.Get(keystr).Result()
 	if err != nil {
+		rc.IsRunning = false
 		return nil, err
 	}
 	resstr, err := strconv.Unquote(res)
 	if err != nil {
+		rc.IsRunning = false
 		return nil, err
 	}
 	if err = json.Unmarshal([]byte(resstr), &target); err != nil {
+		rc.IsRunning = false
 		return nil, err
 	}
+	rc.IsRunning = false
 	return &target, nil
 	// return nil, nil
+
 }
 
 // SetPara : set the key-value
 func (rc *RdsCliBox) SetPara(key *string, value interface{}) (bool, error) {
+	rc.IsRunning = true
 	keystr := rc.CoreKey + "/_" + rc.Key + "." + *key
 	jsonFormat, err := json.Marshal(value)
 	if err != nil {
+		rc.IsRunning = false
 		return false, err
 	}
 	strr := strconv.Quote(string(jsonFormat))
 
 	if _, err := rc.conn.Set(keystr, strr, redisCliSetTime).Result(); err != nil {
+		rc.IsRunning = false
 		return false, err
 	}
-
+	rc.IsRunning = false
 	return true, nil
 }
 
 // RemovePara : remove the k-v
 func (rc *RdsCliBox) RemovePara(key *string) (bool, error) {
+	rc.IsRunning = true
 	res, err := rc.conn.Del(rc.CoreKey + "/_" + rc.Key + "." + *key).Result()
 	if err != nil {
+		rc.IsRunning = false
 		return false, err
 	}
 	log.Println("res", res)
+	rc.IsRunning = false
 	return true, nil
 }
 
 // CleanRem : clear all this redis-cli rem
 func (rc *RdsCliBox) CleanRem() (bool, error) {
+	rc.IsRunning = true
 	list, err := rc.ListRem()
 	if err != nil {
+		rc.IsRunning = false
 		return false, nil
 	}
 	for _, v := range *list {
 		if _, err := rc.conn.Del(v).Result(); err != nil {
+			rc.IsRunning = false
 			return false, err
 		}
 	}
+	rc.IsRunning = false
 	return true, nil
 }
 
 // ListRem : check the ha key
-func (rc *RdsCliBox) ListRem() (*[]string, error) {
-	list, err := rc.conn.Keys(rc.CoreKey + "/_" + rc.Key + ".*").Result()
+func (rc *RdsCliBox) ListRem(optionKey ...*string) (*[]string, error) {
+	rc.IsRunning = true
+	var list []string
+	var err error
+
+	list, err = rc.conn.Keys(rc.CoreKey + "/_" + rc.Key + ".*").Result()
 	if err != nil {
+		rc.IsRunning = false
 		return nil, err
 	}
+	if len(optionKey) > 0 {
+		var listy []string
+		for _, v := range list {
+			for _, lv := range optionKey {
+				if strings.Contains(v, *lv) {
+					listy = append(listy, v)
+				}
+			}
+		}
+		list = listy
+	}
+	rc.IsRunning = false
 	return &list, nil
 }

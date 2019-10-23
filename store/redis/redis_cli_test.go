@@ -45,6 +45,7 @@ func TestConnect(t *testing.T) {
 var testObj = pb.Room{
 	Key:        "Rm0122212",
 	HostId:     "192.180",
+	DuelerId:   "123.125",
 	Status:     0,
 	Round:      1,
 	Cell:       1,

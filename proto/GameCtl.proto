@@ -15,7 +15,9 @@ message RoomListRequest{
 message RoomListResponse {
     repeated Room result = 1;
 }
-
+message RoomCreateRequest {
+    string HostId = 1;
+}
 message RoomRequest {
     string key = 1;
 }
@@ -29,10 +31,11 @@ enum Status {
 message Room {
     string key = 1;
     string host_id = 2; 
-    Status status = 3;
-    int32 round = 4;
-    int32 cell = 5;
-    repeated CellStatus cell_status = 6;
+    string dueler_id = 3;
+    Status status = 4;
+    int32 round = 5;
+    int32 cell = 6;
+    repeated CellStatus cell_status = 7;
 }
 
 message CellStatus{
@@ -42,7 +45,7 @@ message CellStatus{
 }
 
 service RoomStatus {
-    rpc CreateRoom (google.protobuf.Empty) returns (Room){ 
+    rpc CreateRoom (RoomCreateRequest) returns (Room){ 
         option (google.api.http) = {
             post: "/v1/room/create"
             body: "*"

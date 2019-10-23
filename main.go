@@ -68,7 +68,9 @@ func main() {
 		grpc.UnaryInterceptor(grpc_validator.UnaryServerInterceptor()),
 		grpc.StreamInterceptor(grpc_validator.StreamServerInterceptor()),
 	)
-	pbExample.RegisterUserServiceServer(s, server.New())
+	pbExample.RegisterUserServiceServer(
+		s,
+		server.New())
 
 	// Serve gRPC Server
 	log.Info("Serving gRPC on https://", addr)

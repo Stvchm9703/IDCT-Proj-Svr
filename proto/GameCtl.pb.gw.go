@@ -13,7 +13,6 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/gogo/protobuf/types"
 	"github.com/golang/protobuf/descriptor"
 	"github.com/golang/protobuf/proto"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -33,7 +32,7 @@ var _ = utilities.NewDoubleArray
 var _ = descriptor.ForMessage
 
 func request_RoomStatus_CreateRoom_0(ctx context.Context, marshaler runtime.Marshaler, client RoomStatusClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq types.Empty
+	var protoReq RoomCreateRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -50,7 +49,7 @@ func request_RoomStatus_CreateRoom_0(ctx context.Context, marshaler runtime.Mars
 }
 
 func local_request_RoomStatus_CreateRoom_0(ctx context.Context, marshaler runtime.Marshaler, server RoomStatusServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq types.Empty
+	var protoReq RoomCreateRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
