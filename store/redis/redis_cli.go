@@ -6,6 +6,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -18,12 +19,16 @@ import (
 // 		Room-Obj-props
 //	}
 
+// Remark : Export Main function is need to add
+// 			Lock / Unlock for sync
+
 // RdsCliBox : Redis client box custom interface
 type RdsCliBox struct {
 	conn      *redis.Client
 	CoreKey   string
 	Key       string // redis-worker-cli
 	IsRunning bool
+	mu        *sync.Mutex
 }
 
 const (
@@ -33,6 +38,9 @@ const (
 
 // Connect : Constructor of Redis client
 func (rc *RdsCliBox) Connect(cf *config.ConfTmp) (bool, error) {
+	rc.mu.Lock()
+	defer rc.mu.Unlock()
+
 	rc.conn = redis.NewClient(&redis.Options{
 		Addr:     cf.Database.Host + ":" + strconv.Itoa(cf.Database.Port),
 		Password: cf.Database.Password,
@@ -58,7 +66,8 @@ func (rc *RdsCliBox) Disconn() (bool, error) {
 	// if _, err := rc.CleanRem(); err != nil {
 	// 	return false, err
 	// }
-
+	rc.mu.Lock()
+	defer rc.mu.Unlock()
 	// unregister
 	if _, err := rc.unregister(); err != nil {
 		return false, err
@@ -70,8 +79,10 @@ func (rc *RdsCliBox) Disconn() (bool, error) {
 	return true, nil
 }
 
-// Recover:
+// Recover :
 func (rc *RdsCliBox) Recover() (*RdsCliBox, error) {
+	rc.mu.Lock()
+	defer rc.mu.Unlock()
 	optionBu := rc.conn.Options()
 	if err := rc.conn.Close(); err != nil {
 		return nil, err
@@ -164,6 +175,9 @@ func (rc *RdsCliBox) unregister() (bool, error) {
 
 // GetPara : get the value by key
 func (rc *RdsCliBox) GetPara(key *string, target interface{}) (*interface{}, error) {
+	rc.mu.Lock()
+	defer rc.mu.Unlock()
+
 	rc.IsRunning = true
 	keystr := rc.CoreKey + "/_" + rc.Key + "." + *key
 	res, err := rc.conn.Get(keystr).Result()
@@ -182,12 +196,12 @@ func (rc *RdsCliBox) GetPara(key *string, target interface{}) (*interface{}, err
 	}
 	rc.IsRunning = false
 	return &target, nil
-	// return nil, nil
-
 }
 
 // SetPara : set the key-value
 func (rc *RdsCliBox) SetPara(key *string, value interface{}) (bool, error) {
+	rc.mu.Lock()
+	defer rc.mu.Unlock()
 	rc.IsRunning = true
 	keystr := rc.CoreKey + "/_" + rc.Key + "." + *key
 	jsonFormat, err := json.Marshal(value)
@@ -207,6 +221,8 @@ func (rc *RdsCliBox) SetPara(key *string, value interface{}) (bool, error) {
 
 // RemovePara : remove the k-v
 func (rc *RdsCliBox) RemovePara(key *string) (bool, error) {
+	rc.mu.Lock()
+	defer rc.mu.Unlock()
 	rc.IsRunning = true
 	res, err := rc.conn.Del(rc.CoreKey + "/_" + rc.Key + "." + *key).Result()
 	if err != nil {
@@ -220,6 +236,8 @@ func (rc *RdsCliBox) RemovePara(key *string) (bool, error) {
 
 // CleanRem : clear all this redis-cli rem
 func (rc *RdsCliBox) CleanRem() (bool, error) {
+	rc.mu.Lock()
+	defer rc.mu.Unlock()
 	rc.IsRunning = true
 	list, err := rc.ListRem()
 	if err != nil {
@@ -238,6 +256,8 @@ func (rc *RdsCliBox) CleanRem() (bool, error) {
 
 // ListRem : check the ha key
 func (rc *RdsCliBox) ListRem(optionKey ...*string) (*[]string, error) {
+	rc.mu.Lock()
+	defer rc.mu.Unlock()
 	rc.IsRunning = true
 	var list []string
 	var err error

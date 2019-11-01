@@ -19,7 +19,7 @@ import (
 	pbExample "RoomStatus/proto"
 )
 
-var addr = flag.String("addr", "localhost", "The address of the server to connect to")
+var addr = flag.String("addr", "127.0.0.1", "The address of the server to connect to")
 var port = flag.String("port", "10000", "The port to connect to")
 
 var log grpclog.LoggerV2

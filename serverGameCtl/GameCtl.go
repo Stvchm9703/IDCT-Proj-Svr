@@ -19,11 +19,15 @@ import (
 
 type Backend struct {
 	pb.UnimplementedRoomStatusServer
-	mu *sync.RWMutex
+	mu *sync.Mutex
+	// channel
+	redChannel []chan *rd.RdsCliBox
 	// Roomlist []*pb.Room
 	redhdlr []*rd.RdsCliBox
 	CoreKey string
 }
+
+// https://www.cnblogs.com/jkko123/p/6885389.html
 
 // https://gobyexample.com/worker-pools
 // https://www.atatus.com/blog/goroutines-error-handling/
@@ -49,7 +53,7 @@ func New(conf *cf.ConfTmp) *Backend {
 	}
 
 	return &Backend{
-		mu:      &sync.RWMutex{},
+		mu:      &sync.Mutex{},
 		redhdlr: rdfl,
 	}
 }
@@ -84,7 +88,8 @@ func printReqLog(ctx context.Context, req interface{}) {
 // CreateRoom :
 func (b *Backend) CreateRoom(ctx context.Context, req *pb.RoomCreateRequest) (*pb.Room, error) {
 	printReqLog(ctx, req)
-	// b.mu.Lock()
+	b.mu.Lock()
+	defer b.mu.Unlock()
 	// search free box
 	wkbox := b.checkAliveClient()
 	if wkbox == nil {
@@ -121,7 +126,6 @@ func (b *Backend) CreateRoom(ctx context.Context, req *pb.RoomCreateRequest) (*p
 		log.Fatalln(err)
 		return &rmTmp, err
 	}
-	// b.mu.Unlock()
 	return &rmTmp, nil
 }
 
@@ -130,22 +134,22 @@ func (b *Backend) GetRoomList(ctx context.Context, req *pb.RoomListRequest) (*pb
 	return nil, status.Errorf(codes.Unimplemented, "method GetRoomList not implemented")
 }
 
-// GetRoomCurrentInfo:
+// GetRoomCurrentInfo :
 func (b *Backend) GetRoomCurrentInfo(ctx context.Context, req *pb.RoomRequest) (*pb.Room, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRoomCurrentInfo not implemented")
 }
 
-// GetRoomStream:
+// GetRoomStream :
 func (b *Backend) GetRoomStream(req *pb.RoomRequest, srv pb.RoomStatus_GetRoomStreamServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetRoomStream not implemented")
 }
 
-// UpdateRoomStatus:
+// UpdateRoomStatus :
 func (b *Backend) UpdateRoomStatus(ctx context.Context, req *pb.CellStatus) (*types.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateRoomStatus not implemented")
 }
 
-// DeleteRoom:
+// DeleteRoom :
 func (b *Backend) DeleteRoom(ctx context.Context, req *pb.RoomRequest) (*types.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteRoom not implemented")
 }

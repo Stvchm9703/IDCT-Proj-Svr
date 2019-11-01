@@ -135,3 +135,7 @@ protoc -I .\pkg\protos\ .\pkg\protos\*.proto  --go_out=plugins=grpc:.\pkg
 
 
 Synchronizing Physical Clock
+
+
+java rmi 
+https://www.slideshare.net/borisovalex/grpc-vs-rest-let-the-battle-begin-81800634

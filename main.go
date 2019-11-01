@@ -58,7 +58,7 @@ func serveOpenAPI(mux *http.ServeMux) error {
 
 func main() {
 	flag.Parse()
-	addr := fmt.Sprintf("localhost:%d", *gRPCPort)
+	addr := fmt.Sprintf("127.0.0.1:%d", *gRPCPort)
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
@@ -80,7 +80,7 @@ func main() {
 
 	// See https://github.com/grpc/grpc/blob/master/doc/naming.md
 	// for gRPC naming standard information.
-	dialAddr := fmt.Sprintf("passthrough://localhost/%s", addr)
+	dialAddr := fmt.Sprintf("passthrough://127.0.0.1/%s", addr)
 	conn, err := grpc.DialContext(
 		context.Background(),
 		dialAddr,

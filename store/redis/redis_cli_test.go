@@ -13,7 +13,8 @@ import (
 )
 
 var test_conf = cf.ConfTmp{
-	cf.CfTServer{},
+	cf.CfTemplServer{},
+	cf.CfAPIServer{},
 	cf.CfTDatabase{
 		Connector:  "redis",
 		WorkerNode: 12,

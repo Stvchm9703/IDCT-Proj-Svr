@@ -4,6 +4,8 @@ go 1.13.1
 
 require (
 	github.com/BurntSushi/toml v0.3.1
+	github.com/adjust/rmq v1.0.0
+	github.com/adjust/uniuri v0.0.0-20130923163420-498743145e60 // indirect
 	github.com/fatih/structs v1.1.0
 	github.com/go-redis/redis v6.15.6+incompatible
 	github.com/gogo/gateway v1.1.0
@@ -12,6 +14,7 @@ require (
 	github.com/gogo/status v1.1.0
 	github.com/golang/mock v1.1.1
 	github.com/golang/protobuf v1.3.2
+	github.com/google/flatbuffers v1.11.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0
 	github.com/grpc-ecosystem/grpc-gateway v1.11.3
 	github.com/mwitkow/go-proto-validators v0.2.0
@@ -23,5 +26,7 @@ require (
 	golang.org/x/sys v0.0.0-20191020152052-9984515f0562 // indirect
 
 	google.golang.org/grpc v1.24.0
+	gopkg.in/bsm/ratelimit.v1 v1.0.0-20160220154919-db14e161995a // indirect
+	gopkg.in/redis.v3 v3.6.4 // indirect
 	gopkg.in/yaml.v2 v2.2.4
 )
