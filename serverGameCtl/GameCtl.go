@@ -136,7 +136,7 @@ func (b *Backend) CreateRoom(ctx context.Context, req *pb.RoomCreateRequest) (*p
 	}
 
 	// create room success
-	b.Roomlist = append(b.Roomlist, rmTmp)
+	b.Roomlist = append(b.Roomlist, &rmTmp)
 	return &rmTmp, nil
 }
 
