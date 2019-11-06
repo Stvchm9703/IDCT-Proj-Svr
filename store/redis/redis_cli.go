@@ -4,6 +4,7 @@ import (
 	"RoomStatus/config"
 	"encoding/json"
 	"log"
+	"reflect"
 	"strconv"
 	"strings"
 	"sync"
@@ -280,4 +281,41 @@ func (rc *RdsCliBox) ListRem(optionKey ...*string) (*[]string, error) {
 	}
 	rc.IsRunning = false
 	return &list, nil
+}
+
+/// NOTE: Need add testing
+
+// GetParaList : get a list of feature Para
+func (rc *RdsCliBox) GetParaList(key *string, target interface{}, refPointer interface{}) (*interface{}, error) {
+	rc.mu.Lock()
+	defer rc.mu.Unlock()
+
+	rc.IsRunning = true
+	keystr := rc.CoreKey + "/_" + rc.Key + "." + *key
+	res, err := rc.conn.MGet(keystr).Result()
+	if err != nil {
+		rc.IsRunning = false
+		return nil, err
+	}
+	log.Println(res)
+	// arrKey := []string
+	for _, v := range res {
+		log.Println(v)
+		log.Println(reflect.TypeOf(v))
+		resstr, err := strconv.Unquote(v.(string))
+		if err != nil {
+			rc.IsRunning = false
+			return nil, err
+		}
+
+		if err = json.Unmarshal([]byte(resstr), &refPointer); err != nil {
+			rc.IsRunning = false
+			return nil, err
+		}
+		tmp := (refPointer)
+		target = append(target.([]interface{}), tmp)
+	}
+	refPointer = nil
+	rc.IsRunning = false
+	return &target, nil
 }

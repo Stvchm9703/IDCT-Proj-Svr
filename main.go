@@ -84,7 +84,11 @@ func main() {
 	conn, err := grpc.DialContext(
 		context.Background(),
 		dialAddr,
-		grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(insecure.CertPool, "")),
+		grpc.WithTransportCredentials(
+			credentials.NewClientTLSFromCert(
+				insecure.CertPool, "",
+			),
+		),
 		grpc.WithBlock(),
 	)
 	if err != nil {

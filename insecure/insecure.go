@@ -6,6 +6,9 @@ import (
 	"log"
 )
 
+// https://grpc.io/docs/guides/auth/
+// https://github.com/grpc/grpc-go/issues/106
+
 const certPEM = `-----BEGIN CERTIFICATE-----
 MIIDCjCCAfKgAwIBAgIQIj4BuOtQRWxvUA4CUaL+WjANBgkqhkiG9w0BAQsFADAS
 MRAwDgYDVQQKEwdBY21lIENvMCAXDTE4MDIyMjEzNDA1NFoYDzIxMzIwMzIzMDU0
