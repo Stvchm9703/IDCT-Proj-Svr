@@ -15,6 +15,32 @@
     "application/json"
   ],
   "paths": {
+    "/v1/cred/create": {
+      "post": {
+        "operationId": "CreateCred",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "$ref": "#/x-stream-definitions/RoomStatusCred"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RoomStatusCreateCredReq"
+            }
+          }
+        ],
+        "tags": [
+          "RoomStatus"
+        ]
+      }
+    },
     "/v1/room/create": {
       "post": {
         "operationId": "CreateRoom",
@@ -189,6 +215,28 @@
         }
       }
     },
+    "RoomStatusCreateCredReq": {
+      "type": "object",
+      "properties": {
+        "Ip": {
+          "type": "string"
+        },
+        "Username": {
+          "type": "string"
+        },
+        "Password": {
+          "type": "string"
+        }
+      }
+    },
+    "RoomStatusCred": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string"
+        }
+      }
+    },
     "RoomStatusRoom": {
       "type": "object",
       "properties": {
@@ -316,6 +364,18 @@
         }
       },
       "title": "Stream result of RoomStatusCellStatus"
+    },
+    "RoomStatusCred": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/RoomStatusCred"
+        },
+        "error": {
+          "$ref": "#/definitions/runtimeStreamError"
+        }
+      },
+      "title": "Stream result of RoomStatusCred"
     }
   }
 }

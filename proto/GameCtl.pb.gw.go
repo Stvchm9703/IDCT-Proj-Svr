@@ -31,6 +31,31 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = descriptor.ForMessage
 
+func request_RoomStatus_CreateCred_0(ctx context.Context, marshaler runtime.Marshaler, client RoomStatusClient, req *http.Request, pathParams map[string]string) (RoomStatus_CreateCredClient, runtime.ServerMetadata, error) {
+	var protoReq CreateCredReq
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	stream, err := client.CreateCred(ctx, &protoReq)
+	if err != nil {
+		return nil, metadata, err
+	}
+	header, err := stream.Header()
+	if err != nil {
+		return nil, metadata, err
+	}
+	metadata.HeaderMD = header
+	return stream, metadata, nil
+
+}
+
 func request_RoomStatus_CreateRoom_0(ctx context.Context, marshaler runtime.Marshaler, client RoomStatusClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq RoomCreateRequest
 	var metadata runtime.ServerMetadata
@@ -231,6 +256,13 @@ func local_request_RoomStatus_DeleteRoom_0(ctx context.Context, marshaler runtim
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
 func RegisterRoomStatusHandlerServer(ctx context.Context, mux *runtime.ServeMux, server RoomStatusServer) error {
 
+	mux.Handle("POST", pattern_RoomStatus_CreateCred_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		err := status.Error(codes.Unimplemented, "streaming calls are not yet supported in the in-process transport")
+		_, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+		return
+	})
+
 	mux.Handle("POST", pattern_RoomStatus_CreateRoom_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -379,6 +411,26 @@ func RegisterRoomStatusHandler(ctx context.Context, mux *runtime.ServeMux, conn 
 // "RoomStatusClient" to call the correct interceptors.
 func RegisterRoomStatusHandlerClient(ctx context.Context, mux *runtime.ServeMux, client RoomStatusClient) error {
 
+	mux.Handle("POST", pattern_RoomStatus_CreateCred_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_RoomStatus_CreateCred_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_RoomStatus_CreateCred_0(ctx, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("POST", pattern_RoomStatus_CreateRoom_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -503,6 +555,8 @@ func RegisterRoomStatusHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 }
 
 var (
+	pattern_RoomStatus_CreateCred_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "cred", "create"}, "", runtime.AssumeColonVerbOpt(true)))
+
 	pattern_RoomStatus_CreateRoom_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "room", "create"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_RoomStatus_GetRoomList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "room", "list"}, "", runtime.AssumeColonVerbOpt(true)))
@@ -517,6 +571,8 @@ var (
 )
 
 var (
+	forward_RoomStatus_CreateCred_0 = runtime.ForwardResponseStream
+
 	forward_RoomStatus_CreateRoom_0 = runtime.ForwardResponseMessage
 
 	forward_RoomStatus_GetRoomList_0 = runtime.ForwardResponseMessage

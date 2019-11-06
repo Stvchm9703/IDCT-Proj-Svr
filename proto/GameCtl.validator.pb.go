@@ -17,6 +17,12 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
+func (this *CreateCredReq) Validate() error {
+	return nil
+}
+func (this *Cred) Validate() error {
+	return nil
+}
 func (this *RoomListRequest) Validate() error {
 	return nil
 }
