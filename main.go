@@ -65,7 +65,7 @@ func main() {
 		log.Fatalln("Failed to listen:", err)
 	}
 	s := grpc.NewServer(
-		grpc.Creds(credentials.NewServerTLSFromCert(&insecure.Cert)),
+		grpc.Creds(credentials.NewServerTLSFromCert(insecure.Cert)),
 		grpc.UnaryInterceptor(grpc_validator.UnaryServerInterceptor()),
 		grpc.StreamInterceptor(grpc_validator.StreamServerInterceptor()),
 	)
@@ -126,7 +126,7 @@ func main() {
 	gwServer := http.Server{
 		Addr: gatewayAddr,
 		TLSConfig: &tls.Config{
-			Certificates: []tls.Certificate{insecure.Cert},
+			Certificates: []tls.Certificate{*insecure.Cert},
 		},
 		Handler: mux,
 	}
