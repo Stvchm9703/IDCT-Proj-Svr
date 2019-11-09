@@ -4,7 +4,7 @@ go 1.13.1
 
 require (
 	github.com/BurntSushi/toml v0.3.1
-	github.com/adjust/rmq v1.0.0
+	github.com/adjust/rmq v1.0.0 // indirect
 	github.com/adjust/uniuri v0.0.0-20130923163420-498743145e60 // indirect
 	github.com/fatih/structs v1.1.0
 	github.com/go-redis/redis v6.15.6+incompatible
@@ -23,7 +23,6 @@ require (
 	github.com/rakyll/statik v0.1.6
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5 // indirect
-	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
 	golang.org/x/sys v0.0.0-20191020152052-9984515f0562 // indirect
 
 	google.golang.org/grpc v1.24.0

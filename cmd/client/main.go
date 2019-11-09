@@ -32,13 +32,14 @@ func init() {
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-
+	// https://forum.predix.io/questions/30875/event-hub-c-client-how-to-deal-with-the-tls-certif.html
 	conn, err := grpc.DialContext(
 		ctx,
 		net.JoinHostPort(*addr, *port),
 		grpc.WithTransportCredentials(
 			credentials.NewClientTLSFromCert(
-				insecure.CertPool, ""),
+				insecure.CertPool,
+				""),
 		),
 	)
 	if err != nil {

@@ -7,14 +7,14 @@ package RoomStatus;
 option csharp_namespace = "PlayCli.ProtoMod";
 option go_package  = "proto";
 
-message CreateCredReq {
-    string Ip =1;
-    string Username = 2;
-    string Password =3;
-}
-message Cred{
-    string file = 1;
-}
+// message CreateCredReq {
+//     string Ip =1;
+//     string Username = 2;
+//     string Password =3;
+// }
+// message Cred{
+//     string file = 1;
+// }
 
 message RoomListRequest{
     string requirement = 1;
@@ -53,12 +53,12 @@ message CellStatus{
 }
 
 service RoomStatus {
-    rpc CreateCred (CreateCredReq) returns (stream Cred) {
-         option (google.api.http) = {
-            post: "/v1/cred/create"
-            body: "*"
-        };  
-    } 
+    // rpc CreateCred (CreateCredReq) returns (stream Cred) {
+    //      option (google.api.http) = {
+    //         post: "/v1/cred/create"
+    //         body: "*"
+    //     };  
+    // } 
     rpc CreateRoom (RoomCreateRequest) returns (Room){ 
         option (google.api.http) = {
             post: "/v1/room/create"
@@ -95,4 +95,22 @@ service RoomStatus {
             body: "*"
         }; 
     };
+}
+
+message CreateCredReq {
+    string Ip =1;
+    string Username = 2;
+    string Password =3;
+}
+message Cred{
+    string file = 1;
+}
+
+service CreditsAuth {
+    rpc CreateCred (CreateCredReq) returns (stream Cred) {
+         option (google.api.http) = {
+            post: "/v1/cred/create"
+            body: "*"
+        };  
+    } 
 }

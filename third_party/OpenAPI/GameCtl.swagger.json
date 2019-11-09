@@ -17,6 +17,7 @@
   "paths": {
     "/v1/cred/create": {
       "post": {
+        "summary": "rpc CreateCred (CreateCredReq) returns (stream Cred) {\n     option (google.api.http) = {\n        post: \"/v1/cred/create\"\n        body: \"*\"\n    };  \n}",
         "operationId": "CreateCred",
         "responses": {
           "200": {
@@ -37,12 +38,13 @@
           }
         ],
         "tags": [
-          "RoomStatus"
+          "CreditsAuth"
         ]
       }
     },
     "/v1/room/create": {
       "post": {
+        "summary": "rpc CreateCred (CreateCredReq) returns (stream Cred) {\n     option (google.api.http) = {\n        post: \"/v1/cred/create\"\n        body: \"*\"\n    };  \n}",
         "operationId": "CreateRoom",
         "responses": {
           "200": {

@@ -13,8 +13,6 @@ import (
 	"time"
 
 	types "github.com/gogo/protobuf/types"
-	"github.com/gogo/status"
-	"google.golang.org/grpc/codes"
 )
 
 type Backend struct {
@@ -87,10 +85,10 @@ func printReqLog(ctx context.Context, req interface{}) {
 	log.Println(string(jsoon))
 }
 
-// CreateCred : First app init check
-func (b *Backend) CreateCred(req *pb.CreateCredReq, srv pb.RoomStatus_CreateCredServer) error {
-	return status.Errorf(codes.Unimplemented, "method CreateCred not implemented")
-}
+// // CreateCred : First app init check
+// func (b *Backend) CreateCred(req *pb.CreateCredReq, srv pb.RoomStatus_CreateCredServer) error {
+// 	return status.Errorf(codes.Unimplemented, "method CreateCred not implemented")
+// }
 
 // CreateRoom :
 func (b *Backend) CreateRoom(ctx context.Context, req *pb.RoomCreateRequest) (*pb.Room, error) {

@@ -1,0 +1,120 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "authCert.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/cred/create": {
+      "post": {
+        "operationId": "CreateCred",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "$ref": "#/x-stream-definitions/RoomStatusCred"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RoomStatusCreateCredReq"
+            }
+          }
+        ],
+        "tags": [
+          "CreditsAuth"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "RoomStatusCreateCredReq": {
+      "type": "object",
+      "properties": {
+        "Ip": {
+          "type": "string"
+        },
+        "Username": {
+          "type": "string"
+        },
+        "Password": {
+          "type": "string"
+        }
+      }
+    },
+    "RoomStatusCred": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "runtimeStreamError": {
+      "type": "object",
+      "properties": {
+        "grpc_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "http_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "http_status": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  },
+  "x-stream-definitions": {
+    "RoomStatusCred": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/RoomStatusCred"
+        },
+        "error": {
+          "$ref": "#/definitions/runtimeStreamError"
+        }
+      },
+      "title": "Stream result of RoomStatusCred"
+    }
+  }
+}
