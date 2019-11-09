@@ -20,7 +20,8 @@ import (
 type Backend struct {
 	pb.UnimplementedRoomStatusServer
 	mu *sync.Mutex
-	// channel
+	// channels / workers
+
 	redChannel []chan *rd.RdsCliBox
 	Roomlist   []*pb.Room
 	redhdlr    []*rd.RdsCliBox
@@ -58,17 +59,8 @@ func New(conf *cf.ConfTmp) *Backend {
 	}
 }
 
-// Start : Start the server loop logic
-func (b *Backend) Start() error {
-	for {
-		for _, v := range b.Roomlist {
-			log.Println("room:", v)
-
-		}
-	}
-}
-
 // 	Impletement from GameCtl.pb.go(auto-gen file)
+// 		CreateCred(req *pb.CreateCredReq, srv pb.RoomStatus_CreateCredServer) error
 // 		CreateRoom(context.Context, *types.Empty) (*Room, error)
 // 		GetRoomList(context.Context, *RoomListRequest) (*RoomListResponse, error)
 // 		GetRoomCurrentInfo(context.Context, *RoomRequest) (*Room, error)
@@ -96,7 +88,7 @@ func printReqLog(ctx context.Context, req interface{}) {
 }
 
 // CreateCred : First app init check
-func (b *Backend) CreateCred(req *CreateCredReq, srv RoomStatus_CreateCredServer) error {
+func (b *Backend) CreateCred(req *pb.CreateCredReq, srv pb.RoomStatus_CreateCredServer) error {
 	return status.Errorf(codes.Unimplemented, "method CreateCred not implemented")
 }
 

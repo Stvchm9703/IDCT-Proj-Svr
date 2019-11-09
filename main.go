@@ -58,7 +58,8 @@ func serveOpenAPI(mux *http.ServeMux) error {
 
 func main() {
 	flag.Parse()
-	addr := fmt.Sprintf("127.0.0.1:%d", *gRPCPort)
+	// addr := fmt.Sprintf("127.0.0.1:%d", *gRPCPort)
+	addr := "127.0.0.1:10000"
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
