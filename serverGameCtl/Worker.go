@@ -38,7 +38,7 @@ func CreateWorker(workerId *string, maxWorker *int, assignRds *rd.RdsCliBox) *GC
 	}
 }
 
-func (gce *GCExecutor) StartOperation()(<-) {
+func (gce *GCExecutor) StartOperation() <-chan int {
 	for gce.is_running {
 		h := <-gce.RoomInTask
 		cas, err := h.do()

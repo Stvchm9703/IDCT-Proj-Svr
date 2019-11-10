@@ -34,6 +34,7 @@ type CfAPIServer struct {
 	ConnType     string `toml:"conn_type" json:"conn_type" yaml:"conn_type"`
 	IP           string `toml:"ip" json:"ip" yaml:"ip"`
 	Port         int    `toml:"port" json:"port" yaml:"port"`
+	MaxPoolSize  int    `toml:"max_pool_size" json:"max_pool_size" yaml:"max_pool_size"`
 	APIReferType string `toml:"api_refer_type" json:"api_refer_type" yaml:"api_refer_type"`
 	APITablePath string `toml:"api_table_filepath" json:"api_table_filepath" yaml:"api_table_filepath"`
 	APIOutpath   string `toml:"api_outpath" json:"api_outpath" yaml:"api_outpath"`

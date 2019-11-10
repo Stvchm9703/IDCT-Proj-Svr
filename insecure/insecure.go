@@ -91,7 +91,6 @@ func init() {
 	if err != nil {
 		log.Println("try create new")
 		Cert, err = GenCurrCert()
-
 	}
 	CertPool = x509.NewCertPool()
 	CertPool.AddCert(Cert.Leaf)

@@ -53,12 +53,6 @@ message CellStatus{
 }
 
 service RoomStatus {
-    // rpc CreateCred (CreateCredReq) returns (stream Cred) {
-    //      option (google.api.http) = {
-    //         post: "/v1/cred/create"
-    //         body: "*"
-    //     };  
-    // } 
     rpc CreateRoom (RoomCreateRequest) returns (Room){ 
         option (google.api.http) = {
             post: "/v1/room/create"
@@ -77,21 +71,24 @@ service RoomStatus {
             body: "*"
         }; 
     };
+    rpc DeleteRoom (RoomRequest) returns (google.protobuf.Empty){
+        option (google.api.http) = {
+            post: "/v1/room/delete"
+            body: "*"
+        }; 
+    };
+}
+
+service RoomStream {
     rpc GetRoomStream (RoomRequest) returns (stream CellStatus){
         option (google.api.http) = {
             post: "/v1/room/stream"
             body: "*"
         }; 
     };
-    rpc UpdateRoomStatus (CellStatus) returns (google.protobuf.Empty){
+    rpc UpdateRoomStream(stream CellStatus) returns  (stream CellStatus){
         option (google.api.http) = {
-            post: "/v1/room/update"
-            body: "*"
-        }; 
-    };
-    rpc DeleteRoom (RoomRequest) returns (google.protobuf.Empty){
-        option (google.api.http) = {
-            post: "/v1/room/delete"
+            post: "/v1/room/stream/update"
             body: "*"
         }; 
     };
@@ -102,6 +99,7 @@ message CreateCredReq {
     string Username = 2;
     string Password =3;
 }
+
 message Cred{
     string file = 1;
 }

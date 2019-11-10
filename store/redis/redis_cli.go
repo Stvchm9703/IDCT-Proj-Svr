@@ -28,7 +28,7 @@ type RdsCliBox struct {
 	conn      *redis.Client
 	CoreKey   string
 	Key       string // redis-worker-cli
-	IsRunning bool
+	isRunning bool
 	mu        *sync.Mutex
 }
 
@@ -36,6 +36,22 @@ const (
 	redisCliPoolName = "grpc-redis-cli-pool"
 	redisCliSetTime  = 0
 )
+
+func (rc *RdsCliBox) IsRunning() *bool { return &rc.isRunning }
+
+func (rc *RdsCliBox) lock() {
+	rc.mu.Lock()
+	// rc.isRunning = true
+}
+
+func (rc *RdsCliBox) unlock() {
+	rc.mu.Unlock()
+	// rc.isRunning = false
+}
+
+func (rc *RdsCliBox) Preserve(s bool) {
+	rc.isRunning = s
+}
 
 // Connect : Constructor of Redis client
 func (rc *RdsCliBox) Connect(cf *config.ConfTmp) (bool, error) {
@@ -176,96 +192,77 @@ func (rc *RdsCliBox) unregister() (bool, error) {
 
 // GetPara : get the value by key
 func (rc *RdsCliBox) GetPara(key *string, target interface{}) (*interface{}, error) {
-	rc.mu.Lock()
-	defer rc.mu.Unlock()
-
-	rc.IsRunning = true
+	rc.mu.lock()
+	defer rc.mu.unlock()
 	keystr := rc.CoreKey + "/_" + rc.Key + "." + *key
 	res, err := rc.conn.Get(keystr).Result()
 	if err != nil {
-		rc.IsRunning = false
 		return nil, err
 	}
 	resstr, err := strconv.Unquote(res)
 	if err != nil {
-		rc.IsRunning = false
 		return nil, err
 	}
 	if err = json.Unmarshal([]byte(resstr), &target); err != nil {
-		rc.IsRunning = false
 		return nil, err
 	}
-	rc.IsRunning = false
 	return &target, nil
 }
 
 // SetPara : set the key-value
 func (rc *RdsCliBox) SetPara(key *string, value interface{}) (bool, error) {
-	rc.mu.Lock()
-	defer rc.mu.Unlock()
-	rc.IsRunning = true
+	rc.mu.lock()
+	defer rc.mu.unlock()
 	keystr := rc.CoreKey + "/_" + rc.Key + "." + *key
 	jsonFormat, err := json.Marshal(value)
 	if err != nil {
-		rc.IsRunning = false
 		return false, err
 	}
 	strr := strconv.Quote(string(jsonFormat))
 
 	if _, err := rc.conn.Set(keystr, strr, redisCliSetTime).Result(); err != nil {
-		rc.IsRunning = false
 		return false, err
 	}
-	rc.IsRunning = false
 	return true, nil
 }
 
 // RemovePara : remove the k-v
 func (rc *RdsCliBox) RemovePara(key *string) (bool, error) {
-	rc.mu.Lock()
-	defer rc.mu.Unlock()
-	rc.IsRunning = true
+	rc.mu.lock()
+	defer rc.mu.unlock()
 	res, err := rc.conn.Del(rc.CoreKey + "/_" + rc.Key + "." + *key).Result()
 	if err != nil {
-		rc.IsRunning = false
 		return false, err
 	}
 	log.Println("res", res)
-	rc.IsRunning = false
 	return true, nil
 }
 
 // CleanRem : clear all this redis-cli rem
 func (rc *RdsCliBox) CleanRem() (bool, error) {
-	rc.mu.Lock()
-	defer rc.mu.Unlock()
-	rc.IsRunning = true
+	rc.mu.lock()
+	defer rc.mu.unlock()
 	list, err := rc.ListRem()
 	if err != nil {
-		rc.IsRunning = false
 		return false, nil
 	}
 	for _, v := range *list {
 		if _, err := rc.conn.Del(v).Result(); err != nil {
-			rc.IsRunning = false
 			return false, err
 		}
 	}
-	rc.IsRunning = false
 	return true, nil
 }
 
 // ListRem : check the ha key
 func (rc *RdsCliBox) ListRem(optionKey ...*string) (*[]string, error) {
-	rc.mu.Lock()
-	defer rc.mu.Unlock()
-	rc.IsRunning = true
+	rc.mu.lock()
+	defer rc.mu.unlock()
 	var list []string
 	var err error
 
 	list, err = rc.conn.Keys(rc.CoreKey + "/_" + rc.Key + ".*").Result()
 	if err != nil {
-		rc.IsRunning = false
 		return nil, err
 	}
 	if len(optionKey) > 0 {
@@ -279,7 +276,6 @@ func (rc *RdsCliBox) ListRem(optionKey ...*string) (*[]string, error) {
 		}
 		list = listy
 	}
-	rc.IsRunning = false
 	return &list, nil
 }
 
@@ -287,14 +283,11 @@ func (rc *RdsCliBox) ListRem(optionKey ...*string) (*[]string, error) {
 
 // GetParaList : get a list of feature Para
 func (rc *RdsCliBox) GetParaList(key *string, target interface{}, refPointer interface{}) (*interface{}, error) {
-	rc.mu.Lock()
-	defer rc.mu.Unlock()
-
-	rc.IsRunning = true
+	rc.mu.lock()
+	defer rc.mu.unlock()
 	keystr := rc.CoreKey + "/_" + rc.Key + "." + *key
 	res, err := rc.conn.MGet(keystr).Result()
 	if err != nil {
-		rc.IsRunning = false
 		return nil, err
 	}
 	log.Println(res)
@@ -304,18 +297,15 @@ func (rc *RdsCliBox) GetParaList(key *string, target interface{}, refPointer int
 		log.Println(reflect.TypeOf(v))
 		resstr, err := strconv.Unquote(v.(string))
 		if err != nil {
-			rc.IsRunning = false
 			return nil, err
 		}
 
 		if err = json.Unmarshal([]byte(resstr), &refPointer); err != nil {
-			rc.IsRunning = false
 			return nil, err
 		}
 		tmp := (refPointer)
 		target = append(target.([]interface{}), tmp)
 	}
 	refPointer = nil
-	rc.IsRunning = false
 	return &target, nil
 }

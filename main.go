@@ -5,11 +5,12 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"mime"
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
+	"time"
 
 	"github.com/gogo/gateway"
 	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
@@ -19,6 +20,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/grpclog"
 
+	cm "RoomStatus/common"
 	"RoomStatus/insecure"
 	pbExample "RoomStatus/proto"
 	"RoomStatus/server"
@@ -35,7 +37,10 @@ var (
 var log grpclog.LoggerV2
 
 func init() {
-	log = grpclog.NewLoggerV2(os.Stdout, ioutil.Discard, ioutil.Discard)
+	f, _ := os.Getwd()
+	dt := time.Now()
+	w := cm.SetLog(filepath.Join(f, "tmp", "log", dt.Format("01-02-2006")+".log"))
+	log = grpclog.NewLoggerV2(w, w, w)
 	grpclog.SetLoggerV2(log)
 }
 

@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"flag"
 	"io"
 	"io/ioutil"
@@ -15,7 +17,8 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/grpclog"
 
-	"RoomStatus/insecure"
+	// "RoomStatus/insecure"
+
 	pbExample "RoomStatus/proto"
 )
 
@@ -23,10 +26,36 @@ var addr = flag.String("addr", "127.0.0.1", "The address of the server to connec
 var port = flag.String("port", "10000", "The port to connect to")
 
 var log grpclog.LoggerV2
+var cert *tls.Certificate
+var certPool *x509.CertPool
 
+func GetCurrCert() (*tls.Certificate, error) {
+	tmpcert, err := tls.LoadX509KeyPair("../../insecure/server.crt", "../../insecure/server.key")
+	if err != nil {
+		log.Fatalln("Failed to parse key pair:", err)
+		return nil, err
+	}
+	tmpcert.Leaf, err = x509.ParseCertificate(tmpcert.Certificate[0])
+	if err != nil {
+		log.Fatalln("Failed to parse certificate:", err)
+		return nil, err
+	}
+	return &tmpcert, nil
+}
 func init() {
+	var err error
 	log = grpclog.NewLoggerV2(os.Stdout, ioutil.Discard, ioutil.Discard)
 	grpclog.SetLoggerV2(log)
+	cert, err = GetCurrCert()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	cert.Leaf, err = x509.ParseCertificate(cert.Certificate[0])
+	if err != nil {
+		log.Fatalln(err)
+	}
+	certPool = x509.NewCertPool()
+	certPool.AddCert(cert.Leaf)
 }
 
 func main() {
@@ -38,7 +67,7 @@ func main() {
 		net.JoinHostPort(*addr, *port),
 		grpc.WithTransportCredentials(
 			credentials.NewClientTLSFromCert(
-				insecure.CertPool,
+				certPool,
 				""),
 		),
 	)

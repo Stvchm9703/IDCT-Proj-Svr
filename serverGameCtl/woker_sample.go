@@ -166,5 +166,7 @@ func main() {
 	for i := 0; i < nRequester; i++ {
 		go requester(work)
 	}
-	NewBalancer().balance(work)
+	for {
+		NewBalancer().balance(work)
+	}
 }

@@ -71,6 +71,7 @@
     },
     "/v1/room/delete": {
       "post": {
+        "summary": "rpc GetRoomStream (RoomRequest) returns (stream CellStatus){\n    option (google.api.http) = {\n        post: \"/v1/room/stream\"\n        body: \"*\"\n    }; \n};\nrpc UpdateRoomStatus (CellStatus) returns (google.protobuf.Empty){\n    option (google.api.http) = {\n        post: \"/v1/room/update\"\n        body: \"*\"\n    }; \n};",
         "operationId": "DeleteRoom",
         "responses": {
           "200": {
@@ -149,6 +150,7 @@
     },
     "/v1/room/stream": {
       "post": {
+        "summary": "rpc CreateCred (CreateCredReq) returns (stream Cred) {\n     option (google.api.http) = {\n        post: \"/v1/cred/create\"\n        body: \"*\"\n    };  \n}",
         "operationId": "GetRoomStream",
         "responses": {
           "200": {
@@ -169,24 +171,25 @@
           }
         ],
         "tags": [
-          "RoomStatus"
+          "RoomStream"
         ]
       }
     },
-    "/v1/room/update": {
+    "/v1/room/stream/update": {
       "post": {
-        "operationId": "UpdateRoomStatus",
+        "operationId": "UpdateRoomStream",
         "responses": {
           "200": {
-            "description": "A successful response.",
+            "description": "A successful response.(streaming responses)",
             "schema": {
-              "properties": {}
+              "$ref": "#/x-stream-definitions/RoomStatusCellStatus"
             }
           }
         },
         "parameters": [
           {
             "name": "body",
+            "description": " (streaming inputs)",
             "in": "body",
             "required": true,
             "schema": {
@@ -195,7 +198,7 @@
           }
         ],
         "tags": [
-          "RoomStatus"
+          "RoomStream"
         ]
       }
     }
