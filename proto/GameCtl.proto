@@ -90,6 +90,13 @@ service RoomStatus {
             body: "*"
         }; 
     };
+    rpc UpdateRoom( CellStatus) returns (CellStatus){
+        option (google.api.http) = {
+            post: "/v1/room/update"
+            body: "*"
+        }; 
+    };
+    
 }
 
 message CreateCredReq {
