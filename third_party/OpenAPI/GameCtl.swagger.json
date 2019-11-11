@@ -197,6 +197,32 @@
           "RoomStatus"
         ]
       }
+    },
+    "/v1/room/update": {
+      "post": {
+        "operationId": "UpdateRoom",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/RoomStatusCellStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RoomStatusCellStatus"
+            }
+          }
+        ],
+        "tags": [
+          "RoomStatus"
+        ]
+      }
     }
   },
   "definitions": {
