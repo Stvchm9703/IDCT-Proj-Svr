@@ -65,6 +65,10 @@ func (rc *RdsCliBox) Preserve(s bool) {
 	rc.isRunning = s
 }
 
+func (rc *RdsCliBox) options() *redis.Options {
+	return rc.conn.Options()
+}
+
 // Connect : Constructor of Redis client
 func (rc *RdsCliBox) Connect(cf *config.ConfTmp) (bool, error) {
 	rc.lock()

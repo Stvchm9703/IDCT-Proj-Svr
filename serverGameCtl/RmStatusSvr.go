@@ -25,9 +25,11 @@ type RoomStatusBackend struct {
 	createWk  *ants.PoolWithFunc
 	getWk     *ants.PoolWithFunc
 	getListWk *ants.PoolWithFunc
+	updateWk  *ants.PoolWithFunc
 	steamWk   *ants.PoolWithFunc
 
 	redhdlr  []*rd.RdsCliBox
+	sub      []*rd.RdsPubSub
 	CoreKey  string
 	Roomlist []*pb.Room
 }
@@ -52,6 +54,7 @@ func New(conf *cf.ConfTmp) *RoomStatusBackend {
 		redhdlr:   rdfl,
 		deleteWk:  nil,
 		createWk:  nil,
+		updateWk:  nil,
 		getWk:     nil,
 		getListWk: nil,
 	}
@@ -74,7 +77,13 @@ func New(conf *cf.ConfTmp) *RoomStatusBackend {
 	g.getListWk, _ = ants.NewPoolWithFunc(
 		conf.APIServer.MaxPoolSize/4,
 		g.getLsWkTask)
-
+g.updateWk, _ = ants.NewPoolWithFunc(
+		conf.APIServer.MaxPoolSize/4,
+		g.getLsWkTask)
+	// @refer: RSSvrGetStream.go
+	g.steamWk, _ = ants.NewPoolWithFunc(
+		conf.APIServer.MaxPoolSize,
+		g.roomStreamWkTask)
 	return &g
 }
 
@@ -102,8 +111,9 @@ func (this *RoomStatusBackend) Shutdown() {
 // 		DeleteRoom(context.Context, *RoomRequest) (*types.Empty, error)
 
 type WkTask struct {
-	In  interface{}
-	Out chan interface{}
+	In     interface{}
+	Out    chan interface{}
+	Stream interface{}
 }
 
 func (b *RoomStatusBackend) searchAliveClient() *rd.RdsCliBox {
