@@ -17,7 +17,6 @@
   "paths": {
     "/v1/cred/create": {
       "post": {
-        "summary": "rpc CreateCred (CreateCredReq) returns (stream Cred) {\n     option (google.api.http) = {\n        post: \"/v1/cred/create\"\n        body: \"*\"\n    };  \n}",
         "operationId": "CreateCred",
         "responses": {
           "200": {
@@ -44,7 +43,6 @@
     },
     "/v1/room/create": {
       "post": {
-        "summary": "rpc CreateCred (CreateCredReq) returns (stream Cred) {\n     option (google.api.http) = {\n        post: \"/v1/cred/create\"\n        body: \"*\"\n    };  \n}",
         "operationId": "CreateRoom",
         "responses": {
           "200": {
@@ -71,7 +69,6 @@
     },
     "/v1/room/delete": {
       "post": {
-        "summary": "rpc GetRoomStream (RoomRequest) returns (stream CellStatus){\n    option (google.api.http) = {\n        post: \"/v1/room/stream\"\n        body: \"*\"\n    }; \n};\nrpc UpdateRoomStatus (CellStatus) returns (google.protobuf.Empty){\n    option (google.api.http) = {\n        post: \"/v1/room/update\"\n        body: \"*\"\n    }; \n};",
         "operationId": "DeleteRoom",
         "responses": {
           "200": {
@@ -150,7 +147,6 @@
     },
     "/v1/room/stream": {
       "post": {
-        "summary": "rpc CreateCred (CreateCredReq) returns (stream Cred) {\n     option (google.api.http) = {\n        post: \"/v1/cred/create\"\n        body: \"*\"\n    };  \n}",
         "operationId": "GetRoomStream",
         "responses": {
           "200": {
@@ -171,7 +167,7 @@
           }
         ],
         "tags": [
-          "RoomStream"
+          "RoomStatus"
         ]
       }
     },
@@ -198,7 +194,7 @@
           }
         ],
         "tags": [
-          "RoomStream"
+          "RoomStatus"
         ]
       }
     }

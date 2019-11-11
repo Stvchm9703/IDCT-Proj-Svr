@@ -167,7 +167,7 @@ func local_request_RoomStatus_DeleteRoom_0(ctx context.Context, marshaler runtim
 
 }
 
-func request_RoomStream_GetRoomStream_0(ctx context.Context, marshaler runtime.Marshaler, client RoomStreamClient, req *http.Request, pathParams map[string]string) (RoomStream_GetRoomStreamClient, runtime.ServerMetadata, error) {
+func request_RoomStatus_GetRoomStream_0(ctx context.Context, marshaler runtime.Marshaler, client RoomStatusClient, req *http.Request, pathParams map[string]string) (RoomStatus_GetRoomStreamClient, runtime.ServerMetadata, error) {
 	var protoReq RoomRequest
 	var metadata runtime.ServerMetadata
 
@@ -192,7 +192,7 @@ func request_RoomStream_GetRoomStream_0(ctx context.Context, marshaler runtime.M
 
 }
 
-func request_RoomStream_UpdateRoomStream_0(ctx context.Context, marshaler runtime.Marshaler, client RoomStreamClient, req *http.Request, pathParams map[string]string) (RoomStream_UpdateRoomStreamClient, runtime.ServerMetadata, error) {
+func request_RoomStatus_UpdateRoomStream_0(ctx context.Context, marshaler runtime.Marshaler, client RoomStatusClient, req *http.Request, pathParams map[string]string) (RoomStatus_UpdateRoomStreamClient, runtime.ServerMetadata, error) {
 	var metadata runtime.ServerMetadata
 	stream, err := client.UpdateRoomStream(ctx)
 	if err != nil {
@@ -354,22 +354,14 @@ func RegisterRoomStatusHandlerServer(ctx context.Context, mux *runtime.ServeMux,
 
 	})
 
-	return nil
-}
-
-// RegisterRoomStreamHandlerServer registers the http handlers for service RoomStream to "mux".
-// UnaryRPC     :call RoomStreamServer directly.
-// StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-func RegisterRoomStreamHandlerServer(ctx context.Context, mux *runtime.ServeMux, server RoomStreamServer) error {
-
-	mux.Handle("POST", pattern_RoomStream_GetRoomStream_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_RoomStatus_GetRoomStream_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		err := status.Error(codes.Unimplemented, "streaming calls are not yet supported in the in-process transport")
 		_, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		return
 	})
 
-	mux.Handle("POST", pattern_RoomStream_UpdateRoomStream_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_RoomStatus_UpdateRoomStream_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		err := status.Error(codes.Unimplemented, "streaming calls are not yet supported in the in-process transport")
 		_, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -512,6 +504,46 @@ func RegisterRoomStatusHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 
 	})
 
+	mux.Handle("POST", pattern_RoomStatus_GetRoomStream_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_RoomStatus_GetRoomStream_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_RoomStatus_GetRoomStream_0(ctx, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_RoomStatus_UpdateRoomStream_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_RoomStatus_UpdateRoomStream_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_RoomStatus_UpdateRoomStream_0(ctx, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
@@ -523,6 +555,10 @@ var (
 	pattern_RoomStatus_GetRoomCurrentInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "room", "info"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_RoomStatus_DeleteRoom_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "room", "delete"}, "", runtime.AssumeColonVerbOpt(true)))
+
+	pattern_RoomStatus_GetRoomStream_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "room", "stream"}, "", runtime.AssumeColonVerbOpt(true)))
+
+	pattern_RoomStatus_UpdateRoomStream_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "room", "stream", "update"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
@@ -533,99 +569,10 @@ var (
 	forward_RoomStatus_GetRoomCurrentInfo_0 = runtime.ForwardResponseMessage
 
 	forward_RoomStatus_DeleteRoom_0 = runtime.ForwardResponseMessage
-)
 
-// RegisterRoomStreamHandlerFromEndpoint is same as RegisterRoomStreamHandler but
-// automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterRoomStreamHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err != nil {
-			if cerr := conn.Close(); cerr != nil {
-				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
-			}
-			return
-		}
-		go func() {
-			<-ctx.Done()
-			if cerr := conn.Close(); cerr != nil {
-				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
-			}
-		}()
-	}()
+	forward_RoomStatus_GetRoomStream_0 = runtime.ForwardResponseStream
 
-	return RegisterRoomStreamHandler(ctx, mux, conn)
-}
-
-// RegisterRoomStreamHandler registers the http handlers for service RoomStream to "mux".
-// The handlers forward requests to the grpc endpoint over "conn".
-func RegisterRoomStreamHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterRoomStreamHandlerClient(ctx, mux, NewRoomStreamClient(conn))
-}
-
-// RegisterRoomStreamHandlerClient registers the http handlers for service RoomStream
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "RoomStreamClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "RoomStreamClient"
-// doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "RoomStreamClient" to call the correct interceptors.
-func RegisterRoomStreamHandlerClient(ctx context.Context, mux *runtime.ServeMux, client RoomStreamClient) error {
-
-	mux.Handle("POST", pattern_RoomStream_GetRoomStream_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_RoomStream_GetRoomStream_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_RoomStream_GetRoomStream_0(ctx, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("POST", pattern_RoomStream_UpdateRoomStream_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_RoomStream_UpdateRoomStream_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_RoomStream_UpdateRoomStream_0(ctx, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
-
-	})
-
-	return nil
-}
-
-var (
-	pattern_RoomStream_GetRoomStream_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "room", "stream"}, "", runtime.AssumeColonVerbOpt(true)))
-
-	pattern_RoomStream_UpdateRoomStream_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "room", "stream", "update"}, "", runtime.AssumeColonVerbOpt(true)))
-)
-
-var (
-	forward_RoomStream_GetRoomStream_0 = runtime.ForwardResponseStream
-
-	forward_RoomStream_UpdateRoomStream_0 = runtime.ForwardResponseStream
+	forward_RoomStatus_UpdateRoomStream_0 = runtime.ForwardResponseStream
 )
 
 // RegisterCreditsAuthHandlerFromEndpoint is same as RegisterCreditsAuthHandler but
