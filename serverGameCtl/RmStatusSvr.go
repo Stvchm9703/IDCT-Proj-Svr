@@ -16,8 +16,10 @@ import (
 	ants "github.com/panjf2000/ants/v2"
 )
 
+var _ pb.RoomStatusServer = (*RoomStatusBackend)(nil)
+
 type RoomStatusBackend struct {
-	pb.UnimplementedRoomStatusServer
+	// pb.RoomStatusServer
 	mu *sync.Mutex
 	// channels / workers
 	deleteWk  *ants.PoolWithFunc
@@ -38,12 +40,9 @@ func New(conf *cf.ConfTmp) *RoomStatusBackend {
 	ck := "RSCore" + cm.HashText(conf.APIServer.IP)
 	rdfl := []*rd.RdsCliBox{}
 	for i := 0; i < conf.Database.WorkerNode; i++ {
-		rdf := rd.RdsCliBox{
-			CoreKey: ck,
-			Key:     "wKU" + cm.HashText("num"+strconv.Itoa(i)),
-		}
+		rdf := rd.New(ck, "wKU"+cm.HashText("num"+strconv.Itoa(i)))
 		if _, err := rdf.Connect(conf); err == nil {
-			rdfl = append(rdfl, &rdf)
+			rdfl = append(rdfl, rdf)
 		}
 	}
 
@@ -59,12 +58,33 @@ func New(conf *cf.ConfTmp) *RoomStatusBackend {
 	g.createWk, _ = ants.NewPoolWithFunc(
 		conf.APIServer.MaxPoolSize/4,
 		g.createWkTask)
-	defer g.createWk.Release()
+
+	g.deleteWk, _ = ants.NewPoolWithFunc(
+		conf.APIServer.MaxPoolSize/4,
+		g.deleteWkTask)
+
+	g.getWk, _ = ants.NewPoolWithFunc(
+		conf.APIServer.MaxPoolSize/4,
+		g.getInfoWkTask)
+
+	g.getListWk, _ = ants.NewPoolWithFunc(
+		conf.APIServer.MaxPoolSize/4,
+		g.getLsWkTask)
 
 	return &g
 }
 
 func (this *RoomStatusBackend) Shutdown() {
+	log.Println("in shtdown proc")
+	for _, v := range this.redhdlr {
+		if _, err := v.CleanRem(); err != nil {
+			log.Println(err)
+		}
+		if _, e := v.Disconn(); e != nil {
+			log.Println(e)
+		}
+	}
+	log.Println("endof shtdown proc:", this.CoreKey)
 
 }
 
@@ -77,7 +97,7 @@ func (this *RoomStatusBackend) Shutdown() {
 // 		UpdateRoomStatus(context.Context, *CellStatus) (*types.Empty, error)
 // 		DeleteRoom(context.Context, *RoomRequest) (*types.Empty, error)
 
-type wkTask struct {
+type WkTask struct {
 	In  interface{}
 	Out chan interface{}
 }
@@ -88,35 +108,28 @@ func (b *RoomStatusBackend) createWkTask(payload interface{}) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
-	req, ok := payload.(wkTask).In.(*pb.RoomCreateRequest)
+	req, ok := payload.(WkTask).In.(*pb.RoomCreateRequest)
 	if !ok {
 		return
 	}
-	j := sync.WaitGroup{}
 
-	var wkbox chan *rd.RdsCliBox
-	j.Add(1)
-	go b.searchAliveClient(&j, &wkbox)
+	wkbox := b.searchAliveClient()
 
 	// for loop it
-	j.Add(1)
 	tmptime := time.Now().String() + req.HostId
 	var f = ""
+
 	for {
 		f = cm.HashText(tmptime)
-		l, err := (<-wkbox).ListRem(&f)
+		l, err := (wkbox).ListRem(&f)
 		if err != nil {
 			log.Println(err)
-			j.Done()
-
 			return
 		}
 		if len(*l) == 0 {
 			break
 		}
 	}
-	j.Done()
-	j.Add(1)
 	rmTmp := pb.Room{
 		Key:        "Rm" + f,
 		HostId:     req.HostId,
@@ -126,53 +139,138 @@ func (b *RoomStatusBackend) createWkTask(payload interface{}) {
 		Cell:       -1,
 		CellStatus: nil,
 	}
-	if _, err := (<-wkbox).SetPara(&rmTmp.Key, rmTmp); err != nil {
+	if _, err := wkbox.SetPara(&rmTmp.Key, rmTmp); err != nil {
 		log.Println(err)
 		return
 	}
-	(<-wkbox).Preserve(false)
-	j.Done()
-	j.Wait()
-	payload.(wkTask).Out <- rmTmp
+	wkbox.Preserve(false)
+
+	payload.(WkTask).Out <- rmTmp
+}
+
+// TestCreateWkTask : Test Unit
+func (b *RoomStatusBackend) TestCreateWkTask(pl interface{}) (rmTmp *pb.Room, err error) {
+	if err := b.createWk.Invoke(pl.(WkTask)); err != nil {
+		log.Println("err in create Wk", err)
+		return nil, err
+	}
+	// ====== Worker End =======
+	plc := <-(pl.(WkTask)).Out
+	rmTmpa := plc.(pb.Room)
+	rmTmp = &rmTmpa
+	// create room success
+	b.Roomlist = append(b.Roomlist, rmTmp)
+	return
 }
 
 func (b *RoomStatusBackend) deleteWkTask(payload interface{}) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
-	req, ok := payload.(wkTask).In.(*pb.RoomRequest)
+	req, ok := payload.(WkTask).In.(*pb.RoomRequest)
 	if !ok {
 		return
 	}
-	j := sync.WaitGroup{}
 
-	var wkbox chan *rd.RdsCliBox
-	j.Add(1)
-	go b.searchAliveClient(&j, &wkbox)
+	wkbox := b.searchAliveClient()
 
-	j.Add(1)
-	if _, err := (<-wkbox).RemovePara(&req.Key); err != nil {
+	if _, err := (wkbox).RemovePara(&req.Key); err != nil {
 		log.Fatalln(err)
-		j.Done()
 		return
 	}
-	(<-wkbox).Preserve(false)
-	j.Done()
-	j.Wait()
-	payload.(wkTask).Out <- req.Key
+	(wkbox).Preserve(false)
+	payload.(WkTask).Out <- &req.Key
 }
 
-func (b *RoomStatusBackend) searchAliveClient(wg *sync.WaitGroup, wkbox *chan *rd.RdsCliBox) {
-	defer wg.Done()
+// TestCreateWkTask : Test Unit
+func (b *RoomStatusBackend) TestDeteleWkTask(pl interface{}) (rmTmp *pb.Room, err error) {
+	if err := b.deleteWk.Invoke(pl.(WkTask)); err != nil {
+		log.Println("err in create Wk", err)
+		return nil, err
+	}
+	// ====== Worker End =======
+	plc := <-(pl.(WkTask)).Out
+	for k, v := range b.Roomlist {
+		if v.Key == *plc.(*string) {
+			rmTmp = b.Roomlist[k]
+			b.Roomlist = append(b.Roomlist[:k], b.Roomlist[k+1:]...)
+		}
+	}
+	return
+}
+
+func (b *RoomStatusBackend) getInfoWkTask(payload interface{}) {
+	req, ok := payload.(WkTask).In.(*pb.RoomRequest)
+	if !ok {
+		return
+	}
+
+	wkbox := b.searchAliveClient()
+	var tmp pb.Room
+	if _, err := wkbox.GetPara(&req.Key, &tmp); err != nil {
+		log.Fatalln(err)
+		// return nil, err
+	}
+	(wkbox).Preserve(false)
+	payload.(WkTask).Out <- &tmp
+}
+
+func (b *RoomStatusBackend) TestGetInfoWkTask(pl interface{}) (rmTmp *pb.Room, err error) {
+	if err = b.getWk.Invoke(pl.(WkTask)); err != nil {
+		log.Println("err in create Wk", err)
+		return
+	}
+	// ====== Worker End =======
+	rm := <-(pl.(WkTask)).Out
+	rmTmp = rm.(*pb.Room)
+	return
+}
+
+func (b *RoomStatusBackend) getLsWkTask(payload interface{}) {
+	req, ok := payload.(WkTask).In.(*pb.RoomListRequest)
+	if !ok {
+		return
+	}
+
+	wkbox := b.searchAliveClient()
+	// var tmp pb.Room
+	var RmList []*pb.Room
+	strl, err2 := wkbox.GetParaList(&req.Requirement)
+	if err2 != nil {
+		log.Fatalln(err2)
+	}
+	// log.Println("strl:", string(*strl))
+	err := json.Unmarshal(*strl, &RmList)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	// log.Println(RmList)
+	(wkbox).Preserve(false)
+	payload.(WkTask).Out <- RmList
+}
+
+func (b *RoomStatusBackend) TestGetLsWkTask(pl interface{}) (rmTmp *pb.RoomListResponse, err error) {
+	if err = b.getListWk.Invoke(pl.(WkTask)); err != nil {
+		log.Println("err in create Wk", err)
+		return
+	}
+	// ====== Worker End =======
+	rm := <-(pl.(WkTask)).Out
+	fg := rm.([]*pb.Room)
+	rmTmp = &pb.RoomListResponse{
+		Result: fg,
+	}
+	return
+}
+func (b *RoomStatusBackend) searchAliveClient() *rd.RdsCliBox {
 	for {
 		wk := b.checkAliveClient()
 		if wk == nil {
-			log.Println("busy at " + time.Now().String())
+			// log.Println("busy at " + time.Now().String())
 			time.Sleep(500)
 		} else {
 			wk.Preserve(true)
-			*wkbox <- wk
-			return
+			return wk
 		}
 	}
 }
@@ -204,7 +302,7 @@ func (b *RoomStatusBackend) CreateRoom(ctx context.Context, req *pb.RoomCreateRe
 
 	// var k chan pb.Room
 	// ====== Worker Start =======
-	pl := &wkTask{In: req, Out: make(chan interface{})}
+	pl := &WkTask{In: req, Out: make(chan interface{})}
 	if err := b.createWk.Invoke(pl); err != nil {
 		log.Println(err)
 		return nil, err
@@ -230,13 +328,13 @@ func (b *RoomStatusBackend) GetRoomList(ctx context.Context, req *pb.RoomListReq
 		return nil, nil
 		// TODO : use chan to push task ?
 	}
-	var tmp pb.Room
-	var RmList []pb.Room
+	// var tmp pb.Room
+	// var RmList []pb.Room
 
-	if _, err2 := wkbox.GetParaList(&req.Requirement, &RmList, tmp); err2 != nil {
-		log.Fatalln(err)
-		err = err2
-	}
+	// if _, err2 := wkbox.GetParaList(&req.Requirement, &RmList, tmp); err2 != nil {
+	// 	log.Fatalln(err)
+	// 	err = err2
+	// }
 	// for _, v := range RmList {
 	// 	res.Result = append(res.Result, &v)
 	// }
@@ -248,49 +346,36 @@ func (b *RoomStatusBackend) GetRoomList(ctx context.Context, req *pb.RoomListReq
 func (b *RoomStatusBackend) GetRoomCurrentInfo(ctx context.Context, req *pb.RoomRequest) (*pb.Room, error) {
 	// return nil, status.Errorf(codes.Unimplemented, "method GetRoomCurrentInfo not implemented")
 	printReqLog(ctx, req)
-	// b.mu.Lock()
-	// defer b.mu.Unlock()
-
-	// search free box
-	wkbox := b.checkAliveClient()
-	if wkbox == nil {
-		// busy
-		log.Println("busy at " + time.Now().String())
-		return nil, nil
-		// TODO : use chan to push task ?
-	}
-	var tmp pb.Room
-
-	if _, err := wkbox.GetPara(&req.Key, &tmp); err != nil {
-		log.Fatalln(err)
+	pl := &WkTask{
+		In:  req,
+		Out: make(chan interface{})}
+	if err := b.getWk.Invoke(pl); err != nil {
+		log.Println("err in create Wk", err)
 		return nil, err
 	}
-	return &tmp, nil
+	// ====== Worker End =======
+	rm := <-(pl).Out
+	tmp := rm.(*pb.Room)
+	return tmp, nil
 }
 
 // DeleteRoom :
 func (b *RoomStatusBackend) DeleteRoom(ctx context.Context, req *pb.RoomRequest) (*types.Empty, error) {
 	// return nil, status.Errorf(codes.Unimplemented, "method DeleteRoom not implemented")
 	printReqLog(ctx, req)
-	// b.mu.Lock()
-	// defer b.mu.Unlock()
-
-	// search free box
-	wkbox := b.checkAliveClient()
-	if wkbox == nil {
-		// busy
-		log.Println("busy at " + time.Now().String())
-		return nil, nil
-		// TODO : use chan to push task ?
-	}
-
-	if _, err := wkbox.RemovePara(&req.Key); err != nil {
-		log.Fatalln(err)
+	// var k chan pb.Room
+	// ====== Worker Start =======
+	pl := &WkTask{In: req, Out: make(chan interface{})}
+	if err := b.deleteWk.Invoke(pl); err != nil {
+		log.Println(err)
 		return nil, err
 	}
-
+	// ====== Worker End =======
+	plc := <-(pl).Out
 	for k, v := range b.Roomlist {
-		if v.Key == req.Key {
+		if v.Key == *plc.(*string) {
+			// rmTmp = b.Roomlist[k]
+			log.Println(b.Roomlist[k])
 			b.Roomlist = append(b.Roomlist[:k], b.Roomlist[k+1:]...)
 		}
 	}

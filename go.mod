@@ -18,7 +18,6 @@ require (
 	github.com/mwitkow/go-proto-validators v0.2.0
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
-	github.com/panjf2000/ants v1.3.0
 	github.com/panjf2000/ants/v2 v2.2.2
 	github.com/rakyll/statik v0.1.6
 	github.com/spf13/cobra v0.0.5

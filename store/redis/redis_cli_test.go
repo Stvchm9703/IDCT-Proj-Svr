@@ -1,13 +1,11 @@
 package redis_test
 
 import (
-	cm "RoomStatus/common"
 	cf "RoomStatus/config"
 	pb "RoomStatus/proto"
 	rd "RoomStatus/store/redis"
 	"encoding/json"
 	"log"
-	"strconv"
 	"testing"
 	"time"
 )
@@ -18,7 +16,7 @@ var test_conf = cf.ConfTmp{
 	cf.CfTDatabase{
 		Connector:  "redis",
 		WorkerNode: 12,
-		Host:       "192.168.0.107",
+		Host:       "192.168.0.110",
 		Port:       6379,
 		Username:   "",
 		Password:   "",
@@ -28,10 +26,11 @@ var test_conf = cf.ConfTmp{
 }
 
 func TestConnect(t *testing.T) {
-	test := rd.RdsCliBox{
-		CoreKey: "testingUnit",
-		Key:     "workerU",
-	}
+	// test := rd.RdsCliBox{
+	// 	CoreKey: "testingUnit",
+	// 	Key:     "workerU",
+	// }
+	test := rd.New("testingUnit", "workerU")
 	if _, err := test.Connect(&test_conf); err != nil {
 		t.Log(err)
 		log.Println(err)
@@ -54,10 +53,7 @@ var testObj = pb.Room{
 }
 
 func TestParaSet(t *testing.T) {
-	test := rd.RdsCliBox{
-		CoreKey: "testingUnit",
-		Key:     "workerU",
-	}
+	test := rd.New("testingUnit", "workerU")
 	if _, err := test.Connect(&test_conf); err != nil {
 		t.Log(err)
 	}
@@ -80,10 +76,7 @@ func TestParaSet(t *testing.T) {
 
 func TestParaGet(t *testing.T) {
 	t.Log("running ", t.Name())
-	test := rd.RdsCliBox{
-		CoreKey: "testingUnit",
-		Key:     "workerU",
-	}
+	test := rd.New("testingUnit", "workerU")
 	if _, err := test.Connect(&test_conf); err != nil {
 		t.Log(err)
 	}
@@ -105,10 +98,7 @@ func TestParaGet(t *testing.T) {
 	}
 }
 func TestParaRemove(t *testing.T) {
-	test := rd.RdsCliBox{
-		CoreKey: "testingUnit",
-		Key:     "workerU",
-	}
+	test := rd.New("testingUnit", "workerU")
 	if _, err := test.Connect(&test_conf); err != nil {
 		t.Log(err)
 	}
@@ -129,10 +119,7 @@ func TestParaRemove(t *testing.T) {
 func TestListKey(t *testing.T) {
 	log.Println("running ", t.Name())
 	t.Log("running ", t.Name())
-	test := rd.RdsCliBox{
-		CoreKey: "testingUnit",
-		Key:     "workerU",
-	}
+	test := rd.New("testingUnit", "workerU")
 	if _, err := test.Connect(&test_conf); err != nil {
 		t.Fatal(err) //expected
 	}
@@ -149,37 +136,61 @@ func TestListKey(t *testing.T) {
 func TestCleanRem(t *testing.T) {
 	log.Println("running ", t.Name())
 	t.Log("running ", t.Name())
-	test := rd.RdsCliBox{
-		CoreKey: "testingUnit",
-		Key:     "workerU",
-	}
+	// test := rd.New("testingUnit", "workerU")
+	test := rd.New("RSCore8a3d11e", "wKU")
 	if _, err := test.Connect(&test_conf); err != nil {
 		t.Fatal(err) //expected
 	}
 
-	// insert testing data
-	for i := 0; i < 50; i++ {
-		var testObjLoop = pb.Room{
-			Key:        "Rm" + cm.HashText("num"+strconv.Itoa(i)+"test"),
-			HostId:     "192.180.0." + strconv.Itoa(i),
-			Status:     0,
-			Round:      1,
-			Cell:       1,
-			CellStatus: nil,
-		}
-		if _, err := test.SetPara(&testObjLoop.Key, testObjLoop); err != nil {
-			t.Log("err:", err)
-		}
-		time.Sleep(5000)
-	}
-	time.Sleep(500000)
-	// show the list
-	ls, _ := test.ListRem()
-	log.Print(*ls)
-	time.Sleep(500000)
+	// // insert testing data
+	// for i := 0; i < 50; i++ {
+	// 	var testObjLoop = pb.Room{
+	// 		Key:        "Rm" + cm.HashText("num"+strconv.Itoa(i)+"test"),
+	// 		HostId:     "192.180.0." + strconv.Itoa(i),
+	// 		Status:     0,
+	// 		Round:      1,
+	// 		Cell:       1,
+	// 		CellStatus: nil,
+	// 	}
+	// 	if _, err := test.SetPara(&testObjLoop.Key, testObjLoop); err != nil {
+	// 		t.Log("err:", err)
+	// 	}
+	// 	time.Sleep(5000)
+	// }
+	// time.Sleep(500000)
+	// // show the list
+	// ls, _ := test.ListRem()
+	// log.Print(*ls)
+	// time.Sleep(500000)
 
 	// testing clean all
 	if _, err := test.CleanRem(); err != nil {
+		t.Fatal(err)
+		log.Fatal(err)
+	}
+
+	if _, err := test.Disconn(); err != nil {
+		t.Log(err)
+	}
+	log.Println("end ", t.Name())
+	t.Log("end ", t.Name())
+}
+
+func TestForceClear(t *testing.T) {
+	log.Println("running ", t.Name())
+	t.Log("running ", t.Name())
+	// test := rd.New("testingUnit", "workerU")
+	test := rd.New("RSCore8a3d11e", "wKU")
+	if _, err := test.Connect(&test_conf); err != nil {
+		t.Fatal(err) //expected
+	}
+
+	// testing clean all
+	if _, err := test.CleanRem(); err != nil {
+		t.Fatal(err)
+		log.Fatal(err)
+	}
+	if _, err := test.ForceClear(); err != nil {
 		t.Fatal(err)
 		log.Fatal(err)
 	}

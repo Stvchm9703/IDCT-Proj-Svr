@@ -77,9 +77,7 @@ service RoomStatus {
             body: "*"
         }; 
     };
-}
 
-service RoomStream {
     rpc GetRoomStream (RoomRequest) returns (stream CellStatus){
         option (google.api.http) = {
             post: "/v1/room/stream"

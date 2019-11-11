@@ -30,7 +30,7 @@ var cert *tls.Certificate
 var certPool *x509.CertPool
 
 func GetCurrCert() (*tls.Certificate, error) {
-	tmpcert, err := tls.LoadX509KeyPair("../../insecure/server.crt", "../../insecure/server.key")
+	tmpcert, err := tls.LoadX509KeyPair("../../insecure/server.pem", "../../insecure/server.key")
 	if err != nil {
 		log.Fatalln("Failed to parse key pair:", err)
 		return nil, err
@@ -42,6 +42,7 @@ func GetCurrCert() (*tls.Certificate, error) {
 	}
 	return &tmpcert, nil
 }
+
 func init() {
 	var err error
 	log = grpclog.NewLoggerV2(os.Stdout, ioutil.Discard, ioutil.Discard)
@@ -66,15 +67,14 @@ func main() {
 		ctx,
 		net.JoinHostPort(*addr, *port),
 		grpc.WithTransportCredentials(
-			credentials.NewClientTLSFromCert(
-				certPool,
-				""),
+			credentials.NewClientTLSFromCert(certPool, ""),
 		),
 	)
 	if err != nil {
 		log.Fatalln("Failed to dial server:", err)
 	}
 	defer conn.Close()
+
 	c := pbExample.NewUserServiceClient(conn)
 
 	user1 := pbExample.User{ID: 1, Role: pbExample.Role_GUEST}

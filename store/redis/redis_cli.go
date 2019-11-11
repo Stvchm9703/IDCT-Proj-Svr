@@ -4,7 +4,6 @@ import (
 	"RoomStatus/config"
 	"encoding/json"
 	"log"
-	"reflect"
 	"strconv"
 	"strings"
 	"sync"
@@ -37,15 +36,28 @@ const (
 	redisCliSetTime  = 0
 )
 
+func New(coreKey string, key string) *RdsCliBox {
+	v := sync.Mutex{}
+	return &RdsCliBox{
+		CoreKey: coreKey,
+		Key:     key,
+		mu:      &v,
+	}
+}
+
 func (rc *RdsCliBox) IsRunning() *bool { return &rc.isRunning }
 
 func (rc *RdsCliBox) lock() {
-	rc.mu.Lock()
+	if rc.mu != nil {
+		rc.mu.Lock()
+	}
 	// rc.isRunning = true
 }
 
 func (rc *RdsCliBox) unlock() {
-	rc.mu.Unlock()
+	if rc.mu != nil {
+		rc.mu.Unlock()
+	}
 	// rc.isRunning = false
 }
 
@@ -55,8 +67,8 @@ func (rc *RdsCliBox) Preserve(s bool) {
 
 // Connect : Constructor of Redis client
 func (rc *RdsCliBox) Connect(cf *config.ConfTmp) (bool, error) {
-	rc.mu.Lock()
-	defer rc.mu.Unlock()
+	rc.lock()
+	defer rc.unlock()
 
 	rc.conn = redis.NewClient(&redis.Options{
 		Addr:     cf.Database.Host + ":" + strconv.Itoa(cf.Database.Port),
@@ -83,8 +95,8 @@ func (rc *RdsCliBox) Disconn() (bool, error) {
 	// if _, err := rc.CleanRem(); err != nil {
 	// 	return false, err
 	// }
-	rc.mu.Lock()
-	defer rc.mu.Unlock()
+	rc.lock()
+	defer rc.unlock()
 	// unregister
 	if _, err := rc.unregister(); err != nil {
 		return false, err
@@ -98,8 +110,8 @@ func (rc *RdsCliBox) Disconn() (bool, error) {
 
 // Recover :
 func (rc *RdsCliBox) Recover() (*RdsCliBox, error) {
-	rc.mu.Lock()
-	defer rc.mu.Unlock()
+	rc.lock()
+	defer rc.unlock()
 	optionBu := rc.conn.Options()
 	if err := rc.conn.Close(); err != nil {
 		return nil, err
@@ -131,7 +143,7 @@ func (rc *RdsCliBox) register() (bool, error) {
 			// pass
 		}
 	} else {
-		log.Println("ind:", ind)
+		// log.Println("ind:", ind)
 		for _, v := range ind {
 			if v == str {
 				log.Println("key exist")
@@ -164,7 +176,7 @@ func (rc *RdsCliBox) unregister() (bool, error) {
 			// pass
 		}
 	} else {
-		log.Println("ind:", ind)
+		// log.Println("ind:", ind)
 		cd := len(ind)
 		for _, v := range ind {
 			if v == str {
@@ -188,12 +200,45 @@ func (rc *RdsCliBox) unregister() (bool, error) {
 
 // alive :
 
-//
+// ForceClear
+func (rc *RdsCliBox) ForceClear() (bool, error) {
+	// str := rc.CoreKey + "/_*"
+	ind, err := rc.conn.LRange(redisCliPoolName, 0, -1).Result()
+	if err != nil {
+		log.Println("error search")
+		log.Println("ind:", ind)
+		log.Println(err)
+		keyexist, err := rc.conn.Exists(redisCliPoolName).Result()
+		if err != nil {
+			return false, err
+		} else if keyexist == 0 {
+			// pass
+		}
+	} else {
+		log.Println("ind:", ind)
+
+	}
+	for i := 0; i < len(ind); i++ {
+		if ind[i] != "_index_content_" {
+			res, err := rc.conn.LRem(redisCliPoolName, -1, ind[i]).Result()
+			if err != nil {
+				return false, err
+			}
+			log.Println("unreg-proc:", res)
+		}
+	}
+	// res, err := rc.conn.LRem(redisCliPoolName, -1, rc.CoreKey+"/_*").Result()
+	// if err != nil {
+	// 	return false, err
+	// }
+	// log.Println("unreg-proc:", res)
+	return true, nil
+}
 
 // GetPara : get the value by key
 func (rc *RdsCliBox) GetPara(key *string, target interface{}) (*interface{}, error) {
-	rc.mu.lock()
-	defer rc.mu.unlock()
+	rc.lock()
+	defer rc.unlock()
 	keystr := rc.CoreKey + "/_" + rc.Key + "." + *key
 	res, err := rc.conn.Get(keystr).Result()
 	if err != nil {
@@ -211,8 +256,8 @@ func (rc *RdsCliBox) GetPara(key *string, target interface{}) (*interface{}, err
 
 // SetPara : set the key-value
 func (rc *RdsCliBox) SetPara(key *string, value interface{}) (bool, error) {
-	rc.mu.lock()
-	defer rc.mu.unlock()
+	rc.lock()
+	defer rc.unlock()
 	keystr := rc.CoreKey + "/_" + rc.Key + "." + *key
 	jsonFormat, err := json.Marshal(value)
 	if err != nil {
@@ -228,8 +273,8 @@ func (rc *RdsCliBox) SetPara(key *string, value interface{}) (bool, error) {
 
 // RemovePara : remove the k-v
 func (rc *RdsCliBox) RemovePara(key *string) (bool, error) {
-	rc.mu.lock()
-	defer rc.mu.unlock()
+	rc.lock()
+	defer rc.unlock()
 	res, err := rc.conn.Del(rc.CoreKey + "/_" + rc.Key + "." + *key).Result()
 	if err != nil {
 		return false, err
@@ -240,8 +285,8 @@ func (rc *RdsCliBox) RemovePara(key *string) (bool, error) {
 
 // CleanRem : clear all this redis-cli rem
 func (rc *RdsCliBox) CleanRem() (bool, error) {
-	rc.mu.lock()
-	defer rc.mu.unlock()
+	// rc.lock()
+	// defer rc.unlock()
 	list, err := rc.ListRem()
 	if err != nil {
 		return false, nil
@@ -256,8 +301,8 @@ func (rc *RdsCliBox) CleanRem() (bool, error) {
 
 // ListRem : check the ha key
 func (rc *RdsCliBox) ListRem(optionKey ...*string) (*[]string, error) {
-	rc.mu.lock()
-	defer rc.mu.unlock()
+	rc.lock()
+	defer rc.unlock()
 	var list []string
 	var err error
 
@@ -282,30 +327,36 @@ func (rc *RdsCliBox) ListRem(optionKey ...*string) (*[]string, error) {
 /// NOTE: Need add testing
 
 // GetParaList : get a list of feature Para
-func (rc *RdsCliBox) GetParaList(key *string, target interface{}, refPointer interface{}) (*interface{}, error) {
-	rc.mu.lock()
-	defer rc.mu.unlock()
-	keystr := rc.CoreKey + "/_" + rc.Key + "." + *key
-	res, err := rc.conn.MGet(keystr).Result()
+func (rc *RdsCliBox) GetParaList(key *string) (*[]byte, error) {
+	rc.lock()
+	defer rc.unlock()
+	keystr := rc.CoreKey + "/_" + rc.Key + ".*" + *key + "*"
+	// log.Println("Key-in:", keystr)
+	keys, err := rc.conn.Keys(keystr).Result()
 	if err != nil {
+		log.Println("get-para-process,conn-keys,err", err)
 		return nil, err
 	}
-	log.Println(res)
-	// arrKey := []string
-	for _, v := range res {
-		log.Println(v)
-		log.Println(reflect.TypeOf(v))
-		resstr, err := strconv.Unquote(v.(string))
-		if err != nil {
-			return nil, err
-		}
-
-		if err = json.Unmarshal([]byte(resstr), &refPointer); err != nil {
-			return nil, err
-		}
-		tmp := (refPointer)
-		target = append(target.([]interface{}), tmp)
+	// log.Println("key-find:", keys)
+	res, err := rc.conn.MGet(keys...).Result()
+	if err != nil {
+		log.Println("get-para-process-err", err)
+		return nil, err
 	}
-	refPointer = nil
-	return &target, nil
+	resStr := []byte(`[`)
+	for k, v := range res {
+		if v != nil {
+			tmp, err := strconv.Unquote(v.(string))
+			if err != nil {
+				return nil, err
+			}
+			resStr = append(resStr, []byte(tmp)...)
+			if k != len(res)-1 {
+				resStr = append(resStr, []byte(",")...)
+			}
+		}
+	}
+	// refPointer = nil
+	resStr = append(resStr, []byte(`]`)...)
+	return &resStr, nil
 }
