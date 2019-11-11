@@ -25,6 +25,7 @@ type RoomStatusBackend struct {
 	createWk  *ants.PoolWithFunc
 	getWk     *ants.PoolWithFunc
 	getListWk *ants.PoolWithFunc
+	steamWk   *ants.PoolWithFunc
 
 	redhdlr  []*rd.RdsCliBox
 	CoreKey  string

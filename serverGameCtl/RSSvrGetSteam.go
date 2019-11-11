@@ -11,8 +11,8 @@ import (
 // 	return status.Errorf(codes.Unimplemented, "method GetRoomStream not implemented")
 // }
 
-// GetRoomList :
-func (b *RoomStatusBackend) GetRoomStream(ctx context.Context, req *pb.RoomRequest, srv RoomStatusBackend) (res *pb.RoomListResponse, err error) {
+// GetRoomStream :
+func (b *RoomStatusBackend) GetRoomStream(ctx context.Context, req *pb.RoomRequest, srv RoomStatusBackend) (err error) {
 	printReqLog(ctx, req)
 	// ===== Worker Start ======
 	pl := &WkTask{
@@ -30,3 +30,5 @@ func (b *RoomStatusBackend) GetRoomStream(ctx context.Context, req *pb.RoomReque
 	}
 	return
 }
+
+// pb.UpdateRoomStream
