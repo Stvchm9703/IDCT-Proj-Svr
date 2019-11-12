@@ -20,7 +20,7 @@ func (b *RoomStatusBackend) getInfoWkTask(payload interface{}) {
 	}
 	(wkbox).Preserve(false)
 	payload.(WkTask).Out <- &tmp
-	// return
+	return
 }
 
 func (b *RoomStatusBackend) TestGetInfoWkTask(pl interface{}) (rmTmp *pb.Room, err error) {

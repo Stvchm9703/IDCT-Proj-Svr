@@ -25,6 +25,7 @@ func (b *RoomStatusBackend) deleteWkTask(payload interface{}) {
 	}
 	(wkbox).Preserve(false)
 	payload.(WkTask).Out <- &req.Key
+	return
 }
 
 // TestCreateWkTask : Test Unit

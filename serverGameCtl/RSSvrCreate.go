@@ -52,6 +52,7 @@ func (b *RoomStatusBackend) createWkTask(payload interface{}) {
 	wkbox.Preserve(false)
 
 	payload.(WkTask).Out <- rmTmp
+	return
 }
 
 // TestCreateWkTask : Test Unit

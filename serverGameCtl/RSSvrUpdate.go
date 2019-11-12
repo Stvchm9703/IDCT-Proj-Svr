@@ -4,27 +4,57 @@ import (
 	pb "RoomStatus/proto"
 	"context"
 	"log"
-
-	types "github.com/gogo/protobuf/types"
 )
 
 func (b *RoomStatusBackend) updateWkTask(payload interface{}) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
-	req, ok := payload.(WkTask).In.(*pb.RoomRequest)
+	req, ok := payload.(WkTask).In.(*pb.CellStatus)
 	if !ok {
 		return
 	}
 
 	wkbox := b.searchAliveClient()
+	var room pb.Room
+	if _, err := (wkbox).GetPara(&req.Key, &room); err != nil {
+		log.Fatalln(err)
+		return
+	}
+	keynum := -1
+	if len(room.CellStatus) == 9 && room.Round == 9 {
+		log.Println("the game should be end")
+		payload.(WkTask).Out <- nil
+		return
+	}
 
-	if _, err := (wkbox).RemovePara(&req.Key); err != nil {
+	for k, v := range room.CellStatus {
+		if v.Turn == req.Turn {
+			room.Cell = int32(k)
+			v.CellNum = req.CellNum
+			keynum = k
+			break
+		}
+	}
+
+	if keynum == -1 {
+		room.CellStatus = append(room.CellStatus, req)
+		room.Cell = int32(len(room.CellStatus))
+		room.Round++
+	}
+
+	for _, v := range b.Roomlist {
+		if v.Key == room.Key {
+			v = &room
+		}
+	}
+	if _, err := wkbox.UpdatePara(&req.Key, &room); err != nil {
 		log.Fatalln(err)
 		return
 	}
 	(wkbox).Preserve(false)
-	payload.(WkTask).Out <- &req.Key
+	payload.(WkTask).Out <- &room
+	return
 }
 
 // TestUpdateWkTask : Test Unit
@@ -35,17 +65,15 @@ func (b *RoomStatusBackend) TestUpdateWkTask(pl interface{}) (rmTmp *pb.Room, er
 	}
 	// ====== Worker End =======
 	plc := <-(pl.(WkTask)).Out
-	for k, v := range b.Roomlist {
-		if v.Key == *plc.(*string) {
-			rmTmp = b.Roomlist[k]
-			b.Roomlist = append(b.Roomlist[:k], b.Roomlist[k+1:]...)
-		}
-	}
+	log.Println("plc;", plc)
+	rmTmp = plc.(*pb.Room)
 	return
 }
 
+// pb.RoomStatus.
+
 // UpdateRoom :
-func (b *RoomStatusBackend) UpdateRoom(ctx context.Context, req *pb.RoomRequest) (*types.Empty, error) {
+func (b *RoomStatusBackend) UpdateRoom(ctx context.Context, req *pb.CellStatus) (*pb.CellStatus, error) {
 	// return nil, status.Errorf(codes.Unimplemented, "method DeleteRoom not implemented")
 	printReqLog(ctx, req)
 	// var k chan pb.Room
@@ -57,15 +85,11 @@ func (b *RoomStatusBackend) UpdateRoom(ctx context.Context, req *pb.RoomRequest)
 	}
 	// ====== Worker End =======
 	plc := <-(pl).Out
-	for k, v := range b.Roomlist {
-		if v.Key == *plc.(*string) {
-			// rmTmp = b.Roomlist[k]
-			log.Println(b.Roomlist[k])
-			b.Roomlist = append(b.Roomlist[:k], b.Roomlist[k+1:]...)
-		}
-	}
+	r := plc.(*pb.Room).CellStatus
+	qq := r[len(r)-1]
 	log.Println("b.RoomList", b.Roomlist)
-	return nil, nil
+	log.Println("r", r)
+	return qq, nil
 }
 
 //

@@ -65,7 +65,7 @@ service RoomStatus {
             body: "*"
         }; 
     }; 
-    rpc GetRoomCurrentInfo (RoomRequest) returns (Room){ 
+    rpc GetRoomInfo (RoomRequest) returns (Room){ 
         option (google.api.http) = {
             post: "/v1/room/info"
             body: "*"

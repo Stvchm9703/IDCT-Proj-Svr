@@ -10,11 +10,12 @@ require (
 	github.com/gogo/googleapis v1.3.0
 	github.com/gogo/protobuf v1.3.1
 	github.com/gogo/status v1.1.0
-	github.com/golang/mock v1.1.1
+	github.com/golang/mock v1.2.0
 	github.com/golang/protobuf v1.3.2
 	github.com/google/flatbuffers v1.11.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0
 	github.com/grpc-ecosystem/grpc-gateway v1.11.3
+	github.com/micro/go-micro v1.16.0
 	github.com/mwitkow/go-proto-validators v0.2.0
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect

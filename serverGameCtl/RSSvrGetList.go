@@ -28,6 +28,7 @@ func (b *RoomStatusBackend) getLsWkTask(payload interface{}) {
 	// log.Println(RmList)
 	(wkbox).Preserve(false)
 	payload.(WkTask).Out <- RmList
+	return
 }
 
 func (b *RoomStatusBackend) TestGetLsWkTask(pl interface{}) (rmTmp *pb.RoomListResponse, err error) {

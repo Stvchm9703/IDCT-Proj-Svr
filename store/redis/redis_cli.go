@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis"
+	"github.com/micro/go-micro/errors"
 	// rejson "github.com/nitishm/go-rejson"
 )
 
@@ -284,6 +285,34 @@ func (rc *RdsCliBox) RemovePara(key *string) (bool, error) {
 		return false, err
 	}
 	log.Println("res", res)
+	return true, nil
+}
+
+// UpdatePara : set the key-value
+func (rc *RdsCliBox) UpdatePara(key *string, value interface{}) (bool, error) {
+	rc.lock()
+	defer rc.unlock()
+	keystr := "*/_*." + *key
+	keys, err := rc.conn.Keys(keystr).Result()
+	if err != nil {
+		log.Println("get-para-process,conn-keys,err", err)
+		return false, err
+	}
+	if len(keys) != 1 {
+		// not ok
+		return false, errors.New("UPDATE_ERROR", "more than one keys:["+strings.Join(keys, ",")+"]", 1)
+	}
+
+	// OK case
+	jsonFormat, err := json.Marshal(value)
+	if err != nil {
+		return false, err
+	}
+	strr := strconv.Quote(string(jsonFormat))
+
+	if _, err := rc.conn.Set(keys[0], strr, redisCliSetTime).Result(); err != nil {
+		return false, err
+	}
 	return true, nil
 }
 
