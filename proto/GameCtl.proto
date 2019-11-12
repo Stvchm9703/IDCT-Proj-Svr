@@ -78,18 +78,18 @@ service RoomStatus {
         }; 
     };
 
-    rpc GetRoomStream (RoomRequest) returns (stream CellStatus){
-        option (google.api.http) = {
-            post: "/v1/room/stream"
-            body: "*"
-        }; 
-    };
-    rpc UpdateRoomStream(stream CellStatus) returns  (stream CellStatus){
-        option (google.api.http) = {
-            post: "/v1/room/stream/update"
-            body: "*"
-        }; 
-    };
+    // rpc GetRoomStream (RoomRequest) returns (stream CellStatus){
+    //     option (google.api.http) = {
+    //         post: "/v1/room/stream"
+    //         body: "*"
+    //     }; 
+    // };
+    // rpc UpdateRoomStream(stream CellStatus) returns  (stream CellStatus){
+    //     option (google.api.http) = {
+    //         post: "/v1/room/stream/update"
+    //         body: "*"
+    //     }; 
+    // };
     rpc UpdateRoom( CellStatus) returns (CellStatus){
         option (google.api.http) = {
             post: "/v1/room/update"
