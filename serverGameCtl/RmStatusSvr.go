@@ -77,13 +77,13 @@ func New(conf *cf.ConfTmp) *RoomStatusBackend {
 	g.getListWk, _ = ants.NewPoolWithFunc(
 		conf.APIServer.MaxPoolSize/4,
 		g.getLsWkTask)
-g.updateWk, _ = ants.NewPoolWithFunc(
+	g.updateWk, _ = ants.NewPoolWithFunc(
 		conf.APIServer.MaxPoolSize/4,
 		g.getLsWkTask)
 	// @refer: RSSvrGetStream.go
-	g.steamWk, _ = ants.NewPoolWithFunc(
-		conf.APIServer.MaxPoolSize,
-		g.roomStreamWkTask)
+	// g.steamWk, _ = ants.NewPoolWithFunc(
+	// 	conf.APIServer.MaxPoolSize,
+	// 	g.roomStreamWkTask)
 	return &g
 }
 

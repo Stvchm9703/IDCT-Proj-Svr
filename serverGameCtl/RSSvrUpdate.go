@@ -91,5 +91,3 @@ func (b *RoomStatusBackend) UpdateRoom(ctx context.Context, req *pb.CellStatus) 
 	log.Println("r", r)
 	return qq, nil
 }
-
-//

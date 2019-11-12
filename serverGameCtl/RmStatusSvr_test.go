@@ -171,7 +171,7 @@ func TestGetWkTask(t *testing.T) {
 	b.Shutdown()
 }
 
-func TestGetListWkTask(t *testing.T) {
+func TestGetListPWkTask(t *testing.T) {
 	t.Log("Init Server")
 	b := server.New(&testing_config)
 
@@ -185,6 +185,63 @@ func TestGetListWkTask(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		_, err := b.TestCreateWkTask(pl)
 		// log.Println(Tfunc)
+		if err != nil {
+			log.Println(err)
+		}
+	}
+	log.Println("RoomList", b.Roomlist)
+	// Get Room
+	g := server.WkTask{
+		In: &pb.RoomListRequest{
+			Requirement: "*",
+		},
+		Out: make(chan interface{}),
+	}
+	gg, err := b.TestGetLsWkTask(g)
+	log.Println("Get req")
+	log.Println(gg)
+	log.Println("Room List")
+	log.Println(b.Roomlist)
+	log.Println("err", err)
+
+	if err != nil {
+		log.Println(err)
+		b.Shutdown()
+	}
+
+	// Detele Room
+	log.Println("Delete Rm")
+	for i := 0; i < 10; i++ {
+		log.Println(b.Roomlist[0].Key)
+		l := server.WkTask{
+			In: &pb.RoomRequest{
+				Key: b.Roomlist[0].Key,
+			},
+			Out: make(chan interface{}),
+		}
+		_, er := b.TestDeteleWkTask(l)
+		if er != nil {
+			log.Println(er)
+			b.Shutdown()
+		}
+	}
+	log.Println(b.Roomlist)
+	b.Shutdown()
+}
+
+func TestGetListWkTask(t *testing.T) {
+	t.Log("Init Server")
+	b := server.New(&testing_config)
+
+	// Create Room
+	pl := server.WkTask{
+		In: &pb.RoomCreateRequest{
+			HostId: "123.451.1AA",
+		},
+		Out: make(chan interface{})}
+	log.Println("Create req")
+	for i := 0; i < 10; i++ {
+		_, err := b.TestCreateWkTask(pl)
 		if err != nil {
 			log.Println(err)
 		}

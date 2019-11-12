@@ -26,5 +26,7 @@ require (
 	golang.org/x/sys v0.0.0-20191020152052-9984515f0562 // indirect
 
 	google.golang.org/grpc v1.24.0
+	gopkg.in/bsm/ratelimit.v1 v1.0.0-20160220154919-db14e161995a // indirect
+	gopkg.in/redis.v3 v3.6.4 // indirect
 	gopkg.in/yaml.v2 v2.2.4
 )

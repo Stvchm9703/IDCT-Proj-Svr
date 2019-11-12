@@ -2,10 +2,33 @@
 syntax = "proto3";
 import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/mwitkow/go-proto-validators/validator.proto";
 
 package RoomStatus;
 option csharp_namespace = "PlayCli.ProtoMod";
 option go_package  = "proto";
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+  info: {
+    version: "0.1";
+  };
+  external_docs: {
+    url: "https://github.com/stvchm9703/IDCT";
+    description: "gRPC server Impletement repository";
+  }
+  schemes: HTTPS;
+};
+// Enable custom Marshal method.
+option (gogoproto.marshaler_all) = true;
+// Enable custom Unmarshal method.
+option (gogoproto.unmarshaler_all) = true;
+// Enable custom Size method (Required by Marshal and Unmarshal).
+option (gogoproto.sizer_all) = true;
+// Enable registration with golang/protobuf for the grpc-gateway.
+option (gogoproto.goproto_registration) = true;
+// Enable generation of XXX_MessageName methods for grpc-go/status.
+option (gogoproto.messagename_all) = true;
 
 // message CreateCredReq {
 //     string Ip =1;

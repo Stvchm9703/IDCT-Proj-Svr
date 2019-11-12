@@ -34,8 +34,8 @@ func (b *RoomStatusBackend) TestGetInfoWkTask(pl interface{}) (rmTmp *pb.Room, e
 	return
 }
 
-// GetRoomCurrentInfo :
-func (b *RoomStatusBackend) GetRoomCurrentInfo(ctx context.Context, req *pb.RoomRequest) (*pb.Room, error) {
+// GetRoomInfo :
+func (b *RoomStatusBackend) GetRoomInfo(ctx context.Context, req *pb.RoomRequest) (*pb.Room, error) {
 
 	printReqLog(ctx, req)
 	// ===== Worker Start ======

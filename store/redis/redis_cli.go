@@ -9,10 +9,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-redis/redis"
+	rd "github.com/go-redis/redis"
 	"github.com/micro/go-micro/errors"
 	// rejson "github.com/nitishm/go-rejson"
 )
+
+// var t :=
 
 // 	consider the go-redis-client :
 // 	key : <core-master-key>/_<redis-worker-hash-key>
@@ -25,7 +27,7 @@ import (
 
 // RdsCliBox : Redis client box custom interface
 type RdsCliBox struct {
-	conn      *redis.Client
+	conn      *rd.Client
 	CoreKey   string
 	Key       string // redis-worker-cli
 	isRunning bool
@@ -66,7 +68,7 @@ func (rc *RdsCliBox) Preserve(s bool) {
 	rc.isRunning = s
 }
 
-func (rc *RdsCliBox) options() *redis.Options {
+func (rc *RdsCliBox) options() *rd.Options {
 	return rc.conn.Options()
 }
 
@@ -75,7 +77,7 @@ func (rc *RdsCliBox) Connect(cf *config.ConfTmp) (bool, error) {
 	rc.lock()
 	defer rc.unlock()
 
-	rc.conn = redis.NewClient(&redis.Options{
+	rc.conn = rd.NewClient(&rd.Options{
 		Addr:     cf.Database.Host + ":" + strconv.Itoa(cf.Database.Port),
 		Password: cf.Database.Password,
 		PoolSize: cf.Database.WorkerNode,
@@ -123,7 +125,7 @@ func (rc *RdsCliBox) Recover() (*RdsCliBox, error) {
 	}
 	time.Sleep(50000)
 	log.Println("re-create the redis client")
-	newConn := redis.NewClient(optionBu)
+	newConn := rd.NewClient(optionBu)
 	log.Println("try ping")
 	_, err := newConn.Ping().Result()
 	if err != nil {

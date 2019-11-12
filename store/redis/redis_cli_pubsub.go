@@ -13,18 +13,28 @@ type RdsPubSub struct {
 	CoreKey     string
 	Key         string // redis-worker-cli
 	mountedFunc []*(func(...interface{}))
+	structMode  bool
+	keyWord     string
 }
 
 func CBSCopyFromClient(rds *RdsCliBox) *RdsPubSub {
 
 	n := RdsPubSub{
-		conn:    redis.NewClient(rds.options()),
-		pscli:   nil,
-		CoreKey: rds.CoreKey,
-		Key:     rds.Key,
+		conn:       redis.NewClient(rds.options()),
+		pscli:      nil,
+		CoreKey:    rds.CoreKey,
+		Key:        rds.Key,
+		structMode: false,
+		keyWord:    "",
 	}
-
+	n.conn.ConfigSet("notify-keyspace-events", "AKE").Result()
 	return &n
+}
+func (r *RdsPubSub) GetStruct() *bool {
+	return &r.structMode
+}
+func (r *RdsPubSub) SetStruct(s bool) {
+	r.structMode = s
 }
 
 func (sb *RdsPubSub) AddChannel(title *string) (<-chan *redis.Message, error) {
@@ -34,19 +44,27 @@ func (sb *RdsPubSub) AddChannel(title *string) (<-chan *redis.Message, error) {
 	if sb.pscli != nil {
 		return nil, errors.New("pub/sub cli is already existed")
 	}
-	sb.pscli = sb.conn.PSubscribe(*title)
+
+	sb.keyWord = *title
+	if sb.structMode == true {
+		sb.pscli = sb.conn.Subscribe(*title)
+	} else {
+		sb.pscli = sb.conn.PSubscribe(*title)
+	}
+
 	if _, err := sb.pscli.Receive(); err != nil {
 		return nil, err
 	}
+
 	return sb.pscli.Channel(), nil
 }
 
-func (sb *RdsPubSub) CloseChan() error {
+func (sb *RdsPubSub) CloseChannel() error {
 	return sb.pscli.Close()
 }
 
 func (sb *RdsPubSub) Disconn() (bool, error) {
-	if e := sb.CloseChan(); e != nil {
+	if e := sb.CloseChannel(); e != nil {
 		return false, e
 	}
 	if e := sb.conn.Close(); e != nil {

@@ -7,16 +7,23 @@ import (
 	context "context"
 	fmt "fmt"
 	_ "github.com/gogo/googleapis/google/api"
+	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	types "github.com/gogo/protobuf/types"
+	golang_proto "github.com/golang/protobuf/proto"
+	_ "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options"
+	_ "github.com/mwitkow/go-proto-validators"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	io "io"
 	math "math"
+	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
+var _ = golang_proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
@@ -74,16 +81,25 @@ func (*RoomListRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_844dd485888a1988, []int{0}
 }
 func (m *RoomListRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_RoomListRequest.Unmarshal(m, b)
+	return m.Unmarshal(b)
 }
 func (m *RoomListRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_RoomListRequest.Marshal(b, m, deterministic)
+	if deterministic {
+		return xxx_messageInfo_RoomListRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
 }
 func (m *RoomListRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_RoomListRequest.Merge(m, src)
 }
 func (m *RoomListRequest) XXX_Size() int {
-	return xxx_messageInfo_RoomListRequest.Size(m)
+	return m.Size()
 }
 func (m *RoomListRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_RoomListRequest.DiscardUnknown(m)
@@ -96,6 +112,10 @@ func (m *RoomListRequest) GetRequirement() string {
 		return m.Requirement
 	}
 	return ""
+}
+
+func (*RoomListRequest) XXX_MessageName() string {
+	return "RoomStatus.RoomListRequest"
 }
 
 type RoomListResponse struct {
@@ -112,16 +132,25 @@ func (*RoomListResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_844dd485888a1988, []int{1}
 }
 func (m *RoomListResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_RoomListResponse.Unmarshal(m, b)
+	return m.Unmarshal(b)
 }
 func (m *RoomListResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_RoomListResponse.Marshal(b, m, deterministic)
+	if deterministic {
+		return xxx_messageInfo_RoomListResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
 }
 func (m *RoomListResponse) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_RoomListResponse.Merge(m, src)
 }
 func (m *RoomListResponse) XXX_Size() int {
-	return xxx_messageInfo_RoomListResponse.Size(m)
+	return m.Size()
 }
 func (m *RoomListResponse) XXX_DiscardUnknown() {
 	xxx_messageInfo_RoomListResponse.DiscardUnknown(m)
@@ -134,6 +163,10 @@ func (m *RoomListResponse) GetResult() []*Room {
 		return m.Result
 	}
 	return nil
+}
+
+func (*RoomListResponse) XXX_MessageName() string {
+	return "RoomStatus.RoomListResponse"
 }
 
 type RoomCreateRequest struct {
@@ -150,16 +183,25 @@ func (*RoomCreateRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_844dd485888a1988, []int{2}
 }
 func (m *RoomCreateRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_RoomCreateRequest.Unmarshal(m, b)
+	return m.Unmarshal(b)
 }
 func (m *RoomCreateRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_RoomCreateRequest.Marshal(b, m, deterministic)
+	if deterministic {
+		return xxx_messageInfo_RoomCreateRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
 }
 func (m *RoomCreateRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_RoomCreateRequest.Merge(m, src)
 }
 func (m *RoomCreateRequest) XXX_Size() int {
-	return xxx_messageInfo_RoomCreateRequest.Size(m)
+	return m.Size()
 }
 func (m *RoomCreateRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_RoomCreateRequest.DiscardUnknown(m)
@@ -172,6 +214,10 @@ func (m *RoomCreateRequest) GetHostId() string {
 		return m.HostId
 	}
 	return ""
+}
+
+func (*RoomCreateRequest) XXX_MessageName() string {
+	return "RoomStatus.RoomCreateRequest"
 }
 
 type RoomRequest struct {
@@ -188,16 +234,25 @@ func (*RoomRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_844dd485888a1988, []int{3}
 }
 func (m *RoomRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_RoomRequest.Unmarshal(m, b)
+	return m.Unmarshal(b)
 }
 func (m *RoomRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_RoomRequest.Marshal(b, m, deterministic)
+	if deterministic {
+		return xxx_messageInfo_RoomRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
 }
 func (m *RoomRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_RoomRequest.Merge(m, src)
 }
 func (m *RoomRequest) XXX_Size() int {
-	return xxx_messageInfo_RoomRequest.Size(m)
+	return m.Size()
 }
 func (m *RoomRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_RoomRequest.DiscardUnknown(m)
@@ -210,6 +265,10 @@ func (m *RoomRequest) GetKey() string {
 		return m.Key
 	}
 	return ""
+}
+
+func (*RoomRequest) XXX_MessageName() string {
+	return "RoomStatus.RoomRequest"
 }
 
 type Room struct {
@@ -232,16 +291,25 @@ func (*Room) Descriptor() ([]byte, []int) {
 	return fileDescriptor_844dd485888a1988, []int{4}
 }
 func (m *Room) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Room.Unmarshal(m, b)
+	return m.Unmarshal(b)
 }
 func (m *Room) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Room.Marshal(b, m, deterministic)
+	if deterministic {
+		return xxx_messageInfo_Room.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
 }
 func (m *Room) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Room.Merge(m, src)
 }
 func (m *Room) XXX_Size() int {
-	return xxx_messageInfo_Room.Size(m)
+	return m.Size()
 }
 func (m *Room) XXX_DiscardUnknown() {
 	xxx_messageInfo_Room.DiscardUnknown(m)
@@ -298,6 +366,10 @@ func (m *Room) GetCellStatus() []*CellStatus {
 	return nil
 }
 
+func (*Room) XXX_MessageName() string {
+	return "RoomStatus.Room"
+}
+
 type CellStatus struct {
 	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	Turn                 int32    `protobuf:"varint,2,opt,name=turn,proto3" json:"turn,omitempty"`
@@ -314,16 +386,25 @@ func (*CellStatus) Descriptor() ([]byte, []int) {
 	return fileDescriptor_844dd485888a1988, []int{5}
 }
 func (m *CellStatus) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_CellStatus.Unmarshal(m, b)
+	return m.Unmarshal(b)
 }
 func (m *CellStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_CellStatus.Marshal(b, m, deterministic)
+	if deterministic {
+		return xxx_messageInfo_CellStatus.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
 }
 func (m *CellStatus) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_CellStatus.Merge(m, src)
 }
 func (m *CellStatus) XXX_Size() int {
-	return xxx_messageInfo_CellStatus.Size(m)
+	return m.Size()
 }
 func (m *CellStatus) XXX_DiscardUnknown() {
 	xxx_messageInfo_CellStatus.DiscardUnknown(m)
@@ -352,6 +433,10 @@ func (m *CellStatus) GetCellNum() int32 {
 	return 0
 }
 
+func (*CellStatus) XXX_MessageName() string {
+	return "RoomStatus.CellStatus"
+}
+
 type CreateCredReq struct {
 	Ip                   string   `protobuf:"bytes,1,opt,name=Ip,proto3" json:"Ip,omitempty"`
 	Username             string   `protobuf:"bytes,2,opt,name=Username,proto3" json:"Username,omitempty"`
@@ -368,16 +453,25 @@ func (*CreateCredReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_844dd485888a1988, []int{6}
 }
 func (m *CreateCredReq) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_CreateCredReq.Unmarshal(m, b)
+	return m.Unmarshal(b)
 }
 func (m *CreateCredReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_CreateCredReq.Marshal(b, m, deterministic)
+	if deterministic {
+		return xxx_messageInfo_CreateCredReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
 }
 func (m *CreateCredReq) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_CreateCredReq.Merge(m, src)
 }
 func (m *CreateCredReq) XXX_Size() int {
-	return xxx_messageInfo_CreateCredReq.Size(m)
+	return m.Size()
 }
 func (m *CreateCredReq) XXX_DiscardUnknown() {
 	xxx_messageInfo_CreateCredReq.DiscardUnknown(m)
@@ -406,6 +500,10 @@ func (m *CreateCredReq) GetPassword() string {
 	return ""
 }
 
+func (*CreateCredReq) XXX_MessageName() string {
+	return "RoomStatus.CreateCredReq"
+}
+
 type Cred struct {
 	File                 string   `protobuf:"bytes,1,opt,name=file,proto3" json:"file,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -420,16 +518,25 @@ func (*Cred) Descriptor() ([]byte, []int) {
 	return fileDescriptor_844dd485888a1988, []int{7}
 }
 func (m *Cred) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Cred.Unmarshal(m, b)
+	return m.Unmarshal(b)
 }
 func (m *Cred) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Cred.Marshal(b, m, deterministic)
+	if deterministic {
+		return xxx_messageInfo_Cred.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
 }
 func (m *Cred) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Cred.Merge(m, src)
 }
 func (m *Cred) XXX_Size() int {
-	return xxx_messageInfo_Cred.Size(m)
+	return m.Size()
 }
 func (m *Cred) XXX_DiscardUnknown() {
 	xxx_messageInfo_Cred.DiscardUnknown(m)
@@ -444,66 +551,89 @@ func (m *Cred) GetFile() string {
 	return ""
 }
 
+func (*Cred) XXX_MessageName() string {
+	return "RoomStatus.Cred"
+}
 func init() {
 	proto.RegisterEnum("RoomStatus.Status", Status_name, Status_value)
+	golang_proto.RegisterEnum("RoomStatus.Status", Status_name, Status_value)
 	proto.RegisterType((*RoomListRequest)(nil), "RoomStatus.RoomListRequest")
+	golang_proto.RegisterType((*RoomListRequest)(nil), "RoomStatus.RoomListRequest")
 	proto.RegisterType((*RoomListResponse)(nil), "RoomStatus.RoomListResponse")
+	golang_proto.RegisterType((*RoomListResponse)(nil), "RoomStatus.RoomListResponse")
 	proto.RegisterType((*RoomCreateRequest)(nil), "RoomStatus.RoomCreateRequest")
+	golang_proto.RegisterType((*RoomCreateRequest)(nil), "RoomStatus.RoomCreateRequest")
 	proto.RegisterType((*RoomRequest)(nil), "RoomStatus.RoomRequest")
+	golang_proto.RegisterType((*RoomRequest)(nil), "RoomStatus.RoomRequest")
 	proto.RegisterType((*Room)(nil), "RoomStatus.Room")
+	golang_proto.RegisterType((*Room)(nil), "RoomStatus.Room")
 	proto.RegisterType((*CellStatus)(nil), "RoomStatus.CellStatus")
+	golang_proto.RegisterType((*CellStatus)(nil), "RoomStatus.CellStatus")
 	proto.RegisterType((*CreateCredReq)(nil), "RoomStatus.CreateCredReq")
+	golang_proto.RegisterType((*CreateCredReq)(nil), "RoomStatus.CreateCredReq")
 	proto.RegisterType((*Cred)(nil), "RoomStatus.Cred")
+	golang_proto.RegisterType((*Cred)(nil), "RoomStatus.Cred")
 }
 
 func init() { proto.RegisterFile("GameCtl.proto", fileDescriptor_844dd485888a1988) }
+func init() { golang_proto.RegisterFile("GameCtl.proto", fileDescriptor_844dd485888a1988) }
 
 var fileDescriptor_844dd485888a1988 = []byte{
-	// 695 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x54, 0x4d, 0x4f, 0xdb, 0x4c,
-	0x10, 0x7e, 0x9d, 0x6f, 0xc6, 0x7c, 0xf8, 0x5d, 0x21, 0x08, 0x86, 0xaa, 0x91, 0x4f, 0x51, 0x2a,
-	0x25, 0x6d, 0x38, 0x54, 0x42, 0xbd, 0xd0, 0x80, 0x20, 0x12, 0x38, 0xc8, 0x49, 0x44, 0xe9, 0xc5,
-	0x32, 0xf1, 0x06, 0xac, 0xda, 0x5e, 0xb3, 0xbb, 0x6e, 0xc5, 0xb5, 0x7f, 0xa1, 0xff, 0xa2, 0x7f,
-	0xa7, 0xc7, 0xaa, 0xb7, 0xfe, 0x90, 0x6a, 0xd7, 0x9b, 0x2f, 0x92, 0x9c, 0x3c, 0x33, 0xcf, 0xcc,
-	0x33, 0x3b, 0xe3, 0x67, 0x17, 0xb6, 0x2e, 0xbc, 0x08, 0x77, 0x78, 0xd8, 0x4c, 0x28, 0xe1, 0x04,
-	0x81, 0x43, 0x48, 0xd4, 0xe7, 0x1e, 0x4f, 0x99, 0x79, 0xf8, 0x40, 0xc8, 0x43, 0x88, 0x5b, 0x12,
-	0xb9, 0x4f, 0xc7, 0x2d, 0x1c, 0x25, 0xfc, 0x39, 0x4b, 0x34, 0x8f, 0x14, 0xe8, 0x25, 0x41, 0xcb,
-	0x8b, 0x63, 0xc2, 0x3d, 0x1e, 0x90, 0x98, 0x65, 0xa8, 0x75, 0x0c, 0x3b, 0x82, 0xe8, 0x2a, 0x60,
-	0xdc, 0xc1, 0x4f, 0x29, 0x66, 0x1c, 0xd5, 0x40, 0xa7, 0xf8, 0x29, 0x0d, 0x28, 0x8e, 0x70, 0xcc,
-	0xab, 0x5a, 0x4d, 0xab, 0x6f, 0x38, 0xf3, 0x21, 0xeb, 0x03, 0x18, 0xb3, 0x22, 0x96, 0x90, 0x98,
-	0x61, 0x54, 0x87, 0x12, 0xc5, 0x2c, 0x0d, 0x45, 0x41, 0xbe, 0xae, 0xb7, 0x8d, 0xe6, 0xec, 0x80,
-	0xd2, 0x74, 0x14, 0x6e, 0xbd, 0x81, 0xff, 0x85, 0xdf, 0xa1, 0xd8, 0xe3, 0x78, 0xd2, 0x74, 0x0f,
-	0x4a, 0x97, 0x84, 0xf1, 0xae, 0xaf, 0xfa, 0x29, 0xcf, 0x7a, 0x0d, 0xba, 0x2c, 0x56, 0x69, 0x06,
-	0xe4, 0xbf, 0xe0, 0x67, 0x95, 0x23, 0x4c, 0xeb, 0x8f, 0x06, 0x05, 0x91, 0xb1, 0x0c, 0xa1, 0x7d,
-	0x28, 0x3f, 0x12, 0xc6, 0xdd, 0xc0, 0xaf, 0xe6, 0x32, 0xd2, 0x47, 0x49, 0x8a, 0x0e, 0x61, 0xc3,
-	0x4f, 0x71, 0x88, 0xa9, 0x80, 0xf2, 0x12, 0xaa, 0x64, 0x81, 0xae, 0x8f, 0x1a, 0x50, 0x62, 0xf2,
-	0xd4, 0xd5, 0x42, 0x4d, 0xab, 0x6f, 0xb7, 0xd1, 0xfc, 0x20, 0xd9, 0xc7, 0x51, 0x19, 0x68, 0x17,
-	0x8a, 0x94, 0xa4, 0xb1, 0x5f, 0x2d, 0xd6, 0xb4, 0x7a, 0xd1, 0xc9, 0x1c, 0x84, 0xa0, 0x30, 0xc2,
-	0x61, 0x58, 0x2d, 0xc9, 0xa0, 0xb4, 0xd1, 0x7b, 0xd0, 0xc5, 0xd7, 0x55, 0xd4, 0x65, 0xb9, 0xa3,
-	0xbd, 0x79, 0xea, 0x0e, 0x0e, 0x43, 0x45, 0x0f, 0xa3, 0xa9, 0x6d, 0x5d, 0x03, 0xcc, 0x90, 0x15,
-	0x43, 0x22, 0x28, 0xf0, 0x94, 0xc6, 0x72, 0xc2, 0xa2, 0x23, 0x6d, 0x74, 0x00, 0x15, 0xd9, 0x2c,
-	0x4e, 0x23, 0x39, 0x5e, 0xd1, 0x29, 0x0b, 0xdf, 0x4e, 0x23, 0xeb, 0x16, 0xb6, 0xb2, 0xc5, 0x77,
-	0x28, 0xf6, 0x1d, 0xfc, 0x84, 0xb6, 0x21, 0xd7, 0x4d, 0x14, 0x61, 0xae, 0x9b, 0x20, 0x13, 0x2a,
-	0x43, 0x86, 0x69, 0xec, 0x45, 0x58, 0x6d, 0x6d, 0xea, 0x0b, 0xec, 0xc6, 0x63, 0xec, 0x1b, 0xa1,
-	0xd3, 0xb5, 0x4d, 0x7c, 0xcb, 0x84, 0x82, 0xa0, 0x14, 0xe7, 0x19, 0x07, 0x21, 0x56, 0x8c, 0xd2,
-	0x6e, 0xf4, 0xa1, 0xa4, 0xce, 0xbf, 0x09, 0x95, 0x9e, 0xed, 0xf6, 0x07, 0xa7, 0xce, 0xc0, 0xf8,
-	0x0f, 0xe9, 0x50, 0xee, 0xd9, 0xee, 0xed, 0x69, 0x77, 0x60, 0x68, 0xc8, 0x80, 0xcd, 0x9e, 0xed,
-	0x5e, 0xf6, 0xfa, 0x03, 0x77, 0x30, 0x74, 0x6c, 0x23, 0xa7, 0x22, 0x67, 0xc3, 0xf3, 0xab, 0x2c,
-	0x92, 0x47, 0x00, 0xa5, 0x9e, 0xed, 0x9e, 0xdb, 0x67, 0x46, 0xa1, 0xfd, 0x3b, 0x0f, 0x73, 0x77,
-	0x00, 0xdd, 0x01, 0x28, 0x45, 0x09, 0x31, 0xbc, 0x7a, 0xa9, 0xbe, 0x05, 0xb5, 0x99, 0x4b, 0xe2,
-	0xb4, 0xcc, 0xef, 0xbf, 0xfe, 0xfe, 0xc8, 0xed, 0x5a, 0x3b, 0xad, 0xaf, 0xef, 0x5a, 0x94, 0x90,
-	0xa8, 0x35, 0x92, 0x15, 0x27, 0x5a, 0x03, 0xdd, 0x83, 0x7e, 0x81, 0xf9, 0x44, 0xf1, 0xe8, 0xf0,
-	0x65, 0xf1, 0xdc, 0xe5, 0x31, 0x8f, 0x56, 0x83, 0xd9, 0x25, 0xb1, 0xaa, 0xb2, 0x0b, 0xb2, 0xb6,
-	0xa6, 0x5d, 0xc2, 0x80, 0x71, 0xd1, 0xe3, 0x0e, 0x90, 0xea, 0xd1, 0x49, 0x29, 0xc5, 0x31, 0xef,
-	0xc6, 0x63, 0x82, 0xf6, 0x97, 0x2e, 0xd1, 0xda, 0x01, 0x96, 0xa9, 0x83, 0x78, 0x4c, 0x32, 0x6a,
-	0x38, 0xc3, 0x21, 0x56, 0x9b, 0x59, 0x4b, 0xb9, 0xd7, 0xcc, 0x1e, 0x8a, 0xe6, 0xe4, 0x15, 0x69,
-	0x9e, 0x8b, 0x57, 0x64, 0xc5, 0x66, 0x7c, 0xc9, 0x26, 0xa8, 0x3f, 0x01, 0x0c, 0x13, 0x7f, 0xb2,
-	0xf4, 0x35, 0x72, 0x36, 0xd7, 0xc4, 0x57, 0x30, 0xa7, 0x92, 0xec, 0x44, 0x6b, 0xb4, 0xc7, 0xa0,
-	0x0b, 0x39, 0x05, 0x9c, 0x9d, 0xa6, 0xfc, 0x11, 0xdd, 0x4e, 0xfe, 0xae, 0xd4, 0xd8, 0xc1, 0x02,
-	0xe1, 0xbc, 0x9c, 0x17, 0x17, 0x23, 0x82, 0x8b, 0x5d, 0x46, 0x14, 0xfb, 0xb3, 0x3f, 0xfb, 0x56,
-	0xfb, 0x68, 0x7e, 0x2e, 0xca, 0x79, 0x7f, 0xe6, 0x8c, 0x9b, 0xd0, 0x7b, 0xee, 0x84, 0x41, 0xf3,
-	0x46, 0xf8, 0xd7, 0xc4, 0xbf, 0x2f, 0x49, 0xe4, 0xf8, 0x5f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x18,
-	0xd1, 0x1d, 0xb9, 0x7a, 0x05, 0x00, 0x00,
+	// 852 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x54, 0xcd, 0x6e, 0xdb, 0x46,
+	0x10, 0xee, 0xea, 0xcf, 0xce, 0x28, 0x4e, 0xd8, 0x45, 0xe0, 0x28, 0x72, 0xaa, 0x0a, 0x3c, 0x09,
+	0x6a, 0x25, 0x3a, 0x32, 0xd0, 0xa0, 0x46, 0x2f, 0xae, 0x6c, 0xc4, 0x04, 0x12, 0xc9, 0xa0, 0x65,
+	0xb8, 0xe9, 0x45, 0xa0, 0xc5, 0x15, 0x45, 0x84, 0xe4, 0xd2, 0xbb, 0x4b, 0x1b, 0xbe, 0x16, 0xe8,
+	0x0b, 0xb4, 0x6f, 0xd1, 0xa7, 0xe8, 0x31, 0xc7, 0x02, 0xed, 0xb5, 0x40, 0xe1, 0xf4, 0x41, 0x82,
+	0x5d, 0xae, 0x24, 0xda, 0x96, 0x4e, 0x9c, 0x99, 0x6f, 0xe6, 0x9b, 0x9d, 0xe1, 0xb7, 0x0b, 0x5b,
+	0x6f, 0xdc, 0x88, 0xf4, 0x45, 0xd8, 0x4d, 0x18, 0x15, 0x14, 0x83, 0x43, 0x69, 0x74, 0x2a, 0x5c,
+	0x91, 0xf2, 0xfa, 0x8e, 0x4f, 0xa9, 0x1f, 0x12, 0x4b, 0x21, 0x17, 0xe9, 0xd4, 0x22, 0x51, 0x22,
+	0x6e, 0xb2, 0xc4, 0xfa, 0x4b, 0x0d, 0xba, 0x49, 0x60, 0xb9, 0x71, 0x4c, 0x85, 0x2b, 0x02, 0x1a,
+	0x73, 0x8d, 0x7e, 0xab, 0x3e, 0x93, 0x8e, 0x4f, 0xe2, 0x0e, 0xbf, 0x76, 0x7d, 0x9f, 0x30, 0x8b,
+	0x26, 0x2a, 0x63, 0x45, 0x76, 0xc7, 0x0f, 0xc4, 0x2c, 0xbd, 0xe8, 0x4e, 0x68, 0x64, 0xf9, 0xd4,
+	0xa7, 0xcb, 0x8e, 0xd2, 0x53, 0x8e, 0xb2, 0x74, 0xfa, 0x77, 0xb9, 0xf4, 0xe8, 0x3a, 0x10, 0x1f,
+	0xe8, 0xb5, 0xe5, 0xd3, 0x8e, 0x02, 0x3b, 0x57, 0x6e, 0x18, 0x78, 0xae, 0xa0, 0x8c, 0x5b, 0x0b,
+	0x33, 0xab, 0x33, 0xf7, 0xe0, 0xa9, 0x9c, 0xee, 0x6d, 0xc0, 0x85, 0x43, 0x2e, 0x53, 0xc2, 0x05,
+	0x6e, 0x42, 0x95, 0x91, 0xcb, 0x34, 0x60, 0x24, 0x22, 0xb1, 0xa8, 0xa1, 0x26, 0x6a, 0x3d, 0x72,
+	0xf2, 0x21, 0xf3, 0x07, 0x30, 0x96, 0x45, 0x3c, 0xa1, 0x31, 0x27, 0xb8, 0x05, 0x15, 0x46, 0x78,
+	0x1a, 0xca, 0x82, 0x62, 0xab, 0xda, 0x33, 0xba, 0xcb, 0xad, 0x29, 0xd3, 0xd1, 0xb8, 0xf9, 0x0d,
+	0x7c, 0x29, 0xfd, 0x3e, 0x23, 0xae, 0x20, 0xf3, 0xa6, 0xdb, 0x50, 0x39, 0xa6, 0x5c, 0xd8, 0x9e,
+	0xee, 0xa7, 0x3d, 0xf3, 0x6b, 0xa8, 0xaa, 0x62, 0x9d, 0x66, 0x40, 0xf1, 0x03, 0xb9, 0xd1, 0x39,
+	0xd2, 0x34, 0xff, 0x45, 0x50, 0x92, 0x19, 0x0f, 0x21, 0xfc, 0x1c, 0x36, 0x66, 0x94, 0x8b, 0x71,
+	0xe0, 0xd5, 0x0a, 0x19, 0xe9, 0x4c, 0x91, 0xe2, 0x1d, 0x78, 0xe4, 0xa5, 0x24, 0x24, 0x4c, 0x42,
+	0x45, 0x05, 0x6d, 0x66, 0x01, 0xdb, 0xc3, 0x6d, 0xa8, 0x70, 0x75, 0xea, 0x5a, 0xa9, 0x89, 0x5a,
+	0x4f, 0x7a, 0x38, 0x3f, 0x48, 0xf6, 0x71, 0x74, 0x06, 0x7e, 0x06, 0x65, 0x46, 0xd3, 0xd8, 0xab,
+	0x95, 0x9b, 0xa8, 0x55, 0x76, 0x32, 0x07, 0x63, 0x28, 0x4d, 0x48, 0x18, 0xd6, 0x2a, 0x2a, 0xa8,
+	0x6c, 0xfc, 0x1a, 0xaa, 0xf2, 0x3b, 0xd6, 0xd4, 0x1b, 0x6a, 0x47, 0xdb, 0x79, 0xea, 0x3e, 0x09,
+	0x43, 0x4d, 0x0f, 0x93, 0x85, 0x6d, 0xbe, 0x03, 0x58, 0x22, 0x2b, 0x86, 0xc4, 0x50, 0x12, 0x29,
+	0x8b, 0xd5, 0x84, 0x65, 0x47, 0xd9, 0xf8, 0x05, 0x6c, 0xaa, 0x66, 0x71, 0x1a, 0xa9, 0xf1, 0xca,
+	0xce, 0x86, 0xf4, 0x07, 0x69, 0x64, 0x9e, 0xc3, 0x56, 0xb6, 0xf8, 0x3e, 0x23, 0x9e, 0x43, 0x2e,
+	0xf1, 0x13, 0x28, 0xd8, 0x89, 0x26, 0x2c, 0xd8, 0x09, 0xae, 0xc3, 0xe6, 0x19, 0x27, 0x2c, 0x76,
+	0x23, 0xa2, 0xb7, 0xb6, 0xf0, 0x25, 0x76, 0xe2, 0x72, 0x7e, 0x4d, 0xd9, 0x62, 0x6d, 0x73, 0xdf,
+	0xac, 0x43, 0x49, 0x52, 0xca, 0xf3, 0x4c, 0x83, 0x90, 0x68, 0x46, 0x65, 0xb7, 0x4f, 0xa1, 0xa2,
+	0xcf, 0xff, 0x18, 0x36, 0x87, 0x83, 0xf1, 0xe9, 0xe8, 0xc0, 0x19, 0x19, 0x5f, 0xe0, 0x2a, 0x6c,
+	0x0c, 0x07, 0xe3, 0xf3, 0x03, 0x7b, 0x64, 0x20, 0x6c, 0xc0, 0xe3, 0xe1, 0x60, 0x7c, 0x3c, 0x3c,
+	0x1d, 0x8d, 0x47, 0x67, 0xce, 0xc0, 0x28, 0xe8, 0xc8, 0xe1, 0xd9, 0xd1, 0xdb, 0x2c, 0x52, 0xc4,
+	0x00, 0x95, 0xe1, 0x60, 0x7c, 0x34, 0x38, 0x34, 0x4a, 0xbd, 0x7f, 0x8a, 0x90, 0xbb, 0x98, 0xf8,
+	0x3d, 0x80, 0x56, 0x94, 0x14, 0xc3, 0x57, 0xf7, 0xd5, 0x77, 0x47, 0x6d, 0xf5, 0x07, 0xe2, 0x34,
+	0xeb, 0xbf, 0xfc, 0xfd, 0xff, 0xef, 0x85, 0x67, 0xe6, 0x53, 0xeb, 0xea, 0x95, 0xc5, 0x28, 0x8d,
+	0xac, 0x89, 0xaa, 0xd8, 0x47, 0x6d, 0x7c, 0x01, 0xd5, 0x37, 0x44, 0xcc, 0x15, 0x8f, 0x77, 0xee,
+	0x17, 0xe7, 0x2e, 0x4f, 0xfd, 0xe5, 0x6a, 0x30, 0xbb, 0x24, 0x66, 0x4d, 0x75, 0xc1, 0xe6, 0xd6,
+	0xa2, 0x4b, 0x18, 0x70, 0x21, 0x7b, 0x38, 0x8b, 0x1e, 0x76, 0x3c, 0xa5, 0xf8, 0xf9, 0x83, 0xdb,
+	0xb3, 0xf6, 0xe4, 0x0f, 0x39, 0x83, 0x78, 0x4a, 0x25, 0xe7, 0x7b, 0x80, 0x43, 0x12, 0x12, 0xbd,
+	0x92, 0xb5, 0x94, 0xdb, 0xdd, 0xec, 0xd9, 0xea, 0xce, 0x5f, 0x98, 0xee, 0x91, 0x7c, 0xd3, 0x56,
+	0xac, 0xc4, 0x53, 0x6c, 0x92, 0xfa, 0x27, 0x80, 0xb3, 0xc4, 0x9b, 0x6f, 0x7b, 0x8d, 0x8e, 0xeb,
+	0x6b, 0xe2, 0x2b, 0x98, 0x53, 0x45, 0xb6, 0x8f, 0xda, 0xbd, 0x29, 0x54, 0xa5, 0x8e, 0x02, 0xc1,
+	0x0f, 0x52, 0x31, 0xc3, 0xe7, 0xf3, 0xdf, 0xaa, 0xc4, 0xf5, 0xe2, 0x0e, 0x61, 0x5e, 0xc7, 0x77,
+	0x17, 0x23, 0x83, 0x77, 0xbb, 0x4c, 0x18, 0xf1, 0x96, 0xbf, 0x74, 0x17, 0xfd, 0xf8, 0x2b, 0xfa,
+	0xed, 0x60, 0x84, 0xcb, 0xbd, 0xe2, 0x6e, 0xf7, 0x55, 0x1b, 0x15, 0xd8, 0x31, 0x98, 0xbe, 0x73,
+	0xd2, 0x6f, 0x72, 0xc2, 0xae, 0x08, 0x6b, 0xda, 0x51, 0x22, 0x67, 0x95, 0xcf, 0x5d, 0x93, 0x91,
+	0x84, 0xf2, 0x40, 0x50, 0x76, 0x83, 0xcd, 0x99, 0x10, 0x09, 0xdf, 0xb7, 0xac, 0xdc, 0x73, 0xcb,
+	0xc5, 0xd5, 0x64, 0x16, 0x7d, 0xff, 0x7a, 0x77, 0xcf, 0xb2, 0x0f, 0xfb, 0xa3, 0x8f, 0xb7, 0x0d,
+	0xf4, 0xd7, 0x6d, 0x03, 0xfd, 0x77, 0xdb, 0x40, 0x7f, 0x7e, 0x6a, 0xa0, 0x8f, 0x9f, 0x1a, 0xe8,
+	0xe7, 0xb2, 0xda, 0xed, 0x1f, 0x05, 0xe3, 0x24, 0x74, 0x6f, 0xfa, 0x61, 0xd0, 0x3d, 0x91, 0xfe,
+	0x3b, 0xea, 0x5d, 0x54, 0x14, 0xb2, 0xf7, 0x39, 0x00, 0x00, 0xff, 0xff, 0x27, 0x65, 0xe0, 0x27,
+	0x74, 0x06, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -520,7 +650,7 @@ const _ = grpc.SupportPackageIsVersion4
 type RoomStatusClient interface {
 	CreateRoom(ctx context.Context, in *RoomCreateRequest, opts ...grpc.CallOption) (*Room, error)
 	GetRoomList(ctx context.Context, in *RoomListRequest, opts ...grpc.CallOption) (*RoomListResponse, error)
-	GetRoomCurrentInfo(ctx context.Context, in *RoomRequest, opts ...grpc.CallOption) (*Room, error)
+	GetRoomInfo(ctx context.Context, in *RoomRequest, opts ...grpc.CallOption) (*Room, error)
 	DeleteRoom(ctx context.Context, in *RoomRequest, opts ...grpc.CallOption) (*types.Empty, error)
 	// rpc GetRoomStream (RoomRequest) returns (stream CellStatus){
 	//     option (google.api.http) = {
@@ -563,9 +693,9 @@ func (c *roomStatusClient) GetRoomList(ctx context.Context, in *RoomListRequest,
 	return out, nil
 }
 
-func (c *roomStatusClient) GetRoomCurrentInfo(ctx context.Context, in *RoomRequest, opts ...grpc.CallOption) (*Room, error) {
+func (c *roomStatusClient) GetRoomInfo(ctx context.Context, in *RoomRequest, opts ...grpc.CallOption) (*Room, error) {
 	out := new(Room)
-	err := c.cc.Invoke(ctx, "/RoomStatus.RoomStatus/GetRoomCurrentInfo", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/RoomStatus.RoomStatus/GetRoomInfo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -594,7 +724,7 @@ func (c *roomStatusClient) UpdateRoom(ctx context.Context, in *CellStatus, opts 
 type RoomStatusServer interface {
 	CreateRoom(context.Context, *RoomCreateRequest) (*Room, error)
 	GetRoomList(context.Context, *RoomListRequest) (*RoomListResponse, error)
-	GetRoomCurrentInfo(context.Context, *RoomRequest) (*Room, error)
+	GetRoomInfo(context.Context, *RoomRequest) (*Room, error)
 	DeleteRoom(context.Context, *RoomRequest) (*types.Empty, error)
 	// rpc GetRoomStream (RoomRequest) returns (stream CellStatus){
 	//     option (google.api.http) = {
@@ -621,8 +751,8 @@ func (*UnimplementedRoomStatusServer) CreateRoom(ctx context.Context, req *RoomC
 func (*UnimplementedRoomStatusServer) GetRoomList(ctx context.Context, req *RoomListRequest) (*RoomListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRoomList not implemented")
 }
-func (*UnimplementedRoomStatusServer) GetRoomCurrentInfo(ctx context.Context, req *RoomRequest) (*Room, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetRoomCurrentInfo not implemented")
+func (*UnimplementedRoomStatusServer) GetRoomInfo(ctx context.Context, req *RoomRequest) (*Room, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRoomInfo not implemented")
 }
 func (*UnimplementedRoomStatusServer) DeleteRoom(ctx context.Context, req *RoomRequest) (*types.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteRoom not implemented")
@@ -671,20 +801,20 @@ func _RoomStatus_GetRoomList_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RoomStatus_GetRoomCurrentInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _RoomStatus_GetRoomInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RoomRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RoomStatusServer).GetRoomCurrentInfo(ctx, in)
+		return srv.(RoomStatusServer).GetRoomInfo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/RoomStatus.RoomStatus/GetRoomCurrentInfo",
+		FullMethod: "/RoomStatus.RoomStatus/GetRoomInfo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RoomStatusServer).GetRoomCurrentInfo(ctx, req.(*RoomRequest))
+		return srv.(RoomStatusServer).GetRoomInfo(ctx, req.(*RoomRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -738,8 +868,8 @@ var _RoomStatus_serviceDesc = grpc.ServiceDesc{
 			Handler:    _RoomStatus_GetRoomList_Handler,
 		},
 		{
-			MethodName: "GetRoomCurrentInfo",
-			Handler:    _RoomStatus_GetRoomCurrentInfo_Handler,
+			MethodName: "GetRoomInfo",
+			Handler:    _RoomStatus_GetRoomInfo_Handler,
 		},
 		{
 			MethodName: "DeleteRoom",
@@ -852,3 +982,1565 @@ var _CreditsAuth_serviceDesc = grpc.ServiceDesc{
 	},
 	Metadata: "GameCtl.proto",
 }
+
+func (m *RoomListRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RoomListRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RoomListRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.Requirement) > 0 {
+		i -= len(m.Requirement)
+		copy(dAtA[i:], m.Requirement)
+		i = encodeVarintGameCtl(dAtA, i, uint64(len(m.Requirement)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *RoomListResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RoomListResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RoomListResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.Result) > 0 {
+		for iNdEx := len(m.Result) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Result[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGameCtl(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *RoomCreateRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RoomCreateRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RoomCreateRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.HostId) > 0 {
+		i -= len(m.HostId)
+		copy(dAtA[i:], m.HostId)
+		i = encodeVarintGameCtl(dAtA, i, uint64(len(m.HostId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *RoomRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RoomRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RoomRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.Key) > 0 {
+		i -= len(m.Key)
+		copy(dAtA[i:], m.Key)
+		i = encodeVarintGameCtl(dAtA, i, uint64(len(m.Key)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *Room) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Room) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Room) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.CellStatus) > 0 {
+		for iNdEx := len(m.CellStatus) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.CellStatus[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGameCtl(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x3a
+		}
+	}
+	if m.Cell != 0 {
+		i = encodeVarintGameCtl(dAtA, i, uint64(m.Cell))
+		i--
+		dAtA[i] = 0x30
+	}
+	if m.Round != 0 {
+		i = encodeVarintGameCtl(dAtA, i, uint64(m.Round))
+		i--
+		dAtA[i] = 0x28
+	}
+	if m.Status != 0 {
+		i = encodeVarintGameCtl(dAtA, i, uint64(m.Status))
+		i--
+		dAtA[i] = 0x20
+	}
+	if len(m.DuelerId) > 0 {
+		i -= len(m.DuelerId)
+		copy(dAtA[i:], m.DuelerId)
+		i = encodeVarintGameCtl(dAtA, i, uint64(len(m.DuelerId)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.HostId) > 0 {
+		i -= len(m.HostId)
+		copy(dAtA[i:], m.HostId)
+		i = encodeVarintGameCtl(dAtA, i, uint64(len(m.HostId)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Key) > 0 {
+		i -= len(m.Key)
+		copy(dAtA[i:], m.Key)
+		i = encodeVarintGameCtl(dAtA, i, uint64(len(m.Key)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *CellStatus) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CellStatus) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CellStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if m.CellNum != 0 {
+		i = encodeVarintGameCtl(dAtA, i, uint64(m.CellNum))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.Turn != 0 {
+		i = encodeVarintGameCtl(dAtA, i, uint64(m.Turn))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.Key) > 0 {
+		i -= len(m.Key)
+		copy(dAtA[i:], m.Key)
+		i = encodeVarintGameCtl(dAtA, i, uint64(len(m.Key)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *CreateCredReq) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CreateCredReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CreateCredReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.Password) > 0 {
+		i -= len(m.Password)
+		copy(dAtA[i:], m.Password)
+		i = encodeVarintGameCtl(dAtA, i, uint64(len(m.Password)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Username) > 0 {
+		i -= len(m.Username)
+		copy(dAtA[i:], m.Username)
+		i = encodeVarintGameCtl(dAtA, i, uint64(len(m.Username)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Ip) > 0 {
+		i -= len(m.Ip)
+		copy(dAtA[i:], m.Ip)
+		i = encodeVarintGameCtl(dAtA, i, uint64(len(m.Ip)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *Cred) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Cred) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Cred) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.File) > 0 {
+		i -= len(m.File)
+		copy(dAtA[i:], m.File)
+		i = encodeVarintGameCtl(dAtA, i, uint64(len(m.File)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func encodeVarintGameCtl(dAtA []byte, offset int, v uint64) int {
+	offset -= sovGameCtl(v)
+	base := offset
+	for v >= 1<<7 {
+		dAtA[offset] = uint8(v&0x7f | 0x80)
+		v >>= 7
+		offset++
+	}
+	dAtA[offset] = uint8(v)
+	return base
+}
+func (m *RoomListRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Requirement)
+	if l > 0 {
+		n += 1 + l + sovGameCtl(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *RoomListResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Result) > 0 {
+		for _, e := range m.Result {
+			l = e.Size()
+			n += 1 + l + sovGameCtl(uint64(l))
+		}
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *RoomCreateRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.HostId)
+	if l > 0 {
+		n += 1 + l + sovGameCtl(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *RoomRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Key)
+	if l > 0 {
+		n += 1 + l + sovGameCtl(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *Room) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Key)
+	if l > 0 {
+		n += 1 + l + sovGameCtl(uint64(l))
+	}
+	l = len(m.HostId)
+	if l > 0 {
+		n += 1 + l + sovGameCtl(uint64(l))
+	}
+	l = len(m.DuelerId)
+	if l > 0 {
+		n += 1 + l + sovGameCtl(uint64(l))
+	}
+	if m.Status != 0 {
+		n += 1 + sovGameCtl(uint64(m.Status))
+	}
+	if m.Round != 0 {
+		n += 1 + sovGameCtl(uint64(m.Round))
+	}
+	if m.Cell != 0 {
+		n += 1 + sovGameCtl(uint64(m.Cell))
+	}
+	if len(m.CellStatus) > 0 {
+		for _, e := range m.CellStatus {
+			l = e.Size()
+			n += 1 + l + sovGameCtl(uint64(l))
+		}
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *CellStatus) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Key)
+	if l > 0 {
+		n += 1 + l + sovGameCtl(uint64(l))
+	}
+	if m.Turn != 0 {
+		n += 1 + sovGameCtl(uint64(m.Turn))
+	}
+	if m.CellNum != 0 {
+		n += 1 + sovGameCtl(uint64(m.CellNum))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *CreateCredReq) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Ip)
+	if l > 0 {
+		n += 1 + l + sovGameCtl(uint64(l))
+	}
+	l = len(m.Username)
+	if l > 0 {
+		n += 1 + l + sovGameCtl(uint64(l))
+	}
+	l = len(m.Password)
+	if l > 0 {
+		n += 1 + l + sovGameCtl(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *Cred) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.File)
+	if l > 0 {
+		n += 1 + l + sovGameCtl(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func sovGameCtl(x uint64) (n int) {
+	return (math_bits.Len64(x|1) + 6) / 7
+}
+func sozGameCtl(x uint64) (n int) {
+	return sovGameCtl(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *RoomListRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGameCtl
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RoomListRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RoomListRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Requirement", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Requirement = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGameCtl(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RoomListResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGameCtl
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RoomListResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RoomListResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Result", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Result = append(m.Result, &Room{})
+			if err := m.Result[len(m.Result)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGameCtl(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RoomCreateRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGameCtl
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RoomCreateRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RoomCreateRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HostId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.HostId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGameCtl(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RoomRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGameCtl
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RoomRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RoomRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Key = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGameCtl(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Room) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGameCtl
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Room: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Room: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Key = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HostId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.HostId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DuelerId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DuelerId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			m.Status = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Status |= Status(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Round", wireType)
+			}
+			m.Round = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Round |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Cell", wireType)
+			}
+			m.Cell = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Cell |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CellStatus", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CellStatus = append(m.CellStatus, &CellStatus{})
+			if err := m.CellStatus[len(m.CellStatus)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGameCtl(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CellStatus) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGameCtl
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CellStatus: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CellStatus: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Key = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Turn", wireType)
+			}
+			m.Turn = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Turn |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CellNum", wireType)
+			}
+			m.CellNum = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.CellNum |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGameCtl(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CreateCredReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGameCtl
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CreateCredReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CreateCredReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Ip", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Ip = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Username", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Username = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Password", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Password = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGameCtl(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Cred) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGameCtl
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Cred: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Cred: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field File", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.File = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGameCtl(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthGameCtl
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func skipGameCtl(dAtA []byte) (n int, err error) {
+	l := len(dAtA)
+	iNdEx := 0
+	depth := 0
+	for iNdEx < l {
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return 0, ErrIntOverflowGameCtl
+			}
+			if iNdEx >= l {
+				return 0, io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		wireType := int(wire & 0x7)
+		switch wireType {
+		case 0:
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return 0, ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return 0, io.ErrUnexpectedEOF
+				}
+				iNdEx++
+				if dAtA[iNdEx-1] < 0x80 {
+					break
+				}
+			}
+		case 1:
+			iNdEx += 8
+		case 2:
+			var length int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return 0, ErrIntOverflowGameCtl
+				}
+				if iNdEx >= l {
+					return 0, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				length |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if length < 0 {
+				return 0, ErrInvalidLengthGameCtl
+			}
+			iNdEx += length
+		case 3:
+			depth++
+		case 4:
+			if depth == 0 {
+				return 0, ErrUnexpectedEndOfGroupGameCtl
+			}
+			depth--
+		case 5:
+			iNdEx += 4
+		default:
+			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
+		}
+		if iNdEx < 0 {
+			return 0, ErrInvalidLengthGameCtl
+		}
+		if depth == 0 {
+			return iNdEx, nil
+		}
+	}
+	return 0, io.ErrUnexpectedEOF
+}
+
+var (
+	ErrInvalidLengthGameCtl        = fmt.Errorf("proto: negative length found during unmarshaling")
+	ErrIntOverflowGameCtl          = fmt.Errorf("proto: integer overflow")
+	ErrUnexpectedEndOfGroupGameCtl = fmt.Errorf("proto: unexpected end of group")
+)

@@ -91,25 +91,22 @@ func main() {
 	addr := "127.0.0.1:10000"
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
-		log.Fatalln("Failed to listen:", err)
+		panic("Failed to listen:\t"+ err.Error())
 	}
 	s := grpc.NewServer(
-		grpc.Creds(credentials.NewServerTLSFromCert(insecure.Cert)),
-		grpc.UnaryInterceptor(grpc_validator.UnaryServerInterceptor()),
-		grpc.StreamInterceptor(grpc_validator.StreamServerInterceptor()),
+		grpc.Creds( credentials.NewServerTLSFromCert(insecure.Cert)),
+		grpc.UnaryInterceptor( grpc_validator.UnaryServerInterceptor()),
+		grpc.StreamInterceptor( grpc_validator.StreamServerInterceptor()),
 	)
+	// s.GracefulStop()
 	pb.RegisterRoomStatusServer(
 		s,
 		server.New(&testing_config))
 
-	// pb.RegisterRoomStatusServiceServer(
-	// 	s,
-	// 	server.New())
-
 	// Serve gRPC Server
 	log.Info("Serving gRPC on https://", addr)
 	go func() {
-		log.Fatal(s.Serve(lis))
+		panic(s.Serve(lis))
 	}()
 
 	// See https://github.com/grpc/grpc/blob/master/doc/naming.md
@@ -126,7 +123,7 @@ func main() {
 		grpc.WithBlock(),
 	)
 	if err != nil {
-		log.Fatalln("Failed to dial server:", err)
+		panic("Failed to dial server:\t"+err.Error())
 	}
 
 	mux := http.NewServeMux()
@@ -145,13 +142,13 @@ func main() {
 	err = pb.RegisterRoomStatusHandler(
 		context.Background(), gwmux, conn)
 	if err != nil {
-		log.Fatalln("Failed to register gateway:", err)
+		panic("Failed to register gateway:\t"+err.Error())
 	}
 
 	mux.Handle("/", gwmux)
 	err = serveOpenAPI(mux)
 	if err != nil {
-		log.Fatalln("Failed to serve OpenAPI UI")
+		panic("Failed to serve OpenAPI UI")
 	}
 
 	gatewayAddr := fmt.Sprintf("localhost:%d", *gatewayPort)
@@ -164,5 +161,5 @@ func main() {
 		},
 		Handler: mux,
 	}
-	log.Fatalln(gwServer.ListenAndServeTLS("", ""))
+	panic(gwServer.ListenAndServeTLS("", ""))
 }
