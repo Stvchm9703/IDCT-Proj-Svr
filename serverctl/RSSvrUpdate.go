@@ -3,8 +3,10 @@ package serverctl
 import (
 	pb "RoomStatus/proto"
 	"context"
-	"errors"
 	"log"
+	"time"
+
+	"github.com/gogo/status"
 )
 
 func (b *RoomStatusBackend) updateWkTask(payload interface{}) {
@@ -77,16 +79,23 @@ func (b *RoomStatusBackend) updateWkTask(payload interface{}) {
 func (b *RoomStatusBackend) UpdateRoom(ctx context.Context, req *pb.CellStatus) (*pb.CellStatus, error) {
 	// return nil, status.Errorf(codes.Unimplemented, "method DeleteRoom not implemented")
 	printReqLog(ctx, req)
+	start := time.Now()
+	b.mu.Lock()
+	defer func() {
+		b.mu.Unlock()
+		elapsed := time.Since(start)
+		log.Printf("Quit-Room took %s", elapsed)
+	}()
 	wkbox := b.searchAliveClient()
 	var room pb.Room
 	if _, err := (wkbox).GetPara(&req.Key, &room); err != nil {
 		log.Println(err)
-		return nil, err
+		return nil, status.Errorf(500, err.Error())
 	}
 	keynum := -1
 	if len(room.CellStatus) == 9 && room.Round == 9 {
 		log.Println("the game should be end")
-		return nil, errors.New("GameEnd")
+		return nil, status.Errorf(500, "GameEnd")
 	}
 
 	for k, v := range room.CellStatus {
@@ -106,11 +115,12 @@ func (b *RoomStatusBackend) UpdateRoom(ctx context.Context, req *pb.CellStatus) 
 	for _, v := range b.Roomlist {
 		if v.Key == room.Key {
 			v = &room
+			break
 		}
 	}
-	if _, err := wkbox.UpdatePara(&req.Key, &room); err != nil {
+	if _, err := wkbox.UpdatePara(&room.Key, &room); err != nil {
 		log.Fatalln(err)
-		return nil, err
+		return nil, status.Errorf(500, err.Error())
 	}
 	(wkbox).Preserve(false)
 	log.Println("b.RoomList", b.Roomlist)
