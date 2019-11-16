@@ -23,7 +23,7 @@ import (
 	cf "RoomStatus/config"
 	"RoomStatus/insecure"
 	pb "RoomStatus/proto"
-	server "RoomStatus/serverGameCtl"
+	server "RoomStatus/serverctl"
 
 	// Static files
 	_ "RoomStatus/statik"
