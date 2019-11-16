@@ -164,7 +164,7 @@ func (rc *RdsCliBox) register() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	log.Println("register-proc:", res)
+	log.Println("register-proc:", res, ":", str)
 	return true, nil
 }
 
@@ -197,11 +197,11 @@ func (rc *RdsCliBox) unregister() (bool, error) {
 		}
 	}
 
-	res, err := rc.conn.LRem(redisCliPoolName, -1, str).Result()
+	_, err = rc.conn.LRem(redisCliPoolName, -1, str).Result()
 	if err != nil {
 		return false, err
 	}
-	log.Println("unreg-proc:", res)
+	log.Println("unreg-proc:", str)
 	return true, nil
 }
 
@@ -366,18 +366,22 @@ func (rc *RdsCliBox) GetParaList(key *string) (*[]byte, error) {
 	rc.lock()
 	defer rc.unlock()
 	keystr := rc.CoreKey + "/_" + rc.Key + ".*" + *key + "*"
-	// log.Println("Key-in:", keystr)
+	log.Println("Key-in:", keystr)
 	keys, err := rc.conn.Keys(keystr).Result()
 	if err != nil {
 		log.Println("get-para-process,conn-keys,err", err)
 		return nil, err
 	}
-	// log.Println("key-find:", keys)
-	res, err := rc.conn.MGet(keys...).Result()
-	if err != nil {
-		log.Println("get-para-process-err", err)
-		return nil, err
+	log.Println("key-find:", keys)
+	var res []interface{}
+	if len(keys) > 0 {
+		res, err = rc.conn.MGet(keys...).Result()
+		if err != nil {
+			log.Println("get-para-process-err", err)
+			return nil, err
+		}
 	}
+
 	resStr := []byte(`[`)
 	for k, v := range res {
 		if v != nil {

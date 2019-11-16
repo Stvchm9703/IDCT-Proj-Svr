@@ -51,7 +51,7 @@ func (b *RoomStatusBackend) DeleteRoom(ctx context.Context, req *pb.RoomRequest)
 	printReqLog(ctx, req)
 	// var k chan pb.Room
 	// ====== Worker Start =======
-	pl := &WkTask{In: req, Out: make(chan interface{})}
+	pl := WkTask{In: req, Out: make(chan interface{})}
 	if err := b.deleteWk.Invoke(pl); err != nil {
 		log.Println(err)
 		return nil, err

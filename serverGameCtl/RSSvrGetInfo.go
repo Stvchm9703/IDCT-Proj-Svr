@@ -39,7 +39,7 @@ func (b *RoomStatusBackend) GetRoomInfo(ctx context.Context, req *pb.RoomRequest
 
 	printReqLog(ctx, req)
 	// ===== Worker Start ======
-	pl := &WkTask{
+	pl := WkTask{
 		In:  req,
 		Out: make(chan interface{})}
 	if err := b.getWk.Invoke(pl); err != nil {

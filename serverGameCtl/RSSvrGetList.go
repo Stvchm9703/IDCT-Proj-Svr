@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"reflect"
 )
 
 func (b *RoomStatusBackend) getLsWkTask(payload interface{}) {
@@ -20,12 +21,12 @@ func (b *RoomStatusBackend) getLsWkTask(payload interface{}) {
 	if err2 != nil {
 		log.Fatalln(err2)
 	}
-	// log.Println("strl:", string(*strl))
+	log.Println("strl:", string(*strl))
 	err := json.Unmarshal(*strl, &RmList)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	// log.Println(RmList)
+	log.Println(RmList)
 	(wkbox).Preserve(false)
 	payload.(WkTask).Out <- RmList
 	return
@@ -49,7 +50,7 @@ func (b *RoomStatusBackend) TestGetLsWkTask(pl interface{}) (rmTmp *pb.RoomListR
 func (b *RoomStatusBackend) GetRoomList(ctx context.Context, req *pb.RoomListRequest) (res *pb.RoomListResponse, err error) {
 	printReqLog(ctx, req)
 	// ===== Worker Start ======
-	pl := &WkTask{
+	pl := WkTask{
 		In:  req,
 		Out: make(chan interface{})}
 	if err = b.getListWk.Invoke(pl); err != nil {
@@ -59,6 +60,8 @@ func (b *RoomStatusBackend) GetRoomList(ctx context.Context, req *pb.RoomListReq
 	// ====== Worker End =======
 	rm := <-(pl).Out
 	fg := rm.([]*pb.Room)
+	log.Println("list:", fg)
+	log.Println("typeof:", reflect.TypeOf(fg))
 	res = &pb.RoomListResponse{
 		Result: fg,
 	}

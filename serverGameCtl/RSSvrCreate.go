@@ -76,7 +76,7 @@ func (b *RoomStatusBackend) CreateRoom(ctx context.Context, req *pb.RoomCreateRe
 
 	// var k chan pb.Room
 	// ====== Worker Start =======
-	pl := &WkTask{In: req, Out: make(chan interface{})}
+	pl := WkTask{In: req, Out: make(chan interface{})}
 	if err := b.createWk.Invoke(pl); err != nil {
 		log.Println(err)
 		return nil, err

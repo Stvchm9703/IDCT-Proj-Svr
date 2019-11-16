@@ -3,14 +3,15 @@ package main
 import (
 	"context"
 	"crypto/tls"
-	"flag"
 	"fmt"
+	"log"
 	"mime"
 	"net"
 	"net/http"
 	"os"
-	"path/filepath"
-	"time"
+	"os/signal"
+	"strconv"
+	"syscall"
 
 	"github.com/gogo/gateway"
 	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
@@ -18,9 +19,7 @@ import (
 	"github.com/rakyll/statik/fs"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/grpclog"
 
-	cm "RoomStatus/common"
 	cf "RoomStatus/config"
 	"RoomStatus/insecure"
 	pb "RoomStatus/proto"
@@ -30,19 +29,14 @@ import (
 	_ "RoomStatus/statik"
 )
 
-var (
-	gRPCPort    = flag.Int("grpc-port", 10000, "The gRPC server port")
-	gatewayPort = flag.Int("gateway-port", 11000, "The gRPC-Gateway server port")
-)
-
-var log grpclog.LoggerV2
+// var log grpclog.LoggerV2
 
 func init() {
-	f, _ := os.Getwd()
-	dt := time.Now()
-	w := cm.SetLog(filepath.Join(f, "tmp", "log", dt.Format("01-02-2006")+".log"))
-	log = grpclog.NewLoggerV2(w, w, w)
-	grpclog.SetLoggerV2(log)
+	// f, _ := os.Getwd()
+	// dt := time.Now()
+	// w := cm.SetLog(filepath.Join(f, "tmp", "log", dt.Format("01-02-2006")+".log"))
+	// log = grpclog.NewLoggerV2(w, w, w)
+	// grpclog.SetLoggerV2(log)
 }
 
 // serveOpenAPI serves an OpenAPI UI on /openapi-ui/
@@ -62,8 +56,76 @@ func serveOpenAPI(mux *http.ServeMux) error {
 	return nil
 }
 
+func TemplateServer(conf *cf.ConfTmp) {
+	// See https://github.com/grpc/grpc/blob/master/doc/naming.md
+	// for gRPC naming standard information.
+
+	// template-client dial to grpc host
+	addr := conf.APIServer.IP + ":" + strconv.Itoa(conf.APIServer.Port)
+	dialAddr := fmt.Sprintf("passthrough://127.0.0.1/%s", addr)
+	conn, err := grpc.DialContext(
+		context.Background(),
+		dialAddr,
+		grpc.WithTransportCredentials(
+			credentials.NewClientTLSFromCert(
+				insecure.CertPool, "",
+			),
+		),
+		grpc.WithBlock(),
+	)
+	if err != nil {
+		panic("Failed to dial server:\t" + err.Error())
+	}
+
+	mux := http.NewServeMux()
+
+	jsonpb := &gateway.JSONPb{
+		EmitDefaults: true,
+		Indent:       "  ",
+		OrigName:     true,
+	}
+	gwmux := runtime.NewServeMux(
+		runtime.WithMarshalerOption(runtime.MIMEWildcard, jsonpb),
+		// This is necessary to get error details properly
+		// marshalled in unary requests.
+		runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler),
+	)
+	err = pb.RegisterRoomStatusHandler(
+		context.Background(), gwmux, conn)
+	if err != nil {
+		panic("Failed to register gateway:\t" + err.Error())
+	}
+
+	mux.Handle("/", gwmux)
+	err = serveOpenAPI(mux)
+	if err != nil {
+		panic("Failed to serve OpenAPI UI")
+	}
+
+	gatewayAddr := conf.TemplServer.IP + ":" + strconv.Itoa(conf.TemplServer.Port)
+	log.Println("Serving gRPC-Gateway on https://", gatewayAddr)
+	log.Println("Serving OpenAPI Documentation on https://", gatewayAddr, "/openapi-ui/")
+	gwServer := http.Server{
+		Addr: gatewayAddr,
+		TLSConfig: &tls.Config{
+			Certificates: []tls.Certificate{*insecure.Cert},
+		},
+		Handler: mux,
+	}
+	panic(gwServer.ListenAndServeTLS("", ""))
+}
+
 var testing_config = cf.ConfTmp{
-	cf.CfTemplServer{},
+	cf.CfTemplServer{
+		IP:               "127.0.0.1",
+		Port:             9000,
+		RootFilePath:     "",
+		MainPath:         "",
+		StaticFilepath:   "",
+		StaticOutpath:    "",
+		TemplateFilepath: "",
+		TemplateOutpath:  "",
+	},
 	cf.CfAPIServer{
 		ConnType:     "TCP",
 		IP:           "127.0.0.1",
@@ -86,80 +148,42 @@ var testing_config = cf.ConfTmp{
 }
 
 func main() {
-	flag.Parse()
-	// addr := fmt.Sprintf("127.0.0.1:%d", *gRPCPort)
-	addr := "127.0.0.1:10000"
+	addr := testing_config.APIServer.IP + ":" + strconv.Itoa(testing_config.APIServer.Port)
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
-		panic("Failed to listen:\t"+ err.Error())
+		panic("Failed to listen:\t" + err.Error())
 	}
 	s := grpc.NewServer(
-		grpc.Creds( credentials.NewServerTLSFromCert(insecure.Cert)),
-		grpc.UnaryInterceptor( grpc_validator.UnaryServerInterceptor()),
-		grpc.StreamInterceptor( grpc_validator.StreamServerInterceptor()),
+		grpc.Creds(credentials.NewServerTLSFromCert(insecure.Cert)),
+		grpc.UnaryInterceptor(grpc_validator.UnaryServerInterceptor()),
+		grpc.StreamInterceptor(grpc_validator.StreamServerInterceptor()),
 	)
+
+	RMServer := server.New(&testing_config)
 	// s.GracefulStop()
 	pb.RegisterRoomStatusServer(
-		s,
-		server.New(&testing_config))
+		s, RMServer)
 
 	// Serve gRPC Server
-	log.Info("Serving gRPC on https://", addr)
+	log.Println("Serving gRPC on https://", addr)
 	go func() {
 		panic(s.Serve(lis))
 	}()
+	BeforeGracefulStop(s, RMServer)
 
-	// See https://github.com/grpc/grpc/blob/master/doc/naming.md
-	// for gRPC naming standard information.
-	dialAddr := fmt.Sprintf("passthrough://127.0.0.1/%s", addr)
-	conn, err := grpc.DialContext(
-		context.Background(),
-		dialAddr,
-		grpc.WithTransportCredentials(
-			credentials.NewClientTLSFromCert(
-				insecure.CertPool, "",
-			),
-		),
-		grpc.WithBlock(),
-	)
-	if err != nil {
-		panic("Failed to dial server:\t"+err.Error())
-	}
+	// call your cleanup method with this channel as a routine
 
-	mux := http.NewServeMux()
-
-	jsonpb := &gateway.JSONPb{
-		EmitDefaults: true,
-		Indent:       "  ",
-		OrigName:     true,
-	}
-	gwmux := runtime.NewServeMux(
-		runtime.WithMarshalerOption(runtime.MIMEWildcard, jsonpb),
-		// This is necessary to get error details properly
-		// marshalled in unary requests.
-		runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler),
-	)
-	err = pb.RegisterRoomStatusHandler(
-		context.Background(), gwmux, conn)
-	if err != nil {
-		panic("Failed to register gateway:\t"+err.Error())
-	}
-
-	mux.Handle("/", gwmux)
-	err = serveOpenAPI(mux)
-	if err != nil {
-		panic("Failed to serve OpenAPI UI")
-	}
-
-	gatewayAddr := fmt.Sprintf("localhost:%d", *gatewayPort)
-	log.Info("Serving gRPC-Gateway on https://", gatewayAddr)
-	log.Info("Serving OpenAPI Documentation on https://", gatewayAddr, "/openapi-ui/")
-	gwServer := http.Server{
-		Addr: gatewayAddr,
-		TLSConfig: &tls.Config{
-			Certificates: []tls.Certificate{*insecure.Cert},
-		},
-		Handler: mux,
-	}
-	panic(gwServer.ListenAndServeTLS("", ""))
+}
+func BeforeGracefulStop(ss *grpc.Server, rms *server.RoomStatusBackend) {
+	log.Println("BeforeGracefulStop")
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
+	aa := <-c
+	log.Println("OS.signal", aa)
+	log.Println(ss.GetServiceInfo())
+	// ss.Shutdown()
+	rms.Shutdown()
+	ss.GracefulStop()
+	log.Println("os GracefulStop")
+	os.Exit(0)
 }

@@ -1,6 +1,7 @@
 package serverGameCtl
 
 import (
+	// _ "RoomStatus"
 	cm "RoomStatus/common"
 	cf "RoomStatus/config"
 	pb "RoomStatus/proto"
