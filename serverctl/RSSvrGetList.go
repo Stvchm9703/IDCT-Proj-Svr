@@ -5,68 +5,39 @@ import (
 	"context"
 	"encoding/json"
 	"log"
-	"reflect"
+	"time"
+
+	"github.com/gogo/status"
 )
 
-func (b *RoomStatusBackend) getLsWkTask(payload interface{}) {
-	req, ok := payload.(WkTask).In.(*pb.RoomListRequest)
-	if !ok {
-		return
-	}
-
-	wkbox := b.searchAliveClient()
-	// var tmp pb.Room
-	var RmList []*pb.Room
-	strl, err2 := wkbox.GetParaList(&req.Requirement)
-	if err2 != nil {
-		log.Fatalln(err2)
-	}
-	log.Println("strl:", string(*strl))
-	err := json.Unmarshal(*strl, &RmList)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	log.Println(RmList)
-	(wkbox).Preserve(false)
-	payload.(WkTask).Out <- RmList
-	return
-}
-
-// func (b *RoomStatusBackend) TestGetLsWkTask(pl interface{}) (rmTmp *pb.RoomListResponse, err error) {
-// 	if err = b.getListWk.Invoke(pl.(WkTask)); err != nil {
-// 		log.Println("err in GetList Wk", err)
-// 		return
-// 	}
-// 	// ====== Worker End =======
-// 	rm := <-(pl.(WkTask)).Out
-// 	fg := rm.([]*pb.Room)
-// 	rmTmp = &pb.RoomListResponse{
-// 		Result: fg,
-// 	}
-// 	return
-// }
-
 // GetRoomList :
-func (b *RoomStatusBackend) GetRoomList(ctx context.Context, req *pb.RoomListRequest) (res *pb.RoomListResponse, err error) {
+func (b *RoomStatusBackend) GetRoomList(ctx context.Context, req *pb.RoomListRequest) (*pb.RoomListResponse, error) {
+
 	printReqLog(ctx, req)
+	start := time.Now()
+	defer func() {
+		elapsed := time.Since(start)
+		log.Printf("Quit-Room took %s", elapsed)
+	}()
 	wkbox := b.searchAliveClient()
 	// var tmp pb.Room
 	var RmList []*pb.Room
 	strl, err2 := wkbox.GetParaList(&req.Requirement)
 	if err2 != nil {
 		log.Fatalln(err2)
+		// ignore err ()
 	}
-	log.Println("strl:", string(*strl))
-	err = json.Unmarshal(*strl, &RmList)
-	if err != nil {
-		log.Fatalln(err)
-		return
+	// log.Println("strl:", string(*strl))
+	err2 = json.Unmarshal(*strl, &RmList)
+	if err2 != nil {
+		log.Fatalln(err2)
+		return nil, status.Errorf(500, err2.Error())
 	}
 	(wkbox).Preserve(false)
-	log.Println("list:", RmList)
-	log.Println("typeof:", reflect.TypeOf(RmList))
-	res = &pb.RoomListResponse{
+	// log.Println("list:", RmList)
+	// log.Println("typeof:", reflect.TypeOf(RmList))
+	res := &pb.RoomListResponse{
 		Result: RmList,
 	}
-	return
+	return res, nil
 }

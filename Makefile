@@ -72,3 +72,6 @@ install:
 		github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger \
 		github.com/mwitkow/go-proto-validators/protoc-gen-govalidators \
 		github.com/rakyll/statik
+
+build: 
+	go build -o bin/roomstatus_server.exe main.try.go
