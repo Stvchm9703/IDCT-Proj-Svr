@@ -1,4 +1,4 @@
-package serverctlNoRedisl
+package serverctlNoRedis
 
 import (
 	pb "RoomStatus/proto"

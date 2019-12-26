@@ -23,6 +23,7 @@ require (
 	github.com/rakyll/statik v0.1.6
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5 // indirect
+	golang.org/dl v0.0.0-20191220003028-84da647cadd0 // indirect
 	golang.org/x/sys v0.0.0-20191020152052-9984515f0562 // indirect
 
 	google.golang.org/grpc v1.24.0

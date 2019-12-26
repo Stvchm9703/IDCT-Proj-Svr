@@ -1,11 +1,10 @@
-package serverctlNoRedisl
+package serverctlNoRedis
 
 import (
 	cm "RoomStatus/common"
 	pb "RoomStatus/proto"
 	"context"
 	"errors"
-	"log"
 	"time"
 )
 
@@ -21,7 +20,7 @@ func (b *RoomStatusBackend) CreateRoom(ctx context.Context, req *pb.RoomCreateRe
 		}
 	}
 
-	wkbox := b.searchAliveClient()
+	// wkbox := b.searchAliveClient()
 	// for loop it
 	tmptime := time.Now().String() + req.HostId
 	var f = ""
@@ -29,12 +28,13 @@ func (b *RoomStatusBackend) CreateRoom(ctx context.Context, req *pb.RoomCreateRe
 		f = cm.HashText(tmptime)
 
 		// ------
-		l, err := (wkbox).ListRem(&f)
-		if err != nil {
-			log.Println(err)
-			return nil, err
+		var l []*string
+		for _, v := range b.Roomlist {
+			if v.Key == f {
+				l = append(l, &v.Key)
+			}
 		}
-		if len(*l) == 0 {
+		if len(l) == 0 {
 			break
 		}
 		// -----
@@ -48,11 +48,6 @@ func (b *RoomStatusBackend) CreateRoom(ctx context.Context, req *pb.RoomCreateRe
 		Cell:       -1,
 		CellStatus: nil,
 	}
-	// if _, err := wkbox.SetPara(&rmTmp.Key, rmTmp); err != nil {
-	// 	log.Println(err)
-	// 	return nil, err
-	// }
-	// wkbox.Preserve(false)
 	b.Roomlist = append(b.Roomlist, &rmTmp)
 	return &rmTmp, nil
 }

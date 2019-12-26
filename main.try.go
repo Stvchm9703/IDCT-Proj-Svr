@@ -23,7 +23,7 @@ import (
 	cf "RoomStatus/config"
 	"RoomStatus/insecure"
 	pb "RoomStatus/proto"
-	server "RoomStatus/serverctl"
+	server "RoomStatus/serverctlNoRedis"
 
 	// Static files
 	_ "RoomStatus/statik"
@@ -148,6 +148,7 @@ var testing_config = cf.ConfTmp{
 }
 
 func main() {
+	log.Println("start run")
 	addr := testing_config.APIServer.IP + ":" + strconv.Itoa(testing_config.APIServer.Port)
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {

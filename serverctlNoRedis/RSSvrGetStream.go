@@ -1,4 +1,4 @@
-package serverctlNoRedisl
+package serverctlNoRedis
 
 // pb.GetRoomStream
 // func (*UnimplementedRoomStatusServer) GetRoomStream(req *RoomRequest, srv RoomStatus_GetRoomStreamServer) error {
