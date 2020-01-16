@@ -144,32 +144,6 @@
         ]
       }
     },
-    "/v1/room/quit": {
-      "post": {
-        "operationId": "QuitRoom",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/RoomStatusRoomCreateRequest"
-            }
-          }
-        ],
-        "tags": [
-          "RoomStatus"
-        ]
-      }
-    },
     "/v1/room/update": {
       "post": {
         "summary": "rpc GetRoomStream (RoomRequest) returns (stream CellStatus){\n    option (google.api.http) = {\n        post: \"/v1/room/stream\"\n        body: \"*\"\n    }; \n};\nrpc UpdateRoomStream(stream CellStatus) returns  (stream CellStatus){\n    option (google.api.http) = {\n        post: \"/v1/room/stream/update\"\n        body: \"*\"\n    }; \n};",

@@ -40,14 +40,7 @@ func New(conf *cf.ConfTmp) *RoomStatusBackend {
 
 func (this *RoomStatusBackend) Shutdown() {
 	log.Println("in shtdown proc")
-	// for _, v := range this.redhdlr {
-	// 	if _, err := v.CleanRem(); err != nil {
-	// 		log.Println(err)
-	// 	}
-	// 	if _, e := v.Disconn(); e != nil {
-	// 		log.Println(e)
-	// 	}
-	// }
+	/// TODO: send closing msg to all client
 	log.Println("endof shtdown proc:", this.CoreKey)
 
 }
@@ -67,26 +60,7 @@ type WkTask struct {
 	Stream interface{}
 }
 
-// func (b *RoomStatusBackend) searchAliveClient() *rd.RdsCliBox {
-// 	for {
-// 		wk := b.checkAliveClient()
-// 		if wk == nil {
-// 			// log.Println("busy at " + time.Now().String())
-// 			time.Sleep(500)
-// 		} else {
-// 			wk.Preserve(true)
-// 			return wk
-// 		}
-// 	}
-// }
-
-// checkAliveClient
 func (b *RoomStatusBackend) checkAliveClient() *rd.RdsCliBox {
-	// for _, v := range b.redhdlr {
-	// 	if !*v.IsRunning() {
-	// 		return v
-	// 	}
-	// }
 	return nil
 }
 

@@ -120,12 +120,12 @@ service RoomStatus {
         }; 
     };
 
-    rpc QuitRoom(RoomCreateRequest) returns(google.protobuf.Empty){
-         option (google.api.http) = {
-            post: "/v1/room/quit"
-            body: "*"
-        }; 
-    }
+    // rpc QuitRoom(RoomCreateRequest) returns(google.protobuf.Empty){
+    //      option (google.api.http) = {
+    //         post: "/v1/room/quit"
+    //         body: "*"
+    //     }; 
+    // }
     
 }
 
