@@ -36,7 +36,7 @@ func (b *RoomStatusBackend) DeleteRoom(ctx context.Context, req *pb.RoomReq) (*p
 			},
 		}, errors.New("RoomNotExist")
 	}
-	room_tmp.conn_pool.BroadCast(
+	room_tmp.BroadCast(
 		"room_svr"+b.CoreKey,
 		&pb.CellStatusResp{
 			UserId:    "room_svr" + b.CoreKey,

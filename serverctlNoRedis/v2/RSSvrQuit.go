@@ -12,7 +12,7 @@ func (b *RoomStatusBackend) QuitRoom(ctx context.Context, req *pb.RoomCreateReq)
 	var tmpRoom *RoomMgr
 	for _, v := range b.Roomlist {
 		if v.Room.HostId == req.UserId {
-			v.conn_pool.BroadCast("RoomSvrMgr",
+			v.BroadCast("RoomSvrMgr",
 				&pb.CellStatusResp{
 					ResponseMsg: &pb.CellStatusResp_ErrorMsg{
 						ErrorMsg: &pb.ErrorMsg{
@@ -24,7 +24,7 @@ func (b *RoomStatusBackend) QuitRoom(ctx context.Context, req *pb.RoomCreateReq)
 			break
 
 		} else if v.Room.DuelerId == req.UserId {
-			v.conn_pool.BroadCast("RoomSvrMgr",
+			v.BroadCast("RoomSvrMgr",
 				&pb.CellStatusResp{
 					ResponseMsg: &pb.CellStatusResp_ErrorMsg{
 						ErrorMsg: &pb.ErrorMsg{
@@ -36,8 +36,8 @@ func (b *RoomStatusBackend) QuitRoom(ctx context.Context, req *pb.RoomCreateReq)
 			break
 		}
 
-		if k := v.conn_pool.Get(req.UserId); k != nil {
-			v.conn_pool.BroadCast("RoomSvrMgr",
+		if k := v.GetBS(req.UserId); k != nil {
+			v.BroadCast("RoomSvrMgr",
 				&pb.CellStatusResp{
 					ResponseMsg: &pb.CellStatusResp_ErrorMsg{
 						ErrorMsg: &pb.ErrorMsg{
@@ -53,6 +53,6 @@ func (b *RoomStatusBackend) QuitRoom(ctx context.Context, req *pb.RoomCreateReq)
 	if tmpRoom == nil {
 		return nil, errors.New("NoRoomPlayerJoined")
 	}
-	tmpRoom.conn_pool.Del(req.UserId)
+	tmpRoom.DelBS(req.UserId)
 	return nil, nil
 }

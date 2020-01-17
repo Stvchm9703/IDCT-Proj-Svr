@@ -1,0 +1,117 @@
+// # hello.proto
+syntax = "proto3";
+// import "google/protobuf/empty.proto";
+// import "google/api/annotations.proto";
+// import "protoc-gen-swagger/options/annotations.proto";
+// import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+// import "github.com/mwitkow/go-proto-validators/validator.proto";
+
+package RoomStatus;
+option csharp_namespace = "PlayCli.ProtoMod";
+option go_package  = "proto";
+// option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+//   info: {
+//     version: "0.1";
+//   };
+//   external_docs: {
+//     url: "https://github.com/stvchm9703/IDCT";
+//     description: "gRPC server Impletement repository";
+//   }
+//   schemes: HTTPS;
+// };
+// // Enable custom Marshal method.
+// option (gogoproto.marshaler_all) = true;
+// // Enable custom Unmarshal method.
+// option (gogoproto.unmarshaler_all) = true;
+// // Enable custom Size method (Required by Marshal and Unmarshal).
+// option (gogoproto.sizer_all) = true;
+// // Enable registration with golang/protobuf for the grpc-gateway.
+// option (gogoproto.goproto_registration) = true;
+// // Enable generation of XXX_MessageName methods for grpc-go/status.
+// option (gogoproto.messagename_all) = true;
+
+// message CreateCredReq {
+//     string Ip =1;
+//     string Username = 2;
+//     string Password =3;
+// }
+// message Cred{
+//     string file = 1;
+// }
+
+message RoomListRequest{
+    string requirement = 1;
+}
+
+message RoomListResponse {
+    repeated Room result = 1;
+}
+message RoomCreateRequest {
+    string HostId = 1;
+}
+message RoomRequest {
+    string key = 1;
+}
+enum Status {
+    ON_START = 0;
+    ON_WAIT = 1 ;
+    ON_HOST_TURN = 2;
+    ON_DUEL_TURN = 3;
+    ON_END = 4;
+}
+message Room {
+    string key = 1;
+    string host_id = 2; 
+    string dueler_id = 3;
+    Status status = 4;
+    int32 round = 5;
+    int32 cell = 6;
+    repeated CellStatus cell_status = 7;
+}
+
+message CellStatus{
+    string key = 1;
+    int32 turn = 2; // turn 1 = host / -1 = duel
+    int32 cell_num = 3;
+}
+message Empty{}
+service RoomStatus {
+    rpc CreateRoom (RoomCreateRequest) returns (Room){ 
+        // option (google.api.http) = {
+        //     post: "/v1/room/create"
+        //     body: "*"
+        // };  
+    };
+    rpc GetRoomList(RoomListRequest) returns (RoomListResponse){ 
+        // option (google.api.http) = {
+        //     post: "/v1/room/list"
+        //     body: "*"
+        // }; 
+    }; 
+    rpc GetRoomInfo (RoomRequest) returns (Room){ };
+    rpc DeleteRoom (RoomRequest) returns (Empty){};
+
+    rpc UpdateRoom( CellStatus) returns (CellStatus){};
+
+    rpc QuitRoom(RoomCreateRequest) returns(Empty){}
+    
+}
+
+message CreateCredReq {
+    string Ip =1;
+    string Username = 2;
+    string Password =3;
+}
+
+message Cred{
+    string file = 1;
+}
+
+service CreditsAuth {
+    rpc CreateCred (CreateCredReq) returns (stream Cred) {
+        //  option (google.api.http) = {
+        //     post: "/v1/cred/create"
+        //     body: "*"
+        // };  
+    } 
+}

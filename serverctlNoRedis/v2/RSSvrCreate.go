@@ -5,6 +5,7 @@ import (
 	pb "RoomStatus/proto/v2"
 	"context"
 	"errors"
+	"log"
 	"time"
 )
 
@@ -55,12 +56,11 @@ func (b *RoomStatusBackend) CreateRoom(ctx context.Context, req *pb.RoomCreateRe
 		CellStatus: nil,
 	}
 	rmTmp1 := RoomMgr{
-		Room:      rmTmp,
-		conn_pool: nil,
+		Room: rmTmp,
 	}
 
 	b.Roomlist = append(b.Roomlist, &rmTmp1)
-
+	log.Println("Created Room : <", rmTmp)
 	return &pb.RoomResp{
 		Timestamp: time.Now().String(),
 		ResponseMsg: &pb.RoomResp_RoomInfo{

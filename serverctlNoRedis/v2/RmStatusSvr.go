@@ -16,64 +16,95 @@ import (
 
 var _ pb.RoomStatusServer = (*RoomStatusBackend)(nil)
 
-type ConnPool struct{ sync.Map }
-
-func (p *ConnPool) Get(user_id string) pb.RoomStatus_RoomStreamServer {
-	if stream, ok := p.Load(user_id); ok {
-		return stream.(pb.RoomStatus_RoomStreamServer)
-	} else {
+func (rm *RoomMgr) GetGS(user_id string) pb.RoomStatus_GetRoomStreamServer {
+	stream, ok := (*rm).conn_pool.Load(user_id)
+	if !ok {
 		return nil
 	}
+	return (stream).(pb.RoomStatus_GetRoomStreamServer)
 }
-func (p *ConnPool) Add(user_id string, stream pb.RoomStatus_RoomStreamServer) {
-	p.Store(user_id, stream)
-}
-func (rm *RoomMgr) Add(user_id string, stream pb.RoomStatus_RoomStreamServer) {
-	rm.conn_pool.Add(user_id, stream)
+
+func (rm *RoomMgr) AddGS(user_id string, stream pb.RoomStatus_GetRoomStreamServer) {
+	rm.get_only_stream.Store(user_id, stream)
 	_, cn := context.WithCancel(stream.Context())
 	rm.close_link.Store(user_id, cn)
 }
-func (p *ConnPool) Del(user_id string) {
-	p.Delete(user_id)
-}
-func (rm *RoomMgr) Del(user_id string) {
+
+func (rm *RoomMgr) DelGS(user_id string) {
 	if d, ok := rm.close_link.Load(user_id); ok {
 		d.(context.CancelFunc)()
 	}
-	rm.Del(user_id)
+	rm.get_only_stream.Delete(user_id)
 }
-func (rm *RoomMgr) ClearAll() {
-	log.Println("ClearAll Proc")
-	rm.close_link.Range(func(key interface{}, value interface{}) bool {
-		// map2.Delete(key)
-		value.(context.CancelFunc)()
+func (rm *RoomMgr) BroadCastGS(from string, message *pb.CellStatusResp) {
+	rm.conn_pool.Range(func(username_i, stream_i interface{}) bool {
+		username := username_i.(string)
+		stream := (stream_i).(pb.RoomStatus_GetRoomStreamServer)
+		if username == from {
+			return true
+		} else {
+			(stream).Send(message)
+		}
 		return true
 	})
 }
 
-// BroadCast handler
-func (p *ConnPool) BroadCast(from string, message *pb.CellStatusResp) {
-	log.Printf("BroadCast from: %s, message: %s\n", from, message.UserId)
-	p.Range(func(username_i, stream_i interface{}) bool {
+func (rm *RoomMgr) GetBS(user_id string) pb.RoomStatus_RoomStreamServer {
+	stream, ok := (*rm).conn_pool.Load(user_id)
+	if !ok {
+		return nil
+	}
+	return (stream).(pb.RoomStatus_RoomStreamServer)
+}
+
+func (rm *RoomMgr) AddBStream(user_id string, stream pb.RoomStatus_RoomStreamServer) {
+	rm.conn_pool.Store(user_id, stream)
+	_, cn := context.WithCancel((stream).Context())
+	rm.close_link.Store(user_id, cn)
+}
+
+func (rm *RoomMgr) DelBS(user_id string) {
+	if d, ok := rm.close_link.Load(user_id); ok {
+		d.(context.CancelFunc)()
+	}
+	rm.conn_pool.Delete(user_id)
+	// rm.close_link.Delete(user_id)
+}
+func (rm *RoomMgr) ClearAll() {
+	log.Println("ClearAll Proc")
+	rm.close_link.Range(func(key interface{}, value interface{}) bool {
+		// value.(context.CancelFunc)()
+		user_id := key.(string)
+		rm.DelBS(user_id)
+		rm.DelGS(user_id)
+		return true
+	})
+
+}
+func (rm *RoomMgr) BroadCastBS(from string, message *pb.CellStatusResp) {
+	rm.conn_pool.Range(func(username_i, stream_i interface{}) bool {
 		username := username_i.(string)
-		stream := stream_i.(pb.RoomStatus_RoomStreamServer)
+		stream := (stream_i).(pb.RoomStatus_RoomStreamServer)
 		if username == from {
 			return true
 		} else {
-			stream.Send(message)
+			(stream).Send(message)
 		}
 		return true
 	})
 }
 
 func (rm *RoomMgr) BroadCast(from string, message *pb.CellStatusResp) {
-	rm.conn_pool.BroadCast(from, message)
+	log.Println("BS!", message)
+	rm.BroadCastBS(from, message)
+	rm.BroadCastGS(from, message)
 }
 
 type RoomMgr struct {
 	pb.Room
-	conn_pool  *ConnPool
-	close_link *sync.Map
+	conn_pool       sync.Map
+	get_only_stream sync.Map
+	close_link      sync.Map
 }
 
 type RoomStatusBackend struct {
@@ -103,7 +134,7 @@ func (this *RoomStatusBackend) Shutdown() {
 	/// TODO: send closing msg to all client
 	for _, v := range this.Roomlist {
 		log.Println("Server OS.sigKill")
-		v.conn_pool.BroadCast("RmSvrMgr",
+		v.BroadCast("RmSvrMgr",
 			&pb.CellStatusResp{
 				UserId:    "RmSvrMgr",
 				Key:       v.Key,

@@ -11,6 +11,27 @@ import (
 	"google.golang.org/grpc/peer"
 )
 
+func (b *RoomStatusBackend) GetRoomStream(csq *pb.CellStatusReq, rs pb.RoomStatus_GetRoomStreamServer) error {
+	// printReqLog(rs.Context(), csq)
+	// for _, v := range b.Roomlist {
+	// 	if v.Key == csq.Key {
+	// 		// !WARN nil pointer
+	// 		if v.get_only_stream.Get(csq.UserId) != nil {
+	// 			return errors.New("GetStreamIsExist")
+	// 		}
+	// 		v.AddGetStream(csq.UserId, rs)
+	// 		go func() {
+	// 			log.Println("close done")
+	// 			<-rs.Context().Done()
+	// 			v.Del(csq.UserId)
+	// 		}()
+	// 		return nil
+
+	// 	}
+	// }
+	return errors.New("NoRoomExist")
+}
+
 // RoomStream :
 func (b *RoomStatusBackend) RoomStream(stream pb.RoomStatus_RoomStreamServer) error {
 	peer, _ := peer.FromContext(stream.Context())
@@ -21,6 +42,7 @@ func (b *RoomStatusBackend) RoomStream(stream pb.RoomStatus_RoomStreamServer) er
 	if err != nil {
 		return err
 	}
+	log.Println(req)
 	_, err = new_conn_reg(b, stream, req)
 	if err != nil {
 		return err
@@ -31,7 +53,8 @@ func (b *RoomStatusBackend) RoomStream(stream pb.RoomStatus_RoomStreamServer) er
 
 func new_conn_reg(b *RoomStatusBackend, stream pb.RoomStatus_RoomStreamServer, req *pb.CellStatusReq) (bool, error) {
 	for _, v := range b.Roomlist {
-		if v.conn_pool.Get(req.UserId) != nil {
+		log.Println("uid", req.UserId)
+		if v.GetBS(req.UserId) != nil {
 			log.Println("Connection exist")
 			// Conn exist
 			stream.Send(&pb.CellStatusResp{
@@ -40,46 +63,36 @@ func new_conn_reg(b *RoomStatusBackend, stream pb.RoomStatus_RoomStreamServer, r
 				Status:    300,
 				Timestamp: time.Now().String(),
 				ResponseMsg: &pb.CellStatusResp_ErrorMsg{
-					ErrorMsg: &pb.ErrorMsg{
-						MsgInfo: "ConnIsExist",
-						MsgDesp: "Connect is exist in Room<" + v.Key + ">",
-					},
+					ErrorMsg: &pb.ErrorMsg{MsgInfo: "ConnIsExist", MsgDesp: "Connect is exist in Room<" + v.Key + ">"},
 				},
 			})
 			return false, errors.New("ConnIsExist")
 		}
 		if v.Room.Key == req.Key {
 			fmt.Println("new conn in Rm<" + v.Key + ">,UserId<" + req.UserId + ">")
-			v.conn_pool.Add(req.UserId, stream)
+			v.AddBStream(req.UserId, stream)
+			log.Println("Added to stream")
 			stream.Send(&pb.CellStatusResp{
 				UserId:    "RmSvrMgr",
 				Key:       v.Key,
 				Status:    200,
 				Timestamp: time.Now().String(),
 				ResponseMsg: &pb.CellStatusResp_ErrorMsg{
-					ErrorMsg: &pb.ErrorMsg{
-						MsgInfo: "ConnSuccess",
-						MsgDesp: "Connect to Room<" + v.Key + "> Success",
-					},
+					ErrorMsg: &pb.ErrorMsg{MsgInfo: "ConnSuccess", MsgDesp: "Connect to Room<" + v.Key + "> Success"},
 				},
 			})
 			go func() {
 				log.Println("close done")
 				<-stream.Context().Done()
-				v.Del(req.UserId)
-				v.conn_pool.BroadCast(req.UserId,
+				v.DelBS(req.UserId)
+				v.BroadCast(req.UserId,
 					&pb.CellStatusResp{
 						UserId:    "RmSvrMgr",
 						Key:       v.Key,
 						Status:    201,
 						Timestamp: time.Now().String(),
 						ResponseMsg: &pb.CellStatusResp_ErrorMsg{
-							ErrorMsg: &pb.ErrorMsg{
-								MsgInfo: "ConnEnd",
-								MsgDesp: fmt.Sprintf(
-									"User<%v> End to Room<%v>",
-									req.UserId, v.Key),
-							},
+							ErrorMsg: &pb.ErrorMsg{MsgInfo: "ConnEnd", MsgDesp: fmt.Sprintf("User<%v> End to Room<%v>", req.UserId, v.Key)},
 						},
 					})
 			}()
@@ -88,7 +101,7 @@ func new_conn_reg(b *RoomStatusBackend, stream pb.RoomStatus_RoomStreamServer, r
 			if err != nil {
 				return false, err
 			}
-			v.conn_pool.BroadCast(req.UserId, ghj)
+			v.BroadCast(req.UserId, ghj)
 			return true, nil
 		}
 	}
