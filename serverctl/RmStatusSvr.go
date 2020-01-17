@@ -88,7 +88,7 @@ func New(conf *cf.ConfTmp) *RoomStatusBackend {
 }
 
 func (this *RoomStatusBackend) Shutdown() {
-	log.Println("in shtdown proc")
+	log.Println("in shutdown proc")
 	for _, v := range this.redhdlr {
 		if _, err := v.CleanRem(); err != nil {
 			log.Println(err)
@@ -97,7 +97,7 @@ func (this *RoomStatusBackend) Shutdown() {
 			log.Println(e)
 		}
 	}
-	log.Println("endof shtdown proc:", this.CoreKey)
+	log.Println("endof shutdown proc:", this.CoreKey)
 
 }
 

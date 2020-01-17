@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"log"
 	"sync"
+	"time"
 	// ants "github.com/panjf2000/ants/v2"
 )
 
@@ -27,8 +28,27 @@ func (p *ConnPool) Get(user_id string) pb.RoomStatus_RoomStreamServer {
 func (p *ConnPool) Add(user_id string, stream pb.RoomStatus_RoomStreamServer) {
 	p.Store(user_id, stream)
 }
+func (rm *RoomMgr) Add(user_id string, stream pb.RoomStatus_RoomStreamServer) {
+	rm.conn_pool.Add(user_id, stream)
+	_, cn := context.WithCancel(stream.Context())
+	rm.close_link.Store(user_id, cn)
+}
 func (p *ConnPool) Del(user_id string) {
 	p.Delete(user_id)
+}
+func (rm *RoomMgr) Del(user_id string) {
+	if d, ok := rm.close_link.Load(user_id); ok {
+		d.(context.CancelFunc)()
+	}
+	rm.Del(user_id)
+}
+func (rm *RoomMgr) ClearAll() {
+	log.Println("ClearAll Proc")
+	rm.close_link.Range(func(key interface{}, value interface{}) bool {
+		// map2.Delete(key)
+		value.(context.CancelFunc)()
+		return true
+	})
 }
 
 // BroadCast handler
@@ -46,9 +66,14 @@ func (p *ConnPool) BroadCast(from string, message *pb.CellStatusResp) {
 	})
 }
 
+func (rm *RoomMgr) BroadCast(from string, message *pb.CellStatusResp) {
+	rm.conn_pool.BroadCast(from, message)
+}
+
 type RoomMgr struct {
 	pb.Room
-	conn_pool *ConnPool
+	conn_pool  *ConnPool
+	close_link *sync.Map
 }
 
 type RoomStatusBackend struct {
@@ -76,7 +101,24 @@ func New(conf *cf.ConfTmp) *RoomStatusBackend {
 func (this *RoomStatusBackend) Shutdown() {
 	log.Println("in shtdown proc")
 	/// TODO: send closing msg to all client
-	log.Println("endof shtdown proc:", this.CoreKey)
+	for _, v := range this.Roomlist {
+		log.Println("Server OS.sigKill")
+		v.conn_pool.BroadCast("RmSvrMgr",
+			&pb.CellStatusResp{
+				UserId:    "RmSvrMgr",
+				Key:       v.Key,
+				Status:    201,
+				Timestamp: time.Now().String(),
+				ResponseMsg: &pb.CellStatusResp_ErrorMsg{
+					ErrorMsg: &pb.ErrorMsg{
+						MsgInfo: "ConnEnd",
+						MsgDesp: "Server OS.sigKill",
+					},
+				},
+			})
+		v.ClearAll()
+	}
+	log.Println("endof shutdown proc:", this.CoreKey)
 
 }
 

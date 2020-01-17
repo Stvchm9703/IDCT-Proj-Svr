@@ -7,6 +7,7 @@ import (
 	"log"
 	"time"
 
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 )
 
@@ -14,7 +15,8 @@ import (
 func (b *RoomStatusBackend) RoomStream(stream pb.RoomStatus_RoomStreamServer) error {
 	peer, _ := peer.FromContext(stream.Context())
 	log.Printf("Received new connection.  %s", peer.Addr.String())
-	// md, _ := metadata.FromIncomingContext(stream.Context())
+	md, _ := metadata.FromIncomingContext(stream.Context())
+	log.Println(md)
 	req, err := stream.Recv()
 	if err != nil {
 		return err
@@ -30,6 +32,7 @@ func (b *RoomStatusBackend) RoomStream(stream pb.RoomStatus_RoomStreamServer) er
 func new_conn_reg(b *RoomStatusBackend, stream pb.RoomStatus_RoomStreamServer, req *pb.CellStatusReq) (bool, error) {
 	for _, v := range b.Roomlist {
 		if v.conn_pool.Get(req.UserId) != nil {
+			log.Println("Connection exist")
 			// Conn exist
 			stream.Send(&pb.CellStatusResp{
 				UserId:    "RmSvrMgr",
@@ -61,8 +64,9 @@ func new_conn_reg(b *RoomStatusBackend, stream pb.RoomStatus_RoomStreamServer, r
 				},
 			})
 			go func() {
+				log.Println("close done")
 				<-stream.Context().Done()
-				v.conn_pool.Del(req.UserId)
+				v.Del(req.UserId)
 				v.conn_pool.BroadCast(req.UserId,
 					&pb.CellStatusResp{
 						UserId:    "RmSvrMgr",
@@ -79,17 +83,12 @@ func new_conn_reg(b *RoomStatusBackend, stream pb.RoomStatus_RoomStreamServer, r
 						},
 					})
 			}()
-			for {
-				req, err := stream.Recv()
-				if err != nil {
-					return false, err
-				}
-				ghj, err := update_proc(v, req)
-				if err != nil {
-					return false, err
-				}
-				v.conn_pool.BroadCast(req.UserId, ghj)
+
+			ghj, err := update_proc(v, req)
+			if err != nil {
+				return false, err
 			}
+			v.conn_pool.BroadCast(req.UserId, ghj)
 			return true, nil
 		}
 	}
