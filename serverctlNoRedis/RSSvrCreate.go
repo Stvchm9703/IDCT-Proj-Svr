@@ -26,7 +26,6 @@ func (b *RoomStatusBackend) CreateRoom(ctx context.Context, req *pb.RoomCreateRe
 	var f = ""
 	for {
 		f = cm.HashText(tmptime)
-
 		// ------
 		var l []*string
 		for _, v := range b.Roomlist {
