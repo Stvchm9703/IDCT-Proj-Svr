@@ -172,7 +172,7 @@
     },
     "/v1/room/stream": {
       "post": {
-        "operationId": "RoomStream",
+        "operationId": "GetRoomStream",
         "responses": {
           "200": {
             "description": "A successful response.(streaming responses)",
@@ -184,7 +184,6 @@
         "parameters": [
           {
             "name": "body",
-            "description": " (streaming inputs)",
             "in": "body",
             "required": true,
             "schema": {
