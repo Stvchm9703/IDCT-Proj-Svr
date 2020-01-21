@@ -17,7 +17,8 @@ import (
 var _ pb.RoomStatusServer = (*RoomStatusBackend)(nil)
 
 func (rm *RoomMgr) GetGS(user_id string) pb.RoomStatus_GetRoomStreamServer {
-	stream, ok := (*rm).conn_pool.Load(user_id)
+	log.Println(*rm.conn_pool)
+	stream, ok := (*rm.conn_pool).Load(user_id)
 	if !ok {
 		return nil
 	}
@@ -37,9 +38,12 @@ func (rm *RoomMgr) DelGS(user_id string) {
 	rm.get_only_stream.Delete(user_id)
 }
 func (rm *RoomMgr) BroadCastGS(from string, message *pb.CellStatusResp) {
+	log.Println(rm.conn_pool)
 	rm.conn_pool.Range(func(username_i, stream_i interface{}) bool {
+
 		username := username_i.(string)
 		stream := (stream_i).(pb.RoomStatus_GetRoomStreamServer)
+		log.Println("un :", username)
 		if username == from {
 			return true
 		} else {
@@ -82,7 +86,8 @@ func (rm *RoomMgr) ClearAll() {
 
 }
 func (rm *RoomMgr) BroadCastBS(from string, message *pb.CellStatusResp) {
-	rm.conn_pool.Range(func(username_i, stream_i interface{}) bool {
+	rtmp := rm.conn_pool
+	rtmp.Range(func(username_i, stream_i interface{}) bool {
 		username := username_i.(string)
 		stream := (stream_i).(pb.RoomStatus_RoomStreamServer)
 		if username == from {
@@ -102,9 +107,9 @@ func (rm *RoomMgr) BroadCast(from string, message *pb.CellStatusResp) {
 
 type RoomMgr struct {
 	pb.Room
-	conn_pool       sync.Map
-	get_only_stream sync.Map
-	close_link      sync.Map
+	conn_pool       *sync.Map
+	get_only_stream *sync.Map
+	close_link      *sync.Map
 }
 
 type RoomStatusBackend struct {

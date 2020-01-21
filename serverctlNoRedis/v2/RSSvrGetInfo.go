@@ -3,6 +3,7 @@ package v2
 import (
 	pb "RoomStatus/proto/v2"
 	"context"
+	"log"
 	"time"
 )
 
@@ -10,7 +11,8 @@ import (
 func (b *RoomStatusBackend) GetRoomInfo(ctx context.Context, req *pb.RoomReq) (*pb.RoomResp, error) {
 	printReqLog(ctx, req)
 	for _, v := range b.Roomlist {
-		if &v.Key == &req.Key {
+		log.Println(v.Key)
+		if (v).Key == req.Key {
 			return &pb.RoomResp{
 				Timestamp: time.Now().String(),
 				ResponseMsg: &pb.RoomResp_RoomInfo{

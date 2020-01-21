@@ -4,7 +4,6 @@ go 1.13.1
 
 require (
 	github.com/BurntSushi/toml v0.3.1
-	github.com/fatih/structs v1.1.0
 	github.com/go-redis/redis v6.15.6+incompatible
 	github.com/gogo/gateway v1.1.0
 	github.com/gogo/googleapis v1.3.0
@@ -27,6 +26,6 @@ require (
 	golang.org/x/sys v0.0.0-20191020152052-9984515f0562 // indirect
 	google.golang.org/genproto v0.0.0-20200115191322-ca5a22157cba // indirect
 
-	google.golang.org/grpc v1.24.0
+	google.golang.org/grpc v1.26.0
 	gopkg.in/yaml.v2 v2.2.7
 )

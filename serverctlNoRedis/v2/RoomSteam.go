@@ -12,23 +12,24 @@ import (
 )
 
 func (b *RoomStatusBackend) GetRoomStream(csq *pb.CellStatusReq, rs pb.RoomStatus_GetRoomStreamServer) error {
-	// printReqLog(rs.Context(), csq)
-	// for _, v := range b.Roomlist {
-	// 	if v.Key == csq.Key {
-	// 		// !WARN nil pointer
-	// 		if v.get_only_stream.Get(csq.UserId) != nil {
-	// 			return errors.New("GetStreamIsExist")
-	// 		}
-	// 		v.AddGetStream(csq.UserId, rs)
-	// 		go func() {
-	// 			log.Println("close done")
-	// 			<-rs.Context().Done()
-	// 			v.Del(csq.UserId)
-	// 		}()
-	// 		return nil
+	printReqLog(rs.Context(), csq)
+	for _, v := range b.Roomlist {
+		if v.Key == csq.Key {
+			// !WARN nil pointer
+			if v.GetGS(csq.UserId) != nil {
+				return errors.New("GetStreamIsExist")
+			}
+			v.AddGS(csq.UserId, rs)
+			log.Println("Add GS Stream")
+			go func() {
+				log.Println("close done")
+				<-rs.Context().Done()
+				v.DelGS(csq.UserId)
+			}()
+			return nil
 
-	// 	}
-	// }
+		}
+	}
 	return errors.New("NoRoomExist")
 }
 

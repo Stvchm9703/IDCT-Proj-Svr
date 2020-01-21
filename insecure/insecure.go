@@ -77,9 +77,11 @@ var (
 	// wd
 	wd = ""
 	// PrivateCertFile : where the cert file found
-	PrivateCertFile string = filepath.Join(wd, "insecure", "server.crt")
+	// PrivateCertFile string = filepath.Join(wd, "insecure", "server.crt")
+	PrivateCertFile string = filepath.Join(wd, "insecure", "cert.pem")
 	// KeyPEMFile : where the server key found
-	KeyPEMFile string = filepath.Join(wd, "insecure", "server.key")
+	// KeyPEMFile string = filepath.Join(wd, "insecure", "server.key")
+	KeyPEMFile string = filepath.Join(wd, "insecure", "key.pem")
 )
 
 func init() {
@@ -114,12 +116,12 @@ func GenCurrCert() (*tls.Certificate, error) {
 	ca := &x509.Certificate{
 		SerialNumber: big.NewInt(2019),
 		Subject: pkix.Name{
-			Organization:  []string{"Company, INC."},
-			Country:       []string{"US"},
+			Organization:  []string{"MCHI-Comp, INC."},
+			Country:       []string{"HK"},
 			Province:      []string{""},
-			Locality:      []string{"San Francisco"},
-			StreetAddress: []string{"Golden Gate Bridge"},
-			PostalCode:    []string{"94016"},
+			Locality:      []string{"Hong Kong NT"},
+			StreetAddress: []string{"Yueng Long"},
+			PostalCode:    []string{"09123797"},
 		},
 		NotBefore:             time.Now(),
 		NotAfter:              time.Now().AddDate(10, 0, 0),
@@ -158,12 +160,12 @@ func GenCurrCert() (*tls.Certificate, error) {
 	cert := &x509.Certificate{
 		SerialNumber: big.NewInt(2019),
 		Subject: pkix.Name{
-			Organization:  []string{"Company, INC."},
-			Country:       []string{"US"},
+			Organization:  []string{"MCHI-Comp, INC."},
+			Country:       []string{"HK"},
 			Province:      []string{""},
-			Locality:      []string{"San Francisco"},
-			StreetAddress: []string{"Golden Gate Bridge"},
-			PostalCode:    []string{"94016"},
+			Locality:      []string{"Hong Kong NT"},
+			StreetAddress: []string{"Yueng Long"},
+			PostalCode:    []string{"09123797"},
 		},
 		IPAddresses:  []net.IP{net.IPv4(127, 0, 0, 1), net.IPv6loopback},
 		NotBefore:    time.Now(),

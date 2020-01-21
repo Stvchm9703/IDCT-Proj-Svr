@@ -31,13 +31,6 @@ import (
 
 // var log grpclog.LoggerV2
 
-func init() {
-	// f, _ := os.Getwd()
-	// dt := time.Now()
-	// w := cm.SetLog(filepath.Join(f, "tmp", "log", dt.Format("01-02-2006")+".log"))
-	// log = grpclog.NewLoggerV2(w, w, w)
-	// grpclog.SetLoggerV2(log)
-}
 
 // serveOpenAPI serves an OpenAPI UI on /openapi-ui/
 // Adapted from https://github.com/philips/grpc-gateway-example/blob/a269bcb5931ca92be0ceae6130ac27ae89582ecc/cmd/serve.go#L63
