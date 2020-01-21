@@ -5,27 +5,35 @@ import (
 	pb "RoomStatus/proto"
 	"context"
 	"errors"
+	"log"
 	"time"
 )
 
 // CreateRoom :
-func (b *RoomStatusBackend) CreateRoom(ctx context.Context, req *pb.RoomCreateRequest) (*pb.Room, error) {
+func (b *RoomStatusBackend) CreateRoom(ctx context.Context, req *pb.RoomCreateReq) (*pb.RoomResp, error) {
 	printReqLog(ctx, req)
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
 	for _, vr := range b.Roomlist {
-		if vr.HostId == req.HostId || vr.DuelerId == req.HostId {
-			return nil, errors.New("GameSetExistWithCurrentPlayer")
+		if vr.HostId == req.UserId || vr.DuelerId == req.UserId {
+			return &pb.RoomResp{
+				Timestamp: time.Now().String(),
+				ResponseMsg: &pb.RoomResp_Error{
+					Error: &pb.ErrorMsg{
+						MsgInfo: "GameSetExistWithCurrentPlayer",
+						MsgDesp: "Current Player <" + req.UserId + "> is in other Room <" + vr.Key + ">",
+					},
+				},
+			}, errors.New("GameSetExistWithCurrentPlayer")
 		}
 	}
 
-	// wkbox := b.searchAliveClient()
-	// for loop it
-	tmptime := time.Now().String() + req.HostId
+	tmptime := time.Now().String() + req.UserId
 	var f = ""
 	for {
 		f = cm.HashText(tmptime)
+
 		// ------
 		var l []*string
 		for _, v := range b.Roomlist {
@@ -40,13 +48,23 @@ func (b *RoomStatusBackend) CreateRoom(ctx context.Context, req *pb.RoomCreateRe
 	}
 	rmTmp := pb.Room{
 		Key:        "Rm" + f,
-		HostId:     req.HostId,
+		HostId:     req.UserId,
 		DuelerId:   "",
 		Status:     0,
 		Round:      0,
 		Cell:       -1,
 		CellStatus: nil,
 	}
-	b.Roomlist = append(b.Roomlist, &rmTmp)
-	return &rmTmp, nil
+	rmTmp1 := RoomMgr{
+		Room: rmTmp,
+	}
+
+	b.Roomlist = append(b.Roomlist, &rmTmp1)
+	log.Println("Created Room : <", rmTmp)
+	return &pb.RoomResp{
+		Timestamp: time.Now().String(),
+		ResponseMsg: &pb.RoomResp_RoomInfo{
+			RoomInfo: &rmTmp,
+		},
+	}, nil
 }

@@ -12,8 +12,8 @@ import (
 	"google.golang.org/grpc"
 
 	cf "RoomStatus/config"
-	pb "RoomStatus/proto/v2"
-	server "RoomStatus/serverctlNoRedis/v2"
+	pb "RoomStatus/proto"
+	server "RoomStatus/serverctlNoRedis"
 
 	"google.golang.org/grpc/status"
 

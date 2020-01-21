@@ -5,39 +5,87 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 )
 
 // UpdateRoom :
-func (b *RoomStatusBackend) UpdateRoom(ctx context.Context, req *pb.CellStatus) (*pb.CellStatus, error) {
+func (b *RoomStatusBackend) UpdateRoom(ctx context.Context, req *pb.CellStatusReq) (*pb.CellStatusResp, error) {
 	// return nil, status.Errorf(codes.Unimplemented, "method DeleteRoom not implemented")
 	printReqLog(ctx, req)
-	var room pb.Room
+	var rmg *RoomMgr
+	for k := range b.Roomlist {
+		if (*b.Roomlist[k]).Key == req.Key {
+			rmg = b.Roomlist[k]
+		}
+	}
+	if (rmg) == nil {
+		log.Println("RoomNotExistInUpdate")
+		return nil, errors.New("RoomNotExistInUpdate")
+	}
 
-	keynum := -1
-	if len(room.CellStatus) == 9 && room.Round == 9 {
+	if len((*rmg).CellStatus) == 9 || (*rmg).Round == 9 {
 		log.Println("the game should be end")
 		return nil, errors.New("GameEnd")
 	}
 
-	for k, v := range room.CellStatus {
-		if v.Turn == req.Turn {
-			room.Cell = int32(k)
-			v.CellNum = req.CellNum
-			keynum = k
-			break
-		}
+	reqRoom := req.GetCellStatus()
+	if reqRoom == nil {
+		log.Println("UnknownCellStatus")
+		return nil, errors.New("UnknownCellStatus")
 	}
-	if keynum == -1 {
-		room.CellStatus = append(room.CellStatus, req)
-		room.Cell = int32(len(room.CellStatus))
-		room.Round++
+	// Turn only -1 / 1 / 0
+	// check turn
+	if reqRoom.Turn == 0 && reqRoom.CellNum == -1 && req.UserId != "" {
+		(*rmg).DuelerId = req.UserId
+		log.Println(rmg.Room)
+		msgp := &pb.CellStatusResp{
+			UserId:    req.UserId,
+			Key:       (*rmg).Key,
+			Timestamp: time.Now().String(),
+			Status:    201,
+			ResponseMsg: &pb.CellStatusResp_CellStatus{
+				CellStatus: reqRoom,
+			},
+		}
+		rmg.BroadCast(req.UserId, msgp)
+		return msgp, nil
 	}
 
-	for _, v := range b.Roomlist {
-		if v.Key == room.Key {
-			v = &room
+	keynum := len((*rmg).CellStatus)
+	if keynum > 0 {
+		cs := (*rmg).CellStatus[keynum-1]
+		log.Println(cs)
+		if cs.Turn == reqRoom.Turn {
+			log.Println("GameRuleNotPlyrTurn")
+			return nil, errors.New("GameRuleNotPlyrTurn")
+		}
+		for _, v := range (*rmg).CellStatus {
+			if v.CellNum == reqRoom.CellNum {
+				log.Println("GameRuleCellOcc")
+				return nil, errors.New("GameRuleCellOcc")
+			}
 		}
 	}
+
+	(*rmg).CellStatus = append((*rmg).CellStatus, req.GetCellStatus())
+	(*rmg).Cell = int32(len((*rmg).CellStatus))
+	(*rmg).Round++
+
+	log.Println(rmg.CellStatus)
+
 	log.Println("b.RoomList", b.Roomlist)
-	return room.CellStatus[len(room.CellStatus)], nil
+
+	// send update BroadCast
+	msgp := &pb.CellStatusResp{
+		UserId:    req.UserId,
+		Key:       (*rmg).Key,
+		Timestamp: time.Now().String(),
+		Status:    200,
+		ResponseMsg: &pb.CellStatusResp_CellStatus{
+			CellStatus: reqRoom,
+		},
+	}
+
+	rmg.BroadCast(req.UserId, msgp)
+	return msgp, nil
 }
