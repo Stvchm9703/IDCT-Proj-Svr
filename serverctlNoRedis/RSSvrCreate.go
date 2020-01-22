@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"sync"
 	"time"
 )
 
@@ -14,7 +15,6 @@ func (b *RoomStatusBackend) CreateRoom(ctx context.Context, req *pb.RoomCreateRe
 	printReqLog(ctx, req)
 	b.mu.Lock()
 	defer b.mu.Unlock()
-
 	for _, vr := range b.Roomlist {
 		if vr.HostId == req.UserId || vr.DuelerId == req.UserId {
 			return &pb.RoomResp{
@@ -56,7 +56,9 @@ func (b *RoomStatusBackend) CreateRoom(ctx context.Context, req *pb.RoomCreateRe
 		CellStatus: nil,
 	}
 	rmTmp1 := RoomMgr{
-		Room: rmTmp,
+		Room:            rmTmp,
+		get_only_stream: make(map[string]*pb.RoomStatus_GetRoomStreamServer),
+		conn_pool:       &sync.Map{},
 	}
 
 	b.Roomlist = append(b.Roomlist, &rmTmp1)

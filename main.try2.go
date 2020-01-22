@@ -76,6 +76,7 @@ func main() {
 	pb.RegisterRoomStatusServer(
 		s, RMServer)
 
+	// reflection.Register(s)
 	// Serve gRPC Server
 	log.Println("Serving gRPC on https://", addr)
 	go func() {
@@ -94,7 +95,7 @@ func BeforeGracefulStop(ss *grpc.Server, rms *server.RoomStatusBackend) {
 	log.Println(ss.GetServiceInfo())
 	// ss.Shutdown()
 	rms.Shutdown()
-	ss.GracefulStop()
+	ss.Stop()
 	log.Println("os GracefulStop")
 	os.Exit(0)
 }
