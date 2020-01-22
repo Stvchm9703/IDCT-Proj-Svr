@@ -1,0 +1,167 @@
+// # GameCtl.proto
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+// import "github.com/mwitkow/go-proto-validators/validator.proto";
+
+package RoomStatus;
+option csharp_namespace = "PlayCli.ProtoMod";
+option go_package  = "proto";
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+  info: { version: "0.2"; };
+  external_docs: {
+    url: "https://github.com/stvchm9703/IDCT";
+    description: "gRPC server Impletement repository";
+  }
+  schemes: HTTPS;
+};
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.goproto_registration) = true;
+option (gogoproto.messagename_all) = true;
+
+
+message ErrorMsg{
+    string msg_info = 1;
+    string msg_desp =2;
+}
+
+
+message RoomListReq {
+    string requirement = 1;
+}
+
+message RoomListResp {
+    string timestamp = 1;
+    repeated Room result = 2;
+    ErrorMsg error_msg = 3;
+}
+
+message RoomCreateReq {
+    string user_id = 1;
+}
+
+message RoomCreateResp {
+    string user_id = 1;
+    string timestamp = 2;
+    int32  status = 3;
+    oneof response_msg  {
+        Room cell_status  = 4;
+        ErrorMsg error_msg = 5;
+    }
+}
+
+message RoomReq {
+    string key = 1;
+}
+
+message RoomResp {
+    string timestamp =1 ;
+    oneof response_msg{
+        Room room_info = 2;
+        ErrorMsg error = 3;
+    }
+}
+
+message Room {
+    string key = 1;
+    string host_id = 2; 
+    string dueler_id = 3;
+    Status status = 4;
+    enum Status {
+        ON_START = 0;
+        ON_WAIT = 1 ;
+        ON_HOST_TURN = 2;
+        ON_DUEL_TURN = 3;
+        ON_END = 4;
+    }
+    int32 round = 5;
+    int32 cell = 6;
+    repeated CellStatus cell_status = 7;
+}
+
+message CellStatus{
+    string key = 1;
+    int32 turn = 2; // turn 1 = host / -1 = duel
+    int32 cell_num = 3;
+}
+
+message CellStatusReq {
+    string user_id = 1;
+    string key = 2;
+    oneof player {
+        bool is_player = 3;
+        CellStatus cell_status  = 4;
+    }
+}
+
+
+message CellStatusResp {
+    string user_id = 1;
+    string key = 2;
+    string timestamp = 3;
+    int32  status = 4;
+    oneof response_msg  {
+        CellStatus cell_status  = 5;
+        ErrorMsg error_msg = 6;
+    }
+}
+
+service RoomStatus {
+    rpc CreateRoom (RoomCreateReq) returns (RoomResp){ 
+        option (google.api.http) = {
+            post: "/v1/room/create"
+            body: "*"
+        };  
+    };
+    rpc GetRoomList(RoomListReq) returns (RoomListResp){ 
+        option (google.api.http) = {
+            post: "/v1/room/list"
+            body: "*"
+        }; 
+    }; 
+    rpc GetRoomInfo (RoomReq) returns (RoomResp){ 
+        option (google.api.http) = {
+            post: "/v1/room/info"
+            body: "*"
+        }; 
+    };
+    rpc DeleteRoom (RoomReq) returns (RoomResp){
+        option (google.api.http) = {
+            post: "/v1/room/delete"
+            body: "*"
+        }; 
+    };
+
+    rpc RoomStream (stream CellStatusReq) returns (stream CellStatusResp){
+        option (google.api.http) = {
+            post: "/v1/room/stream"
+            body: "*"
+        }; 
+    };
+    rpc GetRoomStream(CellStatusReq) returns(stream CellStatusResp){
+        option (google.api.http) = {
+            post: "/v1/room/stream"
+            body: "*"
+        };
+    };
+  
+    rpc UpdateRoom(CellStatusReq) returns (CellStatusResp){
+        option (google.api.http) = {
+            post: "/v1/room/update"
+            body: "*"
+        }; 
+    };
+
+    rpc QuitRoom(RoomCreateReq) returns(google.protobuf.Empty){
+         option (google.api.http) = {
+            post: "/v1/room/quit"
+            body: "*"
+        }; 
+    }
+
+    
+}

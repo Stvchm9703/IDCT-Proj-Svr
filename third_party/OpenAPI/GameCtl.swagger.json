@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "GameCtl.proto",
-    "version": "0.1"
+    "version": "0.2"
   },
   "schemes": [
     "https"
@@ -14,32 +14,6 @@
     "application/json"
   ],
   "paths": {
-    "/v1/cred/create": {
-      "post": {
-        "operationId": "CreateCred",
-        "responses": {
-          "200": {
-            "description": "A successful response.(streaming responses)",
-            "schema": {
-              "$ref": "#/x-stream-definitions/RoomStatusCred"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/RoomStatusCreateCredReq"
-            }
-          }
-        ],
-        "tags": [
-          "CreditsAuth"
-        ]
-      }
-    },
     "/v1/room/create": {
       "post": {
         "operationId": "CreateRoom",
@@ -47,7 +21,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/RoomStatusRoom"
+              "$ref": "#/definitions/RoomStatusRoomResp"
             }
           }
         },
@@ -57,7 +31,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/RoomStatusRoomCreateRequest"
+              "$ref": "#/definitions/RoomStatusRoomCreateReq"
             }
           }
         ],
@@ -73,7 +47,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "properties": {}
+              "$ref": "#/definitions/RoomStatusRoomResp"
             }
           }
         },
@@ -83,7 +57,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/RoomStatusRoomRequest"
+              "$ref": "#/definitions/RoomStatusRoomReq"
             }
           }
         ],
@@ -99,7 +73,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/RoomStatusRoom"
+              "$ref": "#/definitions/RoomStatusRoomResp"
             }
           }
         },
@@ -109,7 +83,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/RoomStatusRoomRequest"
+              "$ref": "#/definitions/RoomStatusRoomReq"
             }
           }
         ],
@@ -125,7 +99,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/RoomStatusRoomListResponse"
+              "$ref": "#/definitions/RoomStatusRoomListResp"
             }
           }
         },
@@ -135,7 +109,59 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/RoomStatusRoomListRequest"
+              "$ref": "#/definitions/RoomStatusRoomListReq"
+            }
+          }
+        ],
+        "tags": [
+          "RoomStatus"
+        ]
+      }
+    },
+    "/v1/room/quit": {
+      "post": {
+        "operationId": "QuitRoom",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RoomStatusRoomCreateReq"
+            }
+          }
+        ],
+        "tags": [
+          "RoomStatus"
+        ]
+      }
+    },
+    "/v1/room/stream": {
+      "post": {
+        "operationId": "GetRoomStream",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "$ref": "#/x-stream-definitions/RoomStatusCellStatusResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RoomStatusCellStatusReq"
             }
           }
         ],
@@ -146,13 +172,12 @@
     },
     "/v1/room/update": {
       "post": {
-        "summary": "rpc GetRoomStream (RoomRequest) returns (stream CellStatus){\n    option (google.api.http) = {\n        post: \"/v1/room/stream\"\n        body: \"*\"\n    }; \n};\nrpc UpdateRoomStream(stream CellStatus) returns  (stream CellStatus){\n    option (google.api.http) = {\n        post: \"/v1/room/stream/update\"\n        body: \"*\"\n    }; \n};",
         "operationId": "UpdateRoom",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/RoomStatusCellStatus"
+              "$ref": "#/definitions/RoomStatusCellStatusResp"
             }
           }
         },
@@ -162,7 +187,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/RoomStatusCellStatus"
+              "$ref": "#/definitions/RoomStatusCellStatusReq"
             }
           }
         ],
@@ -173,6 +198,17 @@
     }
   },
   "definitions": {
+    "RoomStatus": {
+      "type": "string",
+      "enum": [
+        "ON_START",
+        "ON_WAIT",
+        "ON_HOST_TURN",
+        "ON_DUEL_TURN",
+        "ON_END"
+      ],
+      "default": "ON_START"
+    },
     "RoomStatusCellStatus": {
       "type": "object",
       "properties": {
@@ -189,24 +225,55 @@
         }
       }
     },
-    "RoomStatusCreateCredReq": {
+    "RoomStatusCellStatusReq": {
       "type": "object",
       "properties": {
-        "Ip": {
+        "user_id": {
           "type": "string"
         },
-        "Username": {
+        "key": {
           "type": "string"
         },
-        "Password": {
-          "type": "string"
+        "is_player": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "cell_status": {
+          "$ref": "#/definitions/RoomStatusCellStatus"
         }
       }
     },
-    "RoomStatusCred": {
+    "RoomStatusCellStatusResp": {
       "type": "object",
       "properties": {
-        "file": {
+        "user_id": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "status": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "cell_status": {
+          "$ref": "#/definitions/RoomStatusCellStatus"
+        },
+        "error_msg": {
+          "$ref": "#/definitions/RoomStatusErrorMsg"
+        }
+      }
+    },
+    "RoomStatusErrorMsg": {
+      "type": "object",
+      "properties": {
+        "msg_info": {
+          "type": "string"
+        },
+        "msg_desp": {
           "type": "string"
         }
       }
@@ -224,7 +291,7 @@
           "type": "string"
         },
         "status": {
-          "$ref": "#/definitions/RoomStatusStatus"
+          "$ref": "#/definitions/RoomStatus"
         },
         "round": {
           "type": "integer",
@@ -242,15 +309,15 @@
         }
       }
     },
-    "RoomStatusRoomCreateRequest": {
+    "RoomStatusRoomCreateReq": {
       "type": "object",
       "properties": {
-        "HostId": {
+        "user_id": {
           "type": "string"
         }
       }
     },
-    "RoomStatusRoomListRequest": {
+    "RoomStatusRoomListReq": {
       "type": "object",
       "properties": {
         "requirement": {
@@ -258,18 +325,24 @@
         }
       }
     },
-    "RoomStatusRoomListResponse": {
+    "RoomStatusRoomListResp": {
       "type": "object",
       "properties": {
+        "timestamp": {
+          "type": "string"
+        },
         "result": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/RoomStatusRoom"
           }
+        },
+        "error_msg": {
+          "$ref": "#/definitions/RoomStatusErrorMsg"
         }
       }
     },
-    "RoomStatusRoomRequest": {
+    "RoomStatusRoomReq": {
       "type": "object",
       "properties": {
         "key": {
@@ -277,16 +350,19 @@
         }
       }
     },
-    "RoomStatusStatus": {
-      "type": "string",
-      "enum": [
-        "ON_START",
-        "ON_WAIT",
-        "ON_HOST_TURN",
-        "ON_DUEL_TURN",
-        "ON_END"
-      ],
-      "default": "ON_START"
+    "RoomStatusRoomResp": {
+      "type": "object",
+      "properties": {
+        "timestamp": {
+          "type": "string"
+        },
+        "room_info": {
+          "$ref": "#/definitions/RoomStatusRoom"
+        },
+        "error": {
+          "$ref": "#/definitions/RoomStatusErrorMsg"
+        }
+      }
     },
     "protobufAny": {
       "type": "object",
@@ -330,17 +406,17 @@
     }
   },
   "x-stream-definitions": {
-    "RoomStatusCred": {
+    "RoomStatusCellStatusResp": {
       "type": "object",
       "properties": {
         "result": {
-          "$ref": "#/definitions/RoomStatusCred"
+          "$ref": "#/definitions/RoomStatusCellStatusResp"
         },
         "error": {
           "$ref": "#/definitions/runtimeStreamError"
         }
       },
-      "title": "Stream result of RoomStatusCred"
+      "title": "Stream result of RoomStatusCellStatusResp"
     }
   },
   "externalDocs": {
