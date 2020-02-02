@@ -80,7 +80,7 @@ build:
 
 generate_vcred:
 	protoc \
-		-I proto \
+		-I proto/ \
 		-I vendor/github.com/grpc-ecosystem/grpc-gateway/ \
 		-I vendor/github.com/gogo/googleapis/ \
 		-I vendor/ \

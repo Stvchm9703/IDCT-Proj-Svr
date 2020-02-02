@@ -113,11 +113,10 @@
     "RoomStatusErrorMsg": {
       "type": "object",
       "properties": {
-        "code": {
-          "type": "integer",
-          "format": "int32"
+        "msg_info": {
+          "type": "string"
         },
-        "desp": {
+        "msg_desp": {
           "type": "string"
         }
       }

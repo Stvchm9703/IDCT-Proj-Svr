@@ -8,10 +8,10 @@ import (
 	math "math"
 	proto "github.com/gogo/protobuf/proto"
 	golang_proto "github.com/golang/protobuf/proto"
+	_ "github.com/gogo/protobuf/gogoproto"
 	_ "github.com/gogo/protobuf/types"
 	_ "github.com/gogo/googleapis/google/api"
 	_ "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options"
-	_ "github.com/gogo/protobuf/gogoproto"
 	github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 )
 
@@ -21,9 +21,6 @@ var _ = golang_proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-func (this *ErrorMsg) Validate() error {
-	return nil
-}
 func (this *CredReq) Validate() error {
 	return nil
 }

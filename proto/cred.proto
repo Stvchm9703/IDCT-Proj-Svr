@@ -4,6 +4,7 @@ import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "GameCtl.proto";
 // import "github.com/mwitkow/go-proto-validators/validator.proto";
 
 package RoomStatus;
@@ -23,11 +24,6 @@ option (gogoproto.sizer_all) = true;
 option (gogoproto.goproto_registration) = true;
 option (gogoproto.messagename_all) = true;
 
-
-message ErrorMsg {
-  int32 code          = 1;
-  string desp         = 2;
-}
 
 message CredReq {
   string Ip           = 1;
