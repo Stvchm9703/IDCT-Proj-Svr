@@ -8,10 +8,11 @@ import (
 	math "math"
 	proto "github.com/gogo/protobuf/proto"
 	golang_proto "github.com/golang/protobuf/proto"
-	_ "github.com/gogo/protobuf/gogoproto"
 	_ "github.com/gogo/protobuf/types"
 	_ "github.com/gogo/googleapis/google/api"
 	_ "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options"
+	_ "github.com/gogo/protobuf/gogoproto"
+	github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -20,9 +21,25 @@ var _ = golang_proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-func (this *CreateCredReq) Validate() error {
+func (this *ErrorMsg) Validate() error {
 	return nil
 }
-func (this *Cred) Validate() error {
+func (this *CredReq) Validate() error {
+	return nil
+}
+func (this *CreateCredResp) Validate() error {
+	if this.ErrorMsg != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.ErrorMsg); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("ErrorMsg", err)
+		}
+	}
+	return nil
+}
+func (this *CheckCredResp) Validate() error {
+	if this.ErrorMsg != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.ErrorMsg); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("ErrorMsg", err)
+		}
+	}
 	return nil
 }

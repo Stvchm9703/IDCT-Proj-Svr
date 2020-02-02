@@ -5,10 +5,6 @@ import (
 	"os"
 	"path/filepath"
 
-	// Wb "RoomStatus"
-	// Cf "RoomStatus/config"
-	// "RoomStatus/server/common"
-
 	"github.com/spf13/cobra"
 )
 

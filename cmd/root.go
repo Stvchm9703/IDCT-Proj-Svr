@@ -23,11 +23,11 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "webserver",
-	Short: "webserver, go server",
+	Use:   "roomserver",
+	Short: "roomserver, go server",
 	Long: `
 --------------------------------------------------------
-webserver, for simplify the api service as firebase
+webserver, for simplify the api service 
 `,
 }
 
@@ -47,10 +47,10 @@ func init() {
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Print the version number of webserver",
-	Long:  `All software has versions. This is webserver's`,
+	Short: "Print the version number of roomserver",
+	Long:  `All software has versions. This is roomserver's`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("webserver Static Site Generator v0.9 -- HEAD")
+		fmt.Println("roomserver Static Site Generator v0.9 -- HEAD")
 	},
 }
 

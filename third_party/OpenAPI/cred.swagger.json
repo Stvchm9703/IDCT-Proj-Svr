@@ -14,14 +14,14 @@
     "application/json"
   ],
   "paths": {
-    "/v1/cred/create": {
+    "/v1/cred/check": {
       "post": {
-        "operationId": "CreateCred",
+        "operationId": "GetCred",
         "responses": {
           "200": {
-            "description": "A successful response.(streaming responses)",
+            "description": "A successful response.",
             "schema": {
-              "$ref": "#/x-stream-definitions/RoomStatusCred"
+              "$ref": "#/definitions/RoomStatusCreateCredResp"
             }
           }
         },
@@ -31,7 +31,33 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/RoomStatusCreateCredReq"
+              "$ref": "#/definitions/RoomStatusCredReq"
+            }
+          }
+        ],
+        "tags": [
+          "CreditsAuth"
+        ]
+      }
+    },
+    "/v1/cred/create": {
+      "post": {
+        "operationId": "CreateCred",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "$ref": "#/x-stream-definitions/RoomStatusCreateCredResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RoomStatusCredReq"
             }
           }
         ],
@@ -42,7 +68,35 @@
     }
   },
   "definitions": {
-    "RoomStatusCreateCredReq": {
+    "RoomStatusCheckCredResp": {
+      "type": "object",
+      "properties": {
+        "response_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "error_msg": {
+          "$ref": "#/definitions/RoomStatusErrorMsg"
+        }
+      }
+    },
+    "RoomStatusCreateCredResp": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "file": {
+          "type": "string",
+          "format": "byte"
+        },
+        "error_msg": {
+          "$ref": "#/definitions/RoomStatusErrorMsg"
+        }
+      }
+    },
+    "RoomStatusCredReq": {
       "type": "object",
       "properties": {
         "Ip": {
@@ -56,10 +110,14 @@
         }
       }
     },
-    "RoomStatusCred": {
+    "RoomStatusErrorMsg": {
       "type": "object",
       "properties": {
-        "file": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "desp": {
           "type": "string"
         }
       }
@@ -106,17 +164,17 @@
     }
   },
   "x-stream-definitions": {
-    "RoomStatusCred": {
+    "RoomStatusCreateCredResp": {
       "type": "object",
       "properties": {
         "result": {
-          "$ref": "#/definitions/RoomStatusCred"
+          "$ref": "#/definitions/RoomStatusCreateCredResp"
         },
         "error": {
           "$ref": "#/definitions/runtimeStreamError"
         }
       },
-      "title": "Stream result of RoomStatusCred"
+      "title": "Stream result of RoomStatusCreateCredResp"
     }
   },
   "externalDocs": {

@@ -72,12 +72,9 @@ func main() {
 	)
 
 	RMServer := server.New(&testing_config)
-	// s.GracefulStop()
+
 	pb.RegisterRoomStatusServer(
 		s, RMServer)
-
-	// reflection.Register(s)
-	// Serve gRPC Server
 	log.Println("Serving gRPC on https://", addr)
 	go func() {
 		panic(s.Serve(lis))

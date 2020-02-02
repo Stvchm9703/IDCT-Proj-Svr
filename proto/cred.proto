@@ -23,21 +23,48 @@ option (gogoproto.sizer_all) = true;
 option (gogoproto.goproto_registration) = true;
 option (gogoproto.messagename_all) = true;
 
-message CreateCredReq {
-    string Ip = 1;
-    string Username = 2;
-    string Password = 3;
+
+message ErrorMsg {
+  int32 code          = 1;
+  string desp         = 2;
 }
 
-message Cred{
-    bytes file = 1;
+message CredReq {
+  string Ip           = 1;
+  string Username     = 2;
+  string Password     = 3;
 }
+
+message CreateCredResp{
+  int32 code          = 1;
+  bytes file           = 2;
+  ErrorMsg error_msg  = 3;
+}
+
+message CheckCredResp{
+  int32 response_code = 1; 
+  ErrorMsg error_msg  = 2;
+}
+
+
 
 service CreditsAuth {
-    rpc CreateCred (CreateCredReq) returns (stream Cred) {
-         option (google.api.http) = {
-            post: "/v1/cred/create"
-            body: "*"
-        };  
-    } 
+  rpc CheckCred(CredReq) returns (CheckCredResp){
+    option (google.api.http) = {
+      post: "/v1/cred/check"
+      body: "*"
+    };  
+  }
+  rpc GetCred(CredReq) returns (CreateCredResp){
+    option (google.api.http) = {
+      post: "/v1/cred/check"
+      body: "*"
+    };  
+  }
+  rpc CreateCred (CredReq) returns (stream CreateCredResp) {
+    option (google.api.http) = {
+      post: "/v1/cred/create"
+      body: "*"
+    };  
+  } 
 }
