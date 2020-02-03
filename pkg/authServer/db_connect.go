@@ -2,6 +2,7 @@ package authServer
 
 import (
 	"RoomStatus/config"
+	"log"
 
 	"errors"
 
@@ -14,7 +15,9 @@ func (CAB *CreditsAuthBackend) InitDB(config *config.CfTDatabase) (*gorm.DB, err
 	if err != nil {
 		return nil, err
 	}
+	CAB.DBconn = db
 
+	init_check(db)
 	return db, nil
 
 }
@@ -52,18 +55,26 @@ func (CredSessionMod) TableName() string {
 }
 
 func init_check(dbc *gorm.DB) (bool, error) {
+	log.Println("start checking")
 	if dbc == nil {
 		return false, errors.New("NULL_SESSION")
 	}
 
+	log.Println("table-", UserCredMod{}.TableName())
 	if dbc.HasTable(&UserCredMod{}) == false {
+		log.Println("table->create", UserCredMod{}.TableName())
+
 		dbc.Set(
 			"gorm:table_options",
 			"ENGINE=InnoDB",
 		).CreateTable(&UserCredMod{})
 	}
 
+	log.Println("table-", CredSessionMod{}.TableName())
+
 	if dbc.HasTable(&CredSessionMod{}) == false {
+		log.Println("table->create", CredSessionMod{}.TableName())
+
 		dbc.Set(
 			"gorm:table_options",
 			"ENGINE=InnoDB",

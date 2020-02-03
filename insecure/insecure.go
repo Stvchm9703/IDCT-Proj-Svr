@@ -102,6 +102,9 @@ func GenCurrCert() (*tls.Certificate, error) {
 		Bytes: x509.MarshalPKCS1PrivateKey(caPrivKey),
 	})
 
+	// ------------------------------------------------------------
+	//  cert part
+	//
 	// grep ip
 	ipadd, _ := get_ip_addr()
 
@@ -194,53 +197,10 @@ func get_ip_addr() ([]net.IP, error) {
 }
 
 func CreateClientCrt(ip net.IP) ([]byte, error) {
-	ca := &x509.Certificate{
-		SerialNumber: big.NewInt(2019),
-		Subject: pkix.Name{
-			Organization:  []string{"MCHI-Comp, INC."},
-			Country:       []string{"HK"},
-			Province:      []string{""},
-			Locality:      []string{"Hong Kong NT"},
-			StreetAddress: []string{"Yueng Long"},
-			PostalCode:    []string{"09123797"},
-		},
-		NotBefore:             time.Now(),
-		NotAfter:              time.Now().AddDate(10, 0, 0),
-		IsCA:                  true,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
-		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
-		BasicConstraintsValid: true,
-	}
 
-	// create private and public key
-	caPrivKey, err := rsa.GenerateKey(rand.Reader, 4096)
-	if err != nil {
-		return nil, err
-	}
-
-	// create the CA
-	caBytes, err := x509.CreateCertificate(rand.Reader, ca, ca, &caPrivKey.PublicKey, caPrivKey)
-	if err != nil {
-		return nil, err
-	}
-
-	// pem encode
-	caPEM := new(bytes.Buffer)
-	pem.Encode(caPEM, &pem.Block{
-		Type:  "CERTIFICATE",
-		Bytes: caBytes,
-	})
-
-	caPrivKeyPEM := new(bytes.Buffer)
-	pem.Encode(caPrivKeyPEM, &pem.Block{
-		Type:  "RSA PRIVATE KEY",
-		Bytes: x509.MarshalPKCS1PrivateKey(caPrivKey),
-	})
-
-	// grep ip
 	ipadd, _ := get_ip_addr()
+	ipadd = append(ipadd, ip)
 
-	// set up server certificate
 	cert := &x509.Certificate{
 		SerialNumber: big.NewInt(2019),
 		Subject: pkix.Name{
@@ -264,7 +224,19 @@ func CreateClientCrt(ip net.IP) ([]byte, error) {
 		return nil, err
 	}
 
-	certBytes, err := x509.CreateCertificate(rand.Reader, cert, ca, &certPrivKey.PublicKey, caPrivKey)
+	ca, _ := GetCurrCert()
+	caPrivKey, err := rsa.GenerateKey(rand.Reader, 4096)
+	if err != nil {
+		return nil, err
+	}
+
+	certBytes, err := x509.CreateCertificate(
+		rand.Reader,
+		cert,
+		ca.Leaf,
+		&certPrivKey.PublicKey,
+		caPrivKey)
+
 	if err != nil {
 		return nil, err
 	}
@@ -273,24 +245,9 @@ func CreateClientCrt(ip net.IP) ([]byte, error) {
 		Type:  "CERTIFICATE",
 		Bytes: certBytes,
 	})
-	// certPem => target file
-
-	certPrivKeyPEM := pem.EncodeToMemory(&pem.Block{
-		Type:  "RSA PRIVATE KEY",
-		Bytes: x509.MarshalPKCS1PrivateKey(certPrivKey),
-	})
-	// certPrivKryPem => target file
-
-	serverCert, err := tls.X509KeyPair(certPEM, certPrivKeyPEM)
-	if err != nil {
-		return nil, err
-	}
-	serverCert.Leaf, err = x509.ParseCertificate(serverCert.Certificate[0])
-	if err != nil {
-		log.Println("Failed to parse certificate:", err)
-		return nil, err
-	}
-
+	// f, _ := os.OpenFile(PrivateCertFile, os.O_WRONLY|os.O_CREATE, 0666)
+	// f.Write(certPEM)
+	// f.Close()
 	// return &serverCert, nil
-	return nil, nil
+	return certPEM, nil
 }

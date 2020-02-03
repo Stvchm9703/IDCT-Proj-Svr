@@ -12,7 +12,7 @@ func (CAB *CreditsAuthBackend) CreateCred(req *pb.CredReq, stream pb.CreditsAuth
 	CAB.mu.Lock()
 	defer CAB.mu.Unlock()
 
-	var result []*UserCredMod
+	// var result []*UserCredMod
 	tmpUser := &UserCredMod{
 		Username: &req.Username,
 		Password: &req.Password,
@@ -21,5 +21,5 @@ func (CAB *CreditsAuthBackend) CreateCred(req *pb.CredReq, stream pb.CreditsAuth
 	if !CAB.DBconn.NewRecord(tmpUser) {
 		return errors.New("UserIsExist")
 	}
-	
+	return errors.New("NOT_IMPLEMENT")
 }

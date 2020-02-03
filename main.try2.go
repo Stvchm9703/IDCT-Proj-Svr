@@ -13,12 +13,11 @@ import (
 	server "RoomStatus/pkg/serverctlNoRedis"
 	pb "RoomStatus/proto"
 	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
+
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
-
-	"google.golang.org/grpc/status"
-
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/status"
 	// Static files
 	_ "RoomStatus/statik"
 )
@@ -43,7 +42,7 @@ var testing_config = cf.ConfTmp{
 		IP:           "0.0.0.0",
 		Port:         11000,
 		MaxPoolSize:  20,
-		APIReferType: "proto",
+		APIReferType: "grpc",
 		APITablePath: "{root}/thrid_party/OpenAPI",
 		APIOutpath:   "./",
 	},
@@ -57,7 +56,16 @@ var testing_config = cf.ConfTmp{
 		Database:   "redis",
 		Filepath:   "",
 	},
-	cf.CfTDatabase{},
+	cf.CfTDatabase{
+		Connector:  "postgresql",
+		WorkerNode: 1,
+		Host:       "127.0.0.1",
+		Port:       5432,
+		Username:   "",
+		Password:   "",
+		Database:   "idct_db",
+		Filepath:   "",
+	},
 }
 
 func main() {

@@ -32,12 +32,14 @@ func New(conf *cf.ConfTmp) *CreditsAuthBackend {
 		mu:      &sync.Mutex{},
 	}
 
+	g.InitDB(&conf.Database)
+	
 	return &g
 }
 
 func (this *CreditsAuthBackend) Shutdown() {
 	log.Println("in shtdown proc")
-
+	this.CloseDB()
 	log.Println("endof shutdown proc:", this.CoreKey)
 }
 
