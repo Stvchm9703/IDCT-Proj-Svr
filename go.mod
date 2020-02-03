@@ -39,7 +39,7 @@ require (
 	github.com/xo/dburl v0.0.0-20200124232849-e9ec94f52bc3 // indirect
 	github.com/xo/usql v0.7.8 // indirect
 	github.com/xo/xo v0.0.0-20190105221319-1a94fa516029 // indirect
-	golang.org/x/crypto v0.0.0-20200128174031-69ecbb4d6d5d // indirect
+	golang.org/x/crypto v0.0.0-20200128174031-69ecbb4d6d5d
 	golang.org/x/sys v0.0.0-20200124204421-9fbb57f87de9 // indirect
 	golang.org/x/tools v0.0.0-20200131211209-ecb101ed6550 // indirect
 

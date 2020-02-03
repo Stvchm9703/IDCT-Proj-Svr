@@ -9,7 +9,6 @@ import (
 	"syscall"
 
 	cf "RoomStatus/config"
-	"RoomStatus/insecure"
 	server "RoomStatus/pkg/authServer"
 	pb "RoomStatus/proto"
 
@@ -17,7 +16,6 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 
 	// Static files
@@ -42,30 +40,31 @@ var testing_config = cf.ConfTmp{
 	cf.CfAPIServer{
 		ConnType:     "TCP",
 		IP:           "0.0.0.0",
-		Port:         11000,
+		Port:         12000,
 		MaxPoolSize:  20,
 		APIReferType: "grpc",
 		APITablePath: "{root}/thrid_party/OpenAPI",
 		APIOutpath:   "./",
 	},
+
 	cf.CfTDatabase{
-		Connector:  "redis",
-		WorkerNode: 12,
-		Host:       "192.168.0.110",
-		Port:       6379,
-		Username:   "",
-		Password:   "",
-		Database:   "redis",
-		Filepath:   "",
-	},
-	cf.CfTDatabase{
-		Connector:  "postgresql",
+		Connector:  "postgres",
 		WorkerNode: 1,
 		Host:       "127.0.0.1",
 		Port:       5432,
 		Username:   "",
 		Password:   "",
 		Database:   "idct_db",
+		Filepath:   "",
+	},
+	cf.CfTDatabase{
+		Connector:  "redis",
+		WorkerNode: 12,
+		Host:       "192.168.0.110",
+		Port:       6379,
+		Username:   "test",
+		Password:   "",
+		Database:   "redis",
 		Filepath:   "",
 	},
 }
@@ -80,7 +79,7 @@ func main() {
 	// d := insecure.Cert
 	// log.Println(d)
 	s := grpc.NewServer(
-		grpc.Creds(credentials.NewServerTLSFromCert(insecure.Cert)),
+		// grpc.Creds(credentials.NewServerTLSFromCert(insecure.Cert)),
 		grpc.UnaryInterceptor(grpc_validator.UnaryServerInterceptor()),
 		grpc.StreamInterceptor(grpc_validator.StreamServerInterceptor()),
 	)

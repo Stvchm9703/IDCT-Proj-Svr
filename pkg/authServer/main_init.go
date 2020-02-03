@@ -32,8 +32,10 @@ func New(conf *cf.ConfTmp) *CreditsAuthBackend {
 		mu:      &sync.Mutex{},
 	}
 
+	log.Println("watch DB")
+
 	g.InitDB(&conf.Database)
-	
+
 	return &g
 }
 

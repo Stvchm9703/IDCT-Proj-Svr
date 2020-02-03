@@ -245,9 +245,6 @@ func CreateClientCrt(ip net.IP) ([]byte, error) {
 		Type:  "CERTIFICATE",
 		Bytes: certBytes,
 	})
-	// f, _ := os.OpenFile(PrivateCertFile, os.O_WRONLY|os.O_CREATE, 0666)
-	// f.Write(certPEM)
-	// f.Close()
-	// return &serverCert, nil
+
 	return certPEM, nil
 }
