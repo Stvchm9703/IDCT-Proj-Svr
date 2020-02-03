@@ -17,6 +17,7 @@ type ConfTmp struct {
 	TemplServer CfTemplServer `toml:"tmpl_server" json:"tmpl_server" yaml:"tmpl_server"`
 	APIServer   CfAPIServer   `toml:"api_server" json:"api_server" yaml:"api_server"`
 	Database    CfTDatabase   `toml:"database" json:"database" yaml:"database"`
+	CacheDb     CfTDatabase   `toml:"cache_db" json:"cache_db" yaml:"cache_db"`
 }
 
 type CfTemplServer struct {

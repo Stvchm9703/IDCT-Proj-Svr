@@ -57,7 +57,7 @@ service CreditsAuth {
       body: "*"
     };  
   }
-  rpc CreateCred (CredReq) returns (stream CreateCredResp) {
+  rpc CreateCred (CredReq) returns (CreateCredResp) {
     option (google.api.http) = {
       post: "/v1/cred/create"
       body: "*"

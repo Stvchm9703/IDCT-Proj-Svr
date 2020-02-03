@@ -8,12 +8,13 @@ import (
 	"strconv"
 	"syscall"
 
+	cf "RoomStatus/config"
+	"RoomStatus/insecure"
+	server "RoomStatus/pkg/serverctlNoRedis"
+	pb "RoomStatus/proto"
 	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
 	"google.golang.org/grpc"
-
-	cf "RoomStatus/config"
-	pb "RoomStatus/proto"
-	server "RoomStatus/serverctlNoRedis"
+	"google.golang.org/grpc/credentials"
 
 	"google.golang.org/grpc/status"
 
@@ -56,6 +57,7 @@ var testing_config = cf.ConfTmp{
 		Database:   "redis",
 		Filepath:   "",
 	},
+	cf.CfTDatabase{},
 }
 
 func main() {
@@ -65,8 +67,10 @@ func main() {
 	if err != nil {
 		panic("Failed to listen:\t" + err.Error())
 	}
+	// d := insecure.Cert
+	// log.Println(d)
 	s := grpc.NewServer(
-		// grpc.Creds(credentials.NewServerTLSFromCert(insecure.Cert)),
+		grpc.Creds(credentials.NewServerTLSFromCert(insecure.Cert)),
 		grpc.UnaryInterceptor(grpc_validator.UnaryServerInterceptor()),
 		grpc.StreamInterceptor(grpc_validator.StreamServerInterceptor()),
 	)

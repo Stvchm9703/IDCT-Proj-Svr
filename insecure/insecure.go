@@ -27,10 +27,8 @@ var (
 	// wd
 	wd = ""
 	// PrivateCertFile : where the cert file found
-	// PrivateCertFile string = filepath.Join(wd, "insecure", "server.crt")
 	PrivateCertFile string = filepath.Join(wd, "insecure", "cert.pem")
 	// KeyPEMFile : where the server key found
-	// KeyPEMFile string = filepath.Join(wd, "insecure", "server.key")
 	KeyPEMFile string = filepath.Join(wd, "insecure", "key.pem")
 )
 
@@ -104,6 +102,9 @@ func GenCurrCert() (*tls.Certificate, error) {
 		Bytes: x509.MarshalPKCS1PrivateKey(caPrivKey),
 	})
 
+	// grep ip
+	ipadd, _ := get_ip_addr()
+
 	// set up server certificate
 	cert := &x509.Certificate{
 		SerialNumber: big.NewInt(2019),
@@ -115,9 +116,9 @@ func GenCurrCert() (*tls.Certificate, error) {
 			StreetAddress: []string{"Yueng Long"},
 			PostalCode:    []string{"09123797"},
 		},
-		IPAddresses:  []net.IP{net.IPv4(127, 0, 0, 1), net.IPv6loopback},
+		IPAddresses:  ipadd,
 		NotBefore:    time.Now(),
-		NotAfter:     time.Now().AddDate(10, 0, 0),
+		NotAfter:     time.Now().AddDate(1, 0, 0),
 		SubjectKeyId: []byte{1, 2, 3, 4, 6},
 		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		KeyUsage:     x509.KeyUsageDigitalSignature,
@@ -160,4 +161,136 @@ func GenCurrCert() (*tls.Certificate, error) {
 	}
 
 	return &serverCert, nil
+}
+
+func get_ip_addr() ([]net.IP, error) {
+	ifaces, err := net.Interfaces()
+	// handle err
+	if err != nil {
+		return nil, err
+	}
+	var return_v []net.IP
+	for _, i := range ifaces {
+		addrs, err := i.Addrs()
+		if err != nil {
+			return nil, err
+		}
+		// handle err
+		for _, addr := range addrs {
+			var ip net.IP
+			switch v := addr.(type) {
+			case *net.IPNet:
+				ip = v.IP
+			case *net.IPAddr:
+				ip = v.IP
+			}
+			if ip.String() != "::1" {
+				return_v = append(return_v, ip)
+			}
+		}
+	}
+
+	return return_v, nil
+}
+
+func CreateClientCrt(ip net.IP) ([]byte, error) {
+	ca := &x509.Certificate{
+		SerialNumber: big.NewInt(2019),
+		Subject: pkix.Name{
+			Organization:  []string{"MCHI-Comp, INC."},
+			Country:       []string{"HK"},
+			Province:      []string{""},
+			Locality:      []string{"Hong Kong NT"},
+			StreetAddress: []string{"Yueng Long"},
+			PostalCode:    []string{"09123797"},
+		},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().AddDate(10, 0, 0),
+		IsCA:                  true,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
+		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		BasicConstraintsValid: true,
+	}
+
+	// create private and public key
+	caPrivKey, err := rsa.GenerateKey(rand.Reader, 4096)
+	if err != nil {
+		return nil, err
+	}
+
+	// create the CA
+	caBytes, err := x509.CreateCertificate(rand.Reader, ca, ca, &caPrivKey.PublicKey, caPrivKey)
+	if err != nil {
+		return nil, err
+	}
+
+	// pem encode
+	caPEM := new(bytes.Buffer)
+	pem.Encode(caPEM, &pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: caBytes,
+	})
+
+	caPrivKeyPEM := new(bytes.Buffer)
+	pem.Encode(caPrivKeyPEM, &pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(caPrivKey),
+	})
+
+	// grep ip
+	ipadd, _ := get_ip_addr()
+
+	// set up server certificate
+	cert := &x509.Certificate{
+		SerialNumber: big.NewInt(2019),
+		Subject: pkix.Name{
+			Organization:  []string{"MCHI-Comp, INC."},
+			Country:       []string{"HK"},
+			Province:      []string{""},
+			Locality:      []string{"Hong Kong NT"},
+			StreetAddress: []string{"Yueng Long"},
+			PostalCode:    []string{"09123797"},
+		},
+		IPAddresses:  ipadd,
+		NotBefore:    time.Now(),
+		NotAfter:     time.Now().AddDate(1, 0, 0),
+		SubjectKeyId: []byte{1, 2, 3, 4, 6},
+		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
+		KeyUsage:     x509.KeyUsageDigitalSignature,
+	}
+
+	certPrivKey, err := rsa.GenerateKey(rand.Reader, 4096)
+	if err != nil {
+		return nil, err
+	}
+
+	certBytes, err := x509.CreateCertificate(rand.Reader, cert, ca, &certPrivKey.PublicKey, caPrivKey)
+	if err != nil {
+		return nil, err
+	}
+
+	certPEM := pem.EncodeToMemory(&pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: certBytes,
+	})
+	// certPem => target file
+
+	certPrivKeyPEM := pem.EncodeToMemory(&pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(certPrivKey),
+	})
+	// certPrivKryPem => target file
+
+	serverCert, err := tls.X509KeyPair(certPEM, certPrivKeyPEM)
+	if err != nil {
+		return nil, err
+	}
+	serverCert.Leaf, err = x509.ParseCertificate(serverCert.Certificate[0])
+	if err != nil {
+		log.Println("Failed to parse certificate:", err)
+		return nil, err
+	}
+
+	// return &serverCert, nil
+	return nil, nil
 }
