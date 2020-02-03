@@ -99,7 +99,7 @@ func local_request_CreditsAuth_GetCred_0(ctx context.Context, marshaler runtime.
 
 }
 
-func request_CreditsAuth_CreateCred_0(ctx context.Context, marshaler runtime.Marshaler, client CreditsAuthClient, req *http.Request, pathParams map[string]string) (CreditsAuth_CreateCredClient, runtime.ServerMetadata, error) {
+func request_CreditsAuth_CreateCred_0(ctx context.Context, marshaler runtime.Marshaler, client CreditsAuthClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq CredReq
 	var metadata runtime.ServerMetadata
 
@@ -111,16 +111,25 @@ func request_CreditsAuth_CreateCred_0(ctx context.Context, marshaler runtime.Mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	stream, err := client.CreateCred(ctx, &protoReq)
-	if err != nil {
-		return nil, metadata, err
+	msg, err := client.CreateCred(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_CreditsAuth_CreateCred_0(ctx context.Context, marshaler runtime.Marshaler, server CreditsAuthServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq CredReq
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
 	}
-	header, err := stream.Header()
-	if err != nil {
-		return nil, metadata, err
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	metadata.HeaderMD = header
-	return stream, metadata, nil
+
+	msg, err := server.CreateCred(ctx, &protoReq)
+	return msg, metadata, err
 
 }
 
@@ -170,10 +179,23 @@ func RegisterCreditsAuthHandlerServer(ctx context.Context, mux *runtime.ServeMux
 	})
 
 	mux.Handle("POST", pattern_CreditsAuth_CreateCred_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		err := status.Error(codes.Unimplemented, "streaming calls are not yet supported in the in-process transport")
-		_, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-		return
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_CreditsAuth_CreateCred_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_CreditsAuth_CreateCred_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
 
 	return nil
@@ -273,7 +295,7 @@ func RegisterCreditsAuthHandlerClient(ctx context.Context, mux *runtime.ServeMux
 			return
 		}
 
-		forward_CreditsAuth_CreateCred_0(ctx, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
+		forward_CreditsAuth_CreateCred_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -293,5 +315,5 @@ var (
 
 	forward_CreditsAuth_GetCred_0 = runtime.ForwardResponseMessage
 
-	forward_CreditsAuth_CreateCred_0 = runtime.ForwardResponseStream
+	forward_CreditsAuth_CreateCred_0 = runtime.ForwardResponseMessage
 )
