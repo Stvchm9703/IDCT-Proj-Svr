@@ -12,12 +12,14 @@ import (
 	"RoomStatus/insecure"
 	server "RoomStatus/pkg/serverctlNoRedis"
 	pb "RoomStatus/proto"
-	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
+
 	// Static files
 	_ "RoomStatus/statik"
 )
@@ -27,7 +29,7 @@ var (
 	errInvalidToken    = status.Errorf(codes.Unauthenticated, "invalid token")
 )
 var testing_config = cf.ConfTmp{
-	cf.CfTemplServer{
+	TemplServer: cf.CfTemplServer{
 		IP:               "0.0.0.0",
 		Port:             9000,
 		RootFilePath:     "",
@@ -37,7 +39,7 @@ var testing_config = cf.ConfTmp{
 		TemplateFilepath: "",
 		TemplateOutpath:  "",
 	},
-	cf.CfAPIServer{
+	APIServer: cf.CfAPIServer{
 		ConnType:     "TCP",
 		IP:           "0.0.0.0",
 		Port:         11000,
@@ -46,7 +48,7 @@ var testing_config = cf.ConfTmp{
 		APITablePath: "{root}/thrid_party/OpenAPI",
 		APIOutpath:   "./",
 	},
-	cf.CfTDatabase{
+	CacheDb: cf.CfTDatabase{
 		Connector:  "redis",
 		WorkerNode: 12,
 		Host:       "192.168.0.110",
@@ -56,8 +58,8 @@ var testing_config = cf.ConfTmp{
 		Database:   "redis",
 		Filepath:   "",
 	},
-	cf.CfTDatabase{
-		Connector:  "postgresql",
+	Database: cf.CfTDatabase{
+		Connector:  "postgres",
 		WorkerNode: 1,
 		Host:       "127.0.0.1",
 		Port:       5432,
@@ -79,7 +81,10 @@ func main() {
 	// log.Println(d)
 	s := grpc.NewServer(
 		grpc.Creds(credentials.NewServerTLSFromCert(insecure.Cert)),
-		grpc.UnaryInterceptor(grpc_validator.UnaryServerInterceptor()),
+		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
+			server.TokenInterceptor,
+			grpc_validator.UnaryServerInterceptor(),
+		)),
 		grpc.StreamInterceptor(grpc_validator.StreamServerInterceptor()),
 	)
 
@@ -91,11 +96,11 @@ func main() {
 	go func() {
 		panic(s.Serve(lis))
 	}()
-	BeforeGracefulStop(s, RMServer)
+	beforeGracefulStop(s, RMServer)
 
 	// call your cleanup method with this channel as a routine
 }
-func BeforeGracefulStop(ss *grpc.Server, rms *server.RoomStatusBackend) {
+func beforeGracefulStop(ss *grpc.Server, rms *server.RoomStatusBackend) {
 	log.Println("BeforeGracefulStop")
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)

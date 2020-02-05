@@ -8,17 +8,18 @@ require (
 	github.com/alexflint/go-arg v1.2.0 // indirect
 	github.com/couchbase/gomemcached v0.0.0-20200121175323-40b06a54819a // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20200131184339-0f454e2ecd6a // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-redis/redis v6.15.6+incompatible
 	github.com/gocql/gocql v0.0.0-20200131111108-92af2e088537 // indirect
 	github.com/godror/godror v0.11.2 // indirect
 	github.com/gogo/googleapis v1.3.0
-	github.com/gogo/grpc-example v0.0.0-20190407094907-47d5c98b94b9
+	github.com/gogo/grpc-example v0.0.0-20190407094907-47d5c98b94b9 // indirect
 	github.com/gogo/protobuf v1.3.1
 	github.com/gogo/status v1.1.0
 	github.com/golang/mock v1.3.1
 	github.com/golang/protobuf v1.3.3
 	github.com/google/flatbuffers v1.11.0
-	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0
+	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway v1.12.1
 	github.com/jackc/pgx v3.6.2+incompatible // indirect
 	github.com/jinzhu/gorm v1.9.12

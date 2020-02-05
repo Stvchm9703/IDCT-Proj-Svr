@@ -2,12 +2,13 @@
 package authServer
 
 import (
+	"RoomStatus/insecure"
 	pb "RoomStatus/proto"
-	"bytes"
 	"context"
-	"errors"
 
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // GetCred(context.Context, *CredReq) (*CreateCredResp, error)
@@ -22,17 +23,17 @@ func (CAB *CreditsAuthBackend) GetCred(ctx context.Context, cq *pb.CredReq) (*pb
 	}).Find(&result)
 
 	if len(result) != 1 {
-		return nil, errors.New("UNKNOWN_DB_RECORD")
+		return nil, status.Error(codes.Internal, "UNKNOWN_DB_RECORD")
 	}
-	pwParse, _ := bcrypt.GenerateFromPassword([]byte(cq.Password), bcrypt.DefaultCost)
-	actual, _ := bcrypt.GenerateFromPassword([]byte(result[0].Password), bcrypt.DefaultCost)
-	if !bytes.Equal(actual, pwParse) {
-		return nil, errors.New("PASSWORD_INVALID")
+
+	err := bcrypt.CompareHashAndPassword([]byte(result[0].Password), []byte(cq.Password))
+	if err != nil {
+		return nil, status.Error(codes.Unauthenticated, ("PASSWORD_INVALID"))
 	}
 
 	return &pb.CreateCredResp{
 		Code:     200,
-		File:     result[0].KeyPem,
 		ErrorMsg: nil,
+		File:     insecure.GetCertPemFile(),
 	}, nil
 }

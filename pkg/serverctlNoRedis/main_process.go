@@ -1,4 +1,4 @@
-package main
+package serverctlNoRedis
 
 import (
 	"log"
@@ -9,13 +9,15 @@ import (
 	"syscall"
 
 	cf "RoomStatus/config"
-	server "RoomStatus/pkg/authServer"
+	"RoomStatus/insecure"
+	server "RoomStatus/pkg/serverctlNoRedis"
 	pb "RoomStatus/proto"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
-
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 
 	// Static files
@@ -26,50 +28,8 @@ var (
 	errMissingMetadata = status.Errorf(codes.InvalidArgument, "missing metadata")
 	errInvalidToken    = status.Errorf(codes.Unauthenticated, "invalid token")
 )
-var testing_config = cf.ConfTmp{
-	cf.CfTemplServer{
-		IP:               "0.0.0.0",
-		Port:             9000,
-		RootFilePath:     "",
-		MainPath:         "",
-		StaticFilepath:   "",
-		StaticOutpath:    "",
-		TemplateFilepath: "",
-		TemplateOutpath:  "",
-	},
-	cf.CfAPIServer{
-		ConnType:     "TCP",
-		IP:           "0.0.0.0",
-		Port:         12000,
-		MaxPoolSize:  20,
-		APIReferType: "grpc",
-		APITablePath: "{root}/thrid_party/OpenAPI",
-		APIOutpath:   "./",
-	},
 
-	cf.CfTDatabase{
-		Connector:  "postgres",
-		WorkerNode: 1,
-		Host:       "127.0.0.1",
-		Port:       5432,
-		Username:   "",
-		Password:   "",
-		Database:   "idct_db",
-		Filepath:   "",
-	},
-	cf.CfTDatabase{
-		Connector:  "redis",
-		WorkerNode: 12,
-		Host:       "192.168.0.110",
-		Port:       6379,
-		Username:   "test",
-		Password:   "",
-		Database:   "redis",
-		Filepath:   "",
-	},
-}
-
-func main() {
+func main_process(testing_config *cf.ConfTmp) {
 	log.Println("start run")
 	addr := testing_config.APIServer.IP + ":" + strconv.Itoa(testing_config.APIServer.Port)
 	lis, err := net.Listen("tcp", addr)
@@ -79,13 +39,17 @@ func main() {
 	// d := insecure.Cert
 	// log.Println(d)
 	s := grpc.NewServer(
-		grpc.UnaryInterceptor(grpc_validator.UnaryServerInterceptor()),
+		grpc.Creds(credentials.NewServerTLSFromCert(insecure.Cert)),
+		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
+			server.TokenInterceptor,
+			grpc_validator.UnaryServerInterceptor(),
+		)),
 		grpc.StreamInterceptor(grpc_validator.StreamServerInterceptor()),
 	)
 
 	RMServer := server.New(&testing_config)
 
-	pb.RegisterCreditsAuthServer(
+	pb.RegisterRoomStatusServer(
 		s, RMServer)
 	log.Println("Serving gRPC on https://", addr)
 	go func() {
@@ -95,7 +59,7 @@ func main() {
 
 	// call your cleanup method with this channel as a routine
 }
-func beforeGracefulStop(ss *grpc.Server, rms *server.CreditsAuthBackend) {
+func beforeGracefulStop(ss *grpc.Server, rms *server.RoomStatusBackend) {
 	log.Println("BeforeGracefulStop")
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)

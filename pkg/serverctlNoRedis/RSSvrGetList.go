@@ -3,11 +3,16 @@ package serverctlNoRedis
 import (
 	pb "RoomStatus/proto"
 	"context"
+	"log"
 	"time"
+
+	"google.golang.org/grpc/metadata"
 )
 
 // GetRoomList :
 func (b *RoomStatusBackend) GetRoomList(ctx context.Context, req *pb.RoomListReq) (res *pb.RoomListResp, err error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	log.Println(md)
 	printReqLog(ctx, req)
 
 	var tmp []*pb.Room

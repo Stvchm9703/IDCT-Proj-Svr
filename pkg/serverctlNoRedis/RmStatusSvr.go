@@ -34,7 +34,7 @@ func New(conf *cf.ConfTmp) *RoomStatusBackend {
 		CoreKey: ck,
 		mu:      &sync.Mutex{},
 	}
-
+	g.InitDB(&conf.Database)
 	return &g
 }
 
@@ -58,6 +58,7 @@ func (this *RoomStatusBackend) Shutdown() {
 			})
 		v.ClearAll()
 	}
+	this.CloseDB()
 	log.Println("endof shutdown proc:", this.CoreKey)
 }
 

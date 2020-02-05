@@ -3,11 +3,12 @@ package authServer
 
 import (
 	pb "RoomStatus/proto"
-	"bytes"
 	"context"
 	"errors"
 
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // CheckCred(context.Context, *CredReq) (*CheckCredResp, error)
@@ -21,16 +22,10 @@ func (CAB *CreditsAuthBackend) CheckCred(ctx context.Context, crq *pb.CredReq) (
 	if len(result) != 1 {
 		return nil, errors.New("UNKNOWN_DB_RECORD")
 	}
-	pwParse, _ := bcrypt.GenerateFromPassword([]byte(crq.Password), bcrypt.DefaultCost)
-	actual, _ := bcrypt.GenerateFromPassword([]byte(result[0].Password), bcrypt.DefaultCost)
-	if !bytes.Equal(actual, pwParse) {
-		return &pb.CheckCredResp{
-			ResponseCode: 500,
-			ErrorMsg: &pb.ErrorMsg{
-				MsgInfo: "PASSWORD_INVALID",
-				MsgDesp: "password invalid",
-			},
-		}, nil
+
+	err := bcrypt.CompareHashAndPassword([]byte(result[0].Password), []byte(crq.Password))
+	if err != nil {
+		return nil, status.Error(codes.Unauthenticated, ("PASSWORD_INVALID"))
 	}
 
 	return &pb.CheckCredResp{

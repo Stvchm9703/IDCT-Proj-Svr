@@ -2,12 +2,10 @@
 package authServer
 
 import (
+	"RoomStatus/insecure"
 	pb "RoomStatus/proto"
 	"context"
 	"errors"
-	"net"
-
-	"RoomStatus/insecure"
 
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
@@ -27,17 +25,11 @@ func (CAB *CreditsAuthBackend) CreateCred(ctx context.Context, req *pb.CredReq) 
 	tmpUser := &UserCredMod{
 		Username: req.Username,
 		Password: string(pwParse),
-		// KeyPem:   credFile,
 	}
 
 	count := 0
 	if CAB.DBconn.Model(&UserCredMod{}).Where(tmpUser).Count(&count); count > 0 {
 		return nil, errors.New("UserIsExist")
-	}
-
-	tmpUser.KeyPem, err = insecure.CreateClientCrt(net.ParseIP(req.Ip))
-	if err != nil {
-		return nil, err
 	}
 
 	if err := createCredTx(CAB.DBconn, tmpUser); err != nil {
@@ -46,8 +38,8 @@ func (CAB *CreditsAuthBackend) CreateCred(ctx context.Context, req *pb.CredReq) 
 
 	return &pb.CreateCredResp{
 		Code:     200,
-		File:     tmpUser.KeyPem,
 		ErrorMsg: nil,
+		File:     insecure.GetCertPemFile(),
 	}, nil
 }
 

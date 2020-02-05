@@ -8,6 +8,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
+	"io/ioutil"
 	"log"
 	"math/big"
 	"net"
@@ -33,7 +34,9 @@ var (
 )
 
 func init() {
-	wd, _ = os.Getwd()
+	if wd == "" {
+		wd, _ = os.Getwd()
+	}
 	var err error
 	Cert, err = GetCurrCert()
 	if err != nil {
@@ -59,6 +62,10 @@ func GetCurrCert() (*tls.Certificate, error) {
 }
 
 func GenCurrCert() (*tls.Certificate, error) {
+	if _, err := os.Stat(filepath.Join(wd, "insecure")); os.IsNotExist(err) {
+		os.Mkdir(filepath.Join(wd, "insecure"), os.ModePerm)
+	}
+
 	ca := &x509.Certificate{
 		SerialNumber: big.NewInt(2019),
 		Subject: pkix.Name{
@@ -196,55 +203,7 @@ func get_ip_addr() ([]net.IP, error) {
 	return return_v, nil
 }
 
-func CreateClientCrt(ip net.IP) ([]byte, error) {
-
-	ipadd, _ := get_ip_addr()
-	ipadd = append(ipadd, ip)
-
-	cert := &x509.Certificate{
-		SerialNumber: big.NewInt(2019),
-		Subject: pkix.Name{
-			Organization:  []string{"MCHI-Comp, INC."},
-			Country:       []string{"HK"},
-			Province:      []string{""},
-			Locality:      []string{"Hong Kong NT"},
-			StreetAddress: []string{"Yueng Long"},
-			PostalCode:    []string{"09123797"},
-		},
-		IPAddresses:  ipadd,
-		NotBefore:    time.Now(),
-		NotAfter:     time.Now().AddDate(1, 0, 0),
-		SubjectKeyId: []byte{1, 2, 3, 4, 6},
-		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
-		KeyUsage:     x509.KeyUsageDigitalSignature,
-	}
-
-	certPrivKey, err := rsa.GenerateKey(rand.Reader, 4096)
-	if err != nil {
-		return nil, err
-	}
-
-	ca, _ := GetCurrCert()
-	caPrivKey, err := rsa.GenerateKey(rand.Reader, 4096)
-	if err != nil {
-		return nil, err
-	}
-
-	certBytes, err := x509.CreateCertificate(
-		rand.Reader,
-		cert,
-		ca.Leaf,
-		&certPrivKey.PublicKey,
-		caPrivKey)
-
-	if err != nil {
-		return nil, err
-	}
-
-	certPEM := pem.EncodeToMemory(&pem.Block{
-		Type:  "CERTIFICATE",
-		Bytes: certBytes,
-	})
-
-	return certPEM, nil
+func GetCertPemFile() []byte {
+	dat, _ := ioutil.ReadFile(PrivateCertFile)
+	return dat
 }

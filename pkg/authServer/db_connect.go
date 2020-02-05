@@ -4,6 +4,7 @@ import (
 	"RoomStatus/config"
 	"log"
 	"strconv"
+	"time"
 
 	"errors"
 
@@ -65,7 +66,6 @@ type UserCredMod struct {
 	gorm.Model
 	Username string `gorm:"type:varchar(100)"`
 	Password string `gorm:"type:varchar(100)"`
-	KeyPem   []byte
 }
 
 func (UserCredMod) TableName() string {
@@ -74,8 +74,10 @@ func (UserCredMod) TableName() string {
 
 type CredSessionMod struct {
 	gorm.Model
-	UserId     uint    `gorm:"column:user_id;"`
-	DeviceName *string `gorm:"column:device_name;type:varchar(100)"`
+	UserId     uint   `gorm:"column:user_id;"`
+	DeviceName string `gorm:"column:device_name;type:varchar(100)"`
+	Token      string
+	Timeout    time.Time
 }
 
 func (CredSessionMod) TableName() string {
@@ -101,7 +103,7 @@ func init_check(dbc *gorm.DB) (bool, error) {
 		log.Println("table->create", CredSessionMod{}.TableName())
 
 		dbc.CreateTable(&CredSessionMod{})
-		dbc.Model(&CredSessionMod{}).AddForeignKey("user_id", "user_cred(id)", "CASCADE", "CASCADE")
+		// dbc.Model(&CredSessionMod{}).AddForeignKey("user_id", "user_cred(id)", "CASCADE", "CASCADE")
 	}
 	return true, nil
 }
