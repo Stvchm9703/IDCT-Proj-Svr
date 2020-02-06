@@ -8,7 +8,8 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
-	"io/ioutil"
+
+	// "io/ioutil"
 	"log"
 	"math/big"
 	"net"
@@ -203,7 +204,6 @@ func get_ip_addr() ([]net.IP, error) {
 	return return_v, nil
 }
 
-func GetCertPemFile() []byte {
-	dat, _ := ioutil.ReadFile(PrivateCertFile)
-	return dat
+func GetCertPemFilePath() string {
+	return PrivateCertFile
 }

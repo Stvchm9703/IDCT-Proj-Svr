@@ -2,7 +2,6 @@
 package authServer
 
 import (
-	"RoomStatus/insecure"
 	pb "RoomStatus/proto"
 	"context"
 	"errors"
@@ -13,7 +12,7 @@ import (
 
 // CreateCred(*CredReq, CreditsAuth_CreateCredServer) error
 
-func (CAB *CreditsAuthBackend) CreateCred(ctx context.Context, req *pb.CredReq) (*pb.CreateCredResp, error) {
+func (CAB *CreditsAuthBackend) CreateCred(ctx context.Context, req *pb.CredReq) (*pb.CheckCredResp, error) {
 	CAB.mu.Lock()
 	defer CAB.mu.Unlock()
 
@@ -36,10 +35,9 @@ func (CAB *CreditsAuthBackend) CreateCred(ctx context.Context, req *pb.CredReq) 
 		return nil, err
 	}
 
-	return &pb.CreateCredResp{
-		Code:     200,
-		ErrorMsg: nil,
-		File:     insecure.GetCertPemFile(),
+	return &pb.CheckCredResp{
+		ResponseCode: 200,
+		ErrorMsg:     nil,
 	}, nil
 }
 

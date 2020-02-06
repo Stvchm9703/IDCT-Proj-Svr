@@ -2,9 +2,13 @@
 package authServer
 
 import (
-	"RoomStatus/insecure"
 	pb "RoomStatus/proto"
-	"context"
+
+	"bufio"
+	"log"
+	"os"
+
+	"RoomStatus/insecure"
 
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
@@ -13,7 +17,7 @@ import (
 
 // GetCred(context.Context, *CredReq) (*CreateCredResp, error)
 
-func (CAB *CreditsAuthBackend) GetCred(ctx context.Context, cq *pb.CredReq) (*pb.CreateCredResp, error) {
+func (CAB *CreditsAuthBackend) GetCred(cq *pb.CredReq, stream pb.CreditsAuth_GetCredServer) error {
 	CAB.mu.Lock()
 	defer CAB.mu.Unlock()
 
@@ -23,17 +27,35 @@ func (CAB *CreditsAuthBackend) GetCred(ctx context.Context, cq *pb.CredReq) (*pb
 	}).Find(&result)
 
 	if len(result) != 1 {
-		return nil, status.Error(codes.Internal, "UNKNOWN_DB_RECORD")
+		return status.Error(codes.Internal, "UNKNOWN_DB_RECORD")
 	}
 
 	err := bcrypt.CompareHashAndPassword([]byte(result[0].Password), []byte(cq.Password))
 	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, ("PASSWORD_INVALID"))
+		return status.Error(codes.Unauthenticated, ("PASSWORD_INVALID"))
 	}
 
-	return &pb.CreateCredResp{
-		Code:     200,
-		ErrorMsg: nil,
-		File:     insecure.GetCertPemFile(),
-	}, nil
+	file, err := os.Open(insecure.PrivateCertFile)
+	if err != nil {
+		log.Fatal(err)
+		return status.Error(codes.Internal, "CRED_FILE_ISSUE")
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		if err := stream.Send(&pb.CreateCredResp{
+			Code:     200,
+			File:     scanner.Bytes(),
+			ErrorMsg: nil,
+		}); err != nil {
+			return status.Error(codes.Internal, "STREAM_SEND_ERROR")
+		}
+		if err := scanner.Err(); err != nil {
+			return status.Error(codes.Internal, "STREAM_SCAN_ERROR")
+		}
+	}
+	log.Println("<<End Of Send>>")
+	return nil
 }
