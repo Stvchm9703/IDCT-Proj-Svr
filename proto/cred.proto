@@ -51,16 +51,17 @@ service CreditsAuth {
       body: "*"
     };  
   }
-  rpc GetCred(CredReq) returns (CreateCredResp){
-    option (google.api.http) = {
-      post: "/v1/cred/check"
-      body: "*"
-    };  
-  }
-  rpc CreateCred (CredReq) returns (CreateCredResp) {
+  
+  rpc CreateCred (CredReq) returns (CheckCredResp) {
     option (google.api.http) = {
       post: "/v1/cred/create"
       body: "*"
     };  
   } 
+  rpc GetCred(CredReq) returns (stream CreateCredResp){
+    option (google.api.http) = {
+      post: "/v1/cred/get"
+      body: "*"
+    };  
+  }
 }
