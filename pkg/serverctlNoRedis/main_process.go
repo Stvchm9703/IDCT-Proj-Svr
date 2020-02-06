@@ -10,7 +10,6 @@ import (
 
 	cf "RoomStatus/config"
 	"RoomStatus/insecure"
-	server "RoomStatus/pkg/serverctlNoRedis"
 	pb "RoomStatus/proto"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -41,13 +40,13 @@ func main_process(testing_config *cf.ConfTmp) {
 	s := grpc.NewServer(
 		grpc.Creds(credentials.NewServerTLSFromCert(insecure.Cert)),
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-			server.TokenInterceptor,
+			TokenInterceptor,
 			grpc_validator.UnaryServerInterceptor(),
 		)),
 		grpc.StreamInterceptor(grpc_validator.StreamServerInterceptor()),
 	)
 
-	RMServer := server.New(&testing_config)
+	RMServer := New(testing_config)
 
 	pb.RegisterRoomStatusServer(
 		s, RMServer)
@@ -59,7 +58,7 @@ func main_process(testing_config *cf.ConfTmp) {
 
 	// call your cleanup method with this channel as a routine
 }
-func beforeGracefulStop(ss *grpc.Server, rms *server.RoomStatusBackend) {
+func beforeGracefulStop(ss *grpc.Server, rms *RoomStatusBackend) {
 	log.Println("BeforeGracefulStop")
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
