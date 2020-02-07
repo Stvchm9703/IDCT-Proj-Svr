@@ -155,4 +155,5 @@ func main() {
 		log.Fatalf("Error closing key.pem: %s", err)
 	}
 	log.Print("wrote key.pem\n")
+
 }
