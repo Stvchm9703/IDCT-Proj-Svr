@@ -19,7 +19,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	// Static files
-	_ "RoomStatus/statik"
+	// _ "RoomStatus/statik"
 )
 
 var (
@@ -67,6 +67,7 @@ var testing_config = cf.ConfTmp{
 		Database:   "redis",
 		Filepath:   "",
 	},
+	cf.CfAPIServer{}
 }
 
 func main() {

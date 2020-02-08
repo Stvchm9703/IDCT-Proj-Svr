@@ -1,6 +1,7 @@
 package serverctlNoRedis
 
 import (
+	"RoomStatus/common"
 	pb "RoomStatus/proto"
 	"context"
 	"log"
@@ -9,7 +10,7 @@ import (
 
 // GetRoomInfo :
 func (b *RoomStatusBackend) GetRoomInfo(ctx context.Context, req *pb.RoomReq) (*pb.RoomResp, error) {
-	printReqLog(ctx, req)
+	common.PrintReqLog(ctx, req)
 	for _, v := range b.Roomlist {
 		log.Println(v.Key)
 		if (v).Key == req.Key {

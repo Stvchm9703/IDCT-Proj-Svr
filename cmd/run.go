@@ -24,7 +24,7 @@ var runCMDInput = struct {
 
 var runCmd = &cobra.Command{
 	Use:   "start",
-	Short: "start the server of grpc server",
+	Short: "start the all service of grpc server",
 	Long:  `grpc server start run `,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("grpc server  Generator v0.9 -- HEAD")

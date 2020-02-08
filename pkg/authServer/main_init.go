@@ -5,8 +5,6 @@ import (
 	cm "RoomStatus/common"
 	cf "RoomStatus/config"
 	pb "RoomStatus/proto"
-	"context"
-	"encoding/json"
 	"log"
 	"sync"
 
@@ -25,7 +23,13 @@ type CreditsAuthBackend struct {
 
 // New : Create new backend
 func New(conf *cf.ConfTmp) *CreditsAuthBackend {
-	ck := "RSCore" + cm.HashText(conf.APIServer.IP)
+	ck := "AuthCore"
+	if conf.AuthServer.IP != "" {
+		ck += cm.HashText(conf.AuthServer.IP)
+	} else {
+		ck += cm.HashText(conf.APIServer.IP)
+
+	}
 
 	g := CreditsAuthBackend{
 		CoreKey: ck,
@@ -49,12 +53,3 @@ func (this *CreditsAuthBackend) Shutdown() {
 //		CheckCred(context.Context, *CredReq) (*CheckCredResp, error)
 // 		GetCred(context.Context, *CredReq) (*CreateCredResp, error)
 // 		CreateCred(*CredReq, CreditsAuth_CreateCredServer) error
-
-// printReqLog
-func printReqLog(ctx context.Context, req interface{}) {
-	jsoon, _ := json.Marshal(ctx)
-	log.Println(string(jsoon))
-
-	jsoon, _ = json.Marshal(req)
-	log.Println(string(jsoon))
-}

@@ -19,9 +19,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
-
 	// Static files
-	_ "RoomStatus/statik"
 )
 
 var (

@@ -3,7 +3,7 @@ package redis_test
 import (
 	cf "RoomStatus/config"
 	pb "RoomStatus/proto"
-	rd "RoomStatus/store/redis"
+	rd "RoomStatus/pkg/store/redis"
 	"encoding/json"
 	"log"
 	"testing"

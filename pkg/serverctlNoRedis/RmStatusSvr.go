@@ -5,8 +5,6 @@ import (
 	cm "RoomStatus/common"
 	cf "RoomStatus/config"
 	pb "RoomStatus/proto"
-	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -71,14 +69,7 @@ func (this *RoomStatusBackend) Shutdown() {
 // 		UpdateRoomStatus(context.Context, *CellStatus) (*types.Empty, error)
 // 		DeleteRoom(context.Context, *RoomRequest) (*types.Empty, error)
 
-// printReqLog
-func printReqLog(ctx context.Context, req interface{}) {
-	jsoon, _ := json.Marshal(ctx)
-	log.Println(string(jsoon))
-
-	jsoon, _ = json.Marshal(req)
-	log.Println(string(jsoon))
-}
+// PrintReqLog
 
 // ======================================================================================================
 // RoomMgr : Room Manager

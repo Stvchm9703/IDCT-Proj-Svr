@@ -1,6 +1,8 @@
 package common
 
 import (
+	"context"
+	"encoding/json"
 	"hash/fnv"
 	"io"
 	"log"
@@ -25,4 +27,12 @@ func SetLog(path string) io.Writer {
 	log.SetOutput(wrt)
 	log.Println(" Orders API Called")
 	return wrt
+}
+
+func PrintReqLog(ctx context.Context, req interface{}) {
+	jsoon, _ := json.Marshal(ctx)
+	log.Println(string(jsoon))
+
+	jsoon, _ = json.Marshal(req)
+	log.Println(string(jsoon))
 }

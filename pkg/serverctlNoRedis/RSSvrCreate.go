@@ -12,7 +12,7 @@ import (
 
 // CreateRoom :
 func (b *RoomStatusBackend) CreateRoom(ctx context.Context, req *pb.RoomCreateReq) (*pb.RoomResp, error) {
-	printReqLog(ctx, req)
+	cm.PrintReqLog(ctx, req)
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	for _, vr := range b.Roomlist {

@@ -1,6 +1,7 @@
 package serverctlNoRedis
 
 import (
+	"RoomStatus/common"
 	pb "RoomStatus/proto"
 	"context"
 	"errors"
@@ -11,7 +12,7 @@ import (
 // UpdateRoom :
 func (b *RoomStatusBackend) UpdateRoom(ctx context.Context, req *pb.CellStatusReq) (*pb.CellStatusResp, error) {
 	// return nil, status.Errorf(codes.Unimplemented, "method DeleteRoom not implemented")
-	printReqLog(ctx, req)
+	common.PrintReqLog(ctx, req)
 	var rmg *RoomMgr
 	for k := range b.Roomlist {
 		if (*b.Roomlist[k]).Key == req.Key {

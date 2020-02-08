@@ -1,6 +1,7 @@
 package serverctlNoRedis
 
 import (
+	cm "RoomStatus/common"
 	pb "RoomStatus/proto"
 	"errors"
 	"fmt"
@@ -9,7 +10,7 @@ import (
 )
 
 func (b *RoomStatusBackend) GetRoomStream(csq *pb.CellStatusReq, rs pb.RoomStatus_GetRoomStreamServer) error {
-	printReqLog(rs.Context(), csq)
+	cm.PrintReqLog(rs.Context(), csq)
 	no_rm_flg := true
 	var vf *RoomMgr
 

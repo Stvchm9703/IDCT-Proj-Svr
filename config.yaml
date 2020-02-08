@@ -1,0 +1,45 @@
+tmpl_server:
+  ip: 192.168.0.102
+  port: 11000
+  root_path: ""
+  main_path: ""
+  static_filepath: ""
+  static_outpath: ""
+  template_filepath: ""
+  template_outpath: ""
+
+api_server:
+  conn_type: grpc
+  ip: 192.168.0.102
+  port: 11000
+  max_pool_size: 20
+  api_refer_type: proto
+  api_table_filepath: "'./proto/','./'"
+  api_outpath: "api/"
+
+database:
+  connector: postgres
+  worker_node: 1
+  host: 127.0.0.1
+  port: 5432
+  username: ""
+  password: ""
+  filepath: ""
+
+cache_db:
+  connector: redis
+  worker_node: 12
+  host: 192.168.0.110
+  port: 6379
+  username: ""
+  password: ""
+  filepath: ""
+
+auth_server:
+  conn_type: grpc
+  ip: 192.168.0.102
+  port: 12000
+  max_pool_size: 1
+  api_refer_type: proto
+  api_table_filepath: "'./proto/','./'"
+  api_outpath: "api/"

@@ -18,9 +18,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
-
 	// Static files
-	_ "RoomStatus/statik"
+	// _ "RoomStatus/statik"
 )
 
 var (
@@ -28,7 +27,7 @@ var (
 	errInvalidToken    = status.Errorf(codes.Unauthenticated, "invalid token")
 )
 
-func main_process(testing_config *cf.ConfTmp) {
+func ServerMainProcess(testing_config *cf.ConfTmp) {
 	log.Println("start run")
 	addr := testing_config.APIServer.IP + ":" + strconv.Itoa(testing_config.APIServer.Port)
 	lis, err := net.Listen("tcp", addr)
