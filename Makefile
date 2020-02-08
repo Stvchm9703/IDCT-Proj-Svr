@@ -114,5 +114,5 @@ $(CURDIR)/vendor/ \
 	## Workaround for https://github.com/grpc-ecosystem/grpc-gateway/issues/229.
 	sed -i.bak "s/empty.Empty/types.Empty/g" proto/cred.pb.gw.go && rm proto/cred.pb.gw.go.bak
 
-	## Generate static assets for OpenAPI UI
-	statik -m -f -src third_party/OpenAPI/
+	# ## Generate static assets for OpenAPI UI
+	# statik -m -f -src third_party/OpenAPI/

@@ -92,7 +92,7 @@ func main() {
 
 	pb.RegisterRoomStatusServer(
 		s, RMServer)
-	log.Println("Serving gRPC on https://", addr)
+	log.Println("Serving gRPC on tcp://", addr)
 	go func() {
 		panic(s.Serve(lis))
 	}()
