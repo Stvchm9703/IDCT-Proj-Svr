@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"log"
-	"sync"
 	"time"
 )
 
@@ -58,7 +57,6 @@ func (b *RoomStatusBackend) CreateRoom(ctx context.Context, req *pb.RoomCreateRe
 	rmTmp1 := RoomMgr{
 		Room:            rmTmp,
 		get_only_stream: make(map[string]*pb.RoomStatus_GetRoomStreamServer),
-		conn_pool:       &sync.Map{},
 	}
 
 	b.Roomlist = append(b.Roomlist, &rmTmp1)

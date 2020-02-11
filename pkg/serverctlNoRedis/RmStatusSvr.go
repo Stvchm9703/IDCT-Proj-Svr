@@ -75,7 +75,6 @@ func (this *RoomStatusBackend) Shutdown() {
 // RoomMgr : Room Manager
 type RoomMgr struct {
 	pb.Room
-	conn_pool       *sync.Map
 	get_only_stream map[string]*pb.RoomStatus_GetRoomStreamServer
 	// close_link      *sync.Map
 }
@@ -84,7 +83,6 @@ type RoomMgr struct {
 // roommgr.get_only_stream
 
 func (rm *RoomMgr) GetGS(user_id string) *pb.RoomStatus_GetRoomStreamServer {
-	log.Println(rm.conn_pool)
 	a, ok := rm.get_only_stream[user_id]
 	if ok {
 		return a
