@@ -19,10 +19,11 @@ api_server:
 
 database:
   connector: postgres
+  database: idct_db
   worker_node: 1
-  host: 127.0.0.1
+  host: 192.168.0.110
   port: 5432
-  username: ""
+  username: "postgres"
   password: ""
   filepath: ""
 
