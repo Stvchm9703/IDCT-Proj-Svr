@@ -19,6 +19,7 @@ require (
 	github.com/golang/mock v1.3.1
 	github.com/golang/protobuf v1.3.3
 	github.com/google/flatbuffers v1.11.0
+	github.com/googollee/go-socket.io v1.4.3 // indirect
 	github.com/gorilla/websocket v1.4.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway v1.12.1
