@@ -136,19 +136,7 @@ service RoomStatus {
         }; 
     };
 
-    // rpc RoomStream (stream CellStatusReq) returns (stream CellStatusResp){
-    //     option (google.api.http) = {
-    //         post: "/v1/room/stream"
-    //         body: "*"
-    //     }; 
-    // };
-    // rpc GetRoomStream(CellStatusReq) returns(stream CellStatusResp){
-    //     option (google.api.http) = {
-    //         post: "/v1/room/stream"
-    //         body: "*"
-    //     };
-    // };
-  
+ 
     rpc UpdateRoom(CellStatusReq) returns (CellStatusResp){
         option (google.api.http) = {
             post: "/v1/room/update"
