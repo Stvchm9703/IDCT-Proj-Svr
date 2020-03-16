@@ -55,8 +55,8 @@ func (b *RoomStatusBackend) CreateRoom(ctx context.Context, req *pb.RoomCreateRe
 		CellStatus: nil,
 	}
 	rmTmp1 := RoomMgr{
-		Room:            rmTmp,
-		get_only_stream: make(map[string]*pb.RoomStatus_GetRoomStreamServer),
+		Room: rmTmp,
+		// get_only_stream: make(map[string]*pb.RoomStatus_GetRoomStreamServer),
 	}
 
 	b.Roomlist = append(b.Roomlist, &rmTmp1)
