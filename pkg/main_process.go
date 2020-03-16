@@ -11,7 +11,6 @@ import (
 	cf "RoomStatus/config"
 	"RoomStatus/insecure"
 	RmSv "RoomStatus/pkg/serverctlNoRedis"
-	SocketSv "RoomStatus/pkg/socketServer"
 	pb "RoomStatus/proto"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -56,11 +55,10 @@ func ServerMainProcess(testing_config *cf.ConfTmp) {
 	go func() {
 		panic(s.Serve(lis))
 	}()
-	SocketS, err := SocketSv.InitSocketServer(RMServer)
-	if err != nil {
-		panic("Failed to listen:\t" + err.Error())
-	}
-	panic(SocketSv.RunSocketServer(SocketS))
+
+	go func() {
+		panic(RMServer.RunSocketServer())
+	}()
 
 	beforeGracefulStop(s, RMServer)
 

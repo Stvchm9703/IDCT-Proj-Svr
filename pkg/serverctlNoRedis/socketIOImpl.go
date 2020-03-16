@@ -33,7 +33,11 @@ func (this *RoomStatusBackend) InitSocketServer() (*socketio.Server, error) {
 
 	server.OnEvent("/", "notice", func(s socketio.Conn, msg string) {
 		fmt.Println("notice:", msg)
-		s.Emit("reply", "have "+msg)
+		ls := []string{}
+		for _, v := range this.Roomlist {
+			ls = append(ls, proto.MarshalTextString(v))
+		}
+		s.Emit("reply", ls)
 	})
 	server.OnEvent("/chat", "msg", func(s socketio.Conn, msg string) string {
 		s.SetContext(msg)
@@ -58,51 +62,13 @@ func (this *RoomStatusBackend) InitSocketServer() (*socketio.Server, error) {
 func (this *RoomStatusBackend) RunSocketServer() error {
 	log.Println("Serve Socket Server")
 	router := gin.New()
-	server, err := socketio.NewServer(nil)
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
-	server.OnConnect("/", func(s socketio.Conn) error {
-		s.SetContext("")
-		fmt.Println("NameSpace : /")
-		fmt.Println("connected:", s.ID())
-		fmt.Printf("Room Request : %#v \n", s.URL())
-		return nil
-	})
 
-	server.OnEvent("/", "notice", func(s socketio.Conn, msg string) {
-		fmt.Println("notice:", msg)
-		s.Emit("reply", "have "+msg)
-	})
-	server.OnEvent("/chat", "msg", func(s socketio.Conn, msg string) string {
-		s.SetContext(msg)
-		return "recv " + msg
-	})
-	server.OnEvent("/", "bye", func(s socketio.Conn) string {
-		last := s.Context().(string)
-		s.Emit("bye", last)
-		s.Close()
-		return last
-	})
-	server.OnError("/", func(s socketio.Conn, e error) {
-		fmt.Println("meet error:", e)
-	})
-	server.OnDisconnect("/", func(s socketio.Conn, reason string) {
-		fmt.Println("closed", reason)
-	})
-	err = server.Serve()
+	go this.castServer.Serve()
 
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	// defer server.Close()
-	router.GET("/socket.io/*any", gin.WrapH(server))
-	router.POST("/socket.io/*any", gin.WrapH(server))
-	log.Fatal(router.Run(":8000"))
-	this.castServer = server
-	return nil
+	router.GET("/socket.io/*any", gin.WrapH(this.castServer))
+	router.POST("/socket.io/*any", gin.WrapH(this.castServer))
+	return router.Run(":8000")
+	// return nil
 }
 
 func (this *RoomStatusBackend) BroadCast(msg *pb.CellStatusResp) error {
