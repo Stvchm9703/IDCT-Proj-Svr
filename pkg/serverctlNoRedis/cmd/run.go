@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	Cf "RoomStatus/config"
-	wb "RoomStatus/pkg/serverctlNoRedis"
+	wb "RoomStatus/pkg"
 
 	"github.com/spf13/cobra"
 )

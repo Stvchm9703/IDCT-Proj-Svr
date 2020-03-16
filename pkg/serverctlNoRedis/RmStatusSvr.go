@@ -7,6 +7,9 @@ import (
 	pb "RoomStatus/proto"
 	"log"
 	"sync"
+
+	socketio "github.com/googollee/go-socket.io"
+	"github.com/micro/go-micro/errors"
 	// ants "github.com/panjf2000/ants/v2"
 )
 
@@ -16,9 +19,10 @@ var _ pb.RoomStatusServer = (*RoomStatusBackend)(nil)
 //
 type RoomStatusBackend struct {
 	// pb.RoomStatusServer
-	mu       *sync.Mutex
-	CoreKey  string
-	Roomlist []*pb.Room
+	mu         *sync.Mutex
+	CoreKey    string
+	Roomlist   []*pb.Room
+	castServer *socketio.Server
 }
 
 // New : Create new backend
@@ -29,8 +33,16 @@ func New(conf *cf.ConfTmp) *RoomStatusBackend {
 		CoreKey: ck,
 		mu:      &sync.Mutex{},
 	}
-	g.InitDB(&conf.Database)
+
 	return &g
+}
+
+func (this *RoomStatusBackend) SetCastServer(s *socketio.Server) error {
+	if s == nil {
+		return errors.New("001", "Empty SocketIO server", 0001)
+	}
+	this.castServer = s
+	return nil
 }
 
 func (this *RoomStatusBackend) Shutdown() {
@@ -55,20 +67,7 @@ func (this *RoomStatusBackend) Shutdown() {
 	// 		})
 	// 	v.ClearAll()
 	// }
+	// this.BroadCastShutdown()
 	this.CloseDB()
 	log.Println("endof shutdown proc:", this.CoreKey)
 }
-
-// 	Impletement from GameCtl.pb.go(auto-gen file)
-// 		CreateCred(req *pb.CreateCredReq, srv pb.RoomStatus_CreateCredServer) error
-// 		CreateRoom(context.Context, *types.Empty) (*Room, error)
-// 		GetRoomList(context.Context, *RoomListRequest) (*RoomListResponse, error)
-// 		GetRoomCurrentInfo(context.Context, *RoomRequest) (*Room, error)
-// 		GetRoomStream(*RoomRequest, RoomStatus_GetRoomStreamServer) error
-// 		UpdateRoomStatus(context.Context, *CellStatus) (*types.Empty, error)
-// 		DeleteRoom(context.Context, *RoomRequest) (*types.Empty, error)
-
-// PrintReqLog
-
-// ======================================================================================================
-// RoomMgr : Room Manager

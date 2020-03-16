@@ -6,9 +6,11 @@ require (
 	cloud.google.com/go v0.52.0 // indirect
 	github.com/BurntSushi/toml v0.3.1
 	github.com/alexflint/go-arg v1.2.0 // indirect
+	github.com/coreos/etcd v3.3.17+incompatible
 	github.com/couchbase/gomemcached v0.0.0-20200121175323-40b06a54819a // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20200131184339-0f454e2ecd6a // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/gin-gonic/gin v1.5.0
 	github.com/go-redis/redis v6.15.6+incompatible
 	github.com/gocql/gocql v0.0.0-20200131111108-92af2e088537 // indirect
 	github.com/godror/godror v0.11.2 // indirect
