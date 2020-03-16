@@ -38,6 +38,8 @@ func (this *RoomStatusBackend) Shutdown() {
 	/// TODO: send closing msg to all client
 	// for _, v := range this.Roomlist {
 	// 	log.Println("Server OS.sigKill")
+
+	// !Broadcast
 	// 	v.BroadCast("RmSvrMgr",
 	// 		&pb.CellStatusResp{
 	// 			UserId:    "RmSvrMgr",

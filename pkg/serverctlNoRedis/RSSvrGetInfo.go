@@ -17,7 +17,7 @@ func (b *RoomStatusBackend) GetRoomInfo(ctx context.Context, req *pb.RoomReq) (*
 			return &pb.RoomResp{
 				Timestamp: time.Now().String(),
 				ResponseMsg: &pb.RoomResp_RoomInfo{
-					RoomInfo: &v.Room,
+					RoomInfo: v,
 				},
 			}, nil
 		}

@@ -54,12 +54,12 @@ func (b *RoomStatusBackend) CreateRoom(ctx context.Context, req *pb.RoomCreateRe
 		Cell:       -1,
 		CellStatus: nil,
 	}
-	rmTmp1 := RoomMgr{
-		Room: rmTmp,
-		// get_only_stream: make(map[string]*pb.RoomStatus_GetRoomStreamServer),
-	}
+	// rmTmp1 := RoomMgr{
+	// 	Room: rmTmp,
+	// 	// get_only_stream: make(map[string]*pb.RoomStatus_GetRoomStreamServer),
+	// }
 
-	b.Roomlist = append(b.Roomlist, &rmTmp1)
+	b.Roomlist = append(b.Roomlist, &rmTmp)
 	log.Println("Created Room : <", rmTmp)
 	return &pb.RoomResp{
 		Timestamp: time.Now().String(),

@@ -13,7 +13,7 @@ import (
 func (b *RoomStatusBackend) UpdateRoom(ctx context.Context, req *pb.CellStatusReq) (*pb.CellStatusResp, error) {
 	// return nil, status.Errorf(codes.Unimplemented, "method DeleteRoom not implemented")
 	common.PrintReqLog(ctx, req)
-	var rmg *RoomMgr
+	var rmg *pb.Room
 	for k := range b.Roomlist {
 		if (*b.Roomlist[k]).Key == req.Key {
 			rmg = b.Roomlist[k]
@@ -87,6 +87,7 @@ func (b *RoomStatusBackend) UpdateRoom(ctx context.Context, req *pb.CellStatusRe
 		},
 	}
 
-	rmg.BroadCast(req.UserId, msgp)
+	// !Broadcast
+	// rmg.BroadCast(req.UserId, msgp)
 	return msgp, nil
 }

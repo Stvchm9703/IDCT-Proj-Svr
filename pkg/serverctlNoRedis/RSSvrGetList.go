@@ -18,9 +18,7 @@ func (b *RoomStatusBackend) GetRoomList(ctx context.Context, req *pb.RoomListReq
 
 	var tmp []*pb.Room
 	for _, v := range b.Roomlist {
-		var y pb.Room
-		y = v.Room
-		tmp = append(tmp, &y)
+		tmp = append(tmp, v)
 	}
 	// log.Println("list:", tmp)
 	// log.Println("typeof:", reflect.TypeOf(tmp))
