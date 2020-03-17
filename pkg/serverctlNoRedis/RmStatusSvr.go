@@ -51,10 +51,6 @@ func (this *RoomStatusBackend) SetCastServer(s *socketio.Server) error {
 
 func (this *RoomStatusBackend) Shutdown() {
 	log.Println("in shtdown proc")
-	/// TODO: send closing msg to all client
-	// for _, v := range this.Roomlist {
-	// 	log.Println("Server OS.sigKill")
-
 	this.BroadCastShutdown()
 	this.CloseDB()
 	log.Println("endof shutdown proc:", this.CoreKey)

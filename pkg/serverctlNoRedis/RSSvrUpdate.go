@@ -88,6 +88,6 @@ func (b *RoomStatusBackend) UpdateRoom(ctx context.Context, req *pb.CellStatusRe
 	}
 
 	// !Broadcast
-	// rmg.BroadCast(req.UserId, msgp)
+	b.BroadCast(msgp)
 	return msgp, nil
 }

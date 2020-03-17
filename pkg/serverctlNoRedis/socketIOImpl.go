@@ -31,19 +31,40 @@ func (this *RoomStatusBackend) InitSocketServer() (*socketio.Server, error) {
 		return nil
 	})
 
-	server.OnEvent("/", "notice", func(s socketio.Conn, msg string) {
+	// room server support
+	server.OnEvent("/room", "room_list", func(s socketio.Conn, msg string) []string {
 		fmt.Println("notice:", msg)
 		ls := []string{}
 		for _, v := range this.Roomlist {
 			ls = append(ls, proto.MarshalTextString(v))
 		}
-		s.Emit("reply", ls)
+		// s.Emit("reply", ls)
+		return ls
 	})
-	server.OnEvent("/chat", "msg", func(s socketio.Conn, msg string) string {
+
+	server.OnEvent("/room", "join_room", func(s socketio.Conn, msg string) string {
+		for _, v := range this.Roomlist {
+			if msg == v.Key {
+				s.Join(v.Key)
+				return proto.MarshalTextString(v)
+			}
+		}
+		// s.Emit("reply", ls)
+		return "Not_Found"
+	})
+
+	server.OnEvent("/room", "update_state", func(s socketio.Conn, msg string) {
+		fmt.Println("notice:", msg)
+		s.Emit("reply", "have "+msg)
+	})
+
+	// chatroom
+	server.OnEvent("/chat", "msg", func(s socketio.Conn, msg string) {
 		s.SetContext(msg)
-		return "recv " + msg
+		s.Emit("recv", msg)
+		// return "recv " + msg
 	})
-	server.OnEvent("/", "bye", func(s socketio.Conn) string {
+	server.OnEvent("/", "close", func(s socketio.Conn) string {
 		last := s.Context().(string)
 		s.Emit("bye", last)
 		s.Close()
@@ -76,7 +97,7 @@ func (this *RoomStatusBackend) BroadCast(msg *pb.CellStatusResp) error {
 		return status.Error(codes.Internal, "Broadcast Not Inited")
 	}
 	msgpt := proto.MarshalTextString(msg)
-	this.castServer.BroadcastToRoom("/room", msg.Key, "Syst_Msg", msgpt)
+	this.castServer.BroadcastToRoom("/room", msg.Key, "SystMsg", msgpt)
 	return nil
 }
 
@@ -85,7 +106,7 @@ func (this *RoomStatusBackend) BroadCastRaw(msg *pb.CellStatusResp) error {
 		return status.Error(codes.Internal, "Broadcast Not Inited")
 	}
 	msgpt, _ := json.Marshal(msg)
-	this.castServer.BroadcastToRoom("/room", msg.Key, "Syst_Msg", msgpt)
+	this.castServer.BroadcastToRoom("/room", msg.Key, "SystMsg", msgpt)
 	return nil
 }
 
