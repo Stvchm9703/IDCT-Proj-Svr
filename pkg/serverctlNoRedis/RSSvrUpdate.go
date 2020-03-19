@@ -12,7 +12,7 @@ import (
 // UpdateRoom :
 func (b *RoomStatusBackend) UpdateRoom(ctx context.Context, req *pb.CellStatusReq) (*pb.CellStatusResp, error) {
 	// return nil, status.Errorf(codes.Unimplemented, "method DeleteRoom not implemented")
-	common.PrintReqLog(ctx, req)
+	common.PrintReqLog(ctx, "update-room", req)
 	var rmg *pb.Room
 	for k := range b.Roomlist {
 		if (*b.Roomlist[k]).Key == req.Key {
@@ -34,23 +34,6 @@ func (b *RoomStatusBackend) UpdateRoom(ctx context.Context, req *pb.CellStatusRe
 		log.Println("UnknownCellStatus")
 		return nil, errors.New("UnknownCellStatus")
 	}
-	// Turn only -1 / 1 / 0
-	// check turn
-	// if reqRoom.Turn == 0 && reqRoom.CellNum == -1 && req.UserId != "" {
-	// 	(*rmg).DuelerId = req.UserId
-	// 	log.Println(rmg.Room)
-	// 	msgp := &pb.CellStatusResp{
-	// 		UserId:    req.UserId,
-	// 		Key:       (*rmg).Key,
-	// 		Timestamp: time.Now().String(),
-	// 		Status:    201,
-	// 		ResponseMsg: &pb.CellStatusResp_CellStatus{
-	// 			CellStatus: reqRoom,
-	// 		},
-	// 	}
-	// 	rmg.BroadCast(req.UserId, msgp)
-	// 	return msgp, nil
-	// }
 
 	keynum := len((*rmg).CellStatus)
 	if keynum > 0 {
@@ -88,6 +71,6 @@ func (b *RoomStatusBackend) UpdateRoom(ctx context.Context, req *pb.CellStatusRe
 	}
 
 	// !Broadcast
-	b.BroadCast(msgp)
+	go b.BroadCast(msgp)
 	return msgp, nil
 }

@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -40,8 +39,8 @@ var runCmd = &cobra.Command{
 		} else if strings.Contains(runCMDInput.cfPath, ".yaml") {
 			configPoint, err = Cf.OpenYaml(runCMDInput.cfPath)
 		}
-		log.Println(configPoint)
-		log.Println(runCMDInput.mode)
+		fmt.Printf("\n %#v\n", configPoint)
+		fmt.Println(runCMDInput.mode)
 		if err == nil {
 			// Wb.ServerMainProcess(configPoint, callPath, runCMDInput.mode)
 			wb.ServerMainProcess(configPoint)

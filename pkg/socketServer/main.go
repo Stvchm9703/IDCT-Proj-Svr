@@ -1,6 +1,5 @@
 package socketServer
 
-
 import (
 	RmSr "RoomStatus/pkg/serverctlNoRedis"
 	"fmt"
@@ -14,7 +13,7 @@ import (
 // InitSocketServer :
 // since the broadcast issue case [Shutdown ungradefully]
 // this implement socket.io websocket server is used for client receive only
-func InitSocketServer( gs *RmSr.RoomStatusBackend ) ( *socketio.Server, error) {
+func InitSocketServer(gs *RmSr.RoomStatusBackend) (*socketio.Server, error) {
 
 	server, err := socketio.NewServer(nil)
 	if err != nil {
@@ -54,15 +53,14 @@ func InitSocketServer( gs *RmSr.RoomStatusBackend ) ( *socketio.Server, error) {
 
 }
 
-func RunSocketServer ( server *socketio.Server) error{
+func RunSocketServer(server *socketio.Server) error {
 	router := gin.New()
 	go server.Serve()
 	// defer server.Close()
 	router.GET("/socket.io/*any", gin.WrapH(server))
 	router.POST("/socket.io/*any", gin.WrapH(server))
-	return  router.Run(":8000")
+	return router.Run(":8000")
 }
-
 
 func SocketShutdown(s *socketio.Server) error {
 	// this.castServer.LeaveAllRooms("/room", )

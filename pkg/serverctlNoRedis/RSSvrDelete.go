@@ -37,19 +37,18 @@ func (b *RoomStatusBackend) DeleteRoom(ctx context.Context, req *pb.RoomReq) (*p
 		}, errors.New("RoomNotExist")
 	}
 	// !Broadcast
-	// room_tmp.BroadCast("RoomSvrMgr",
-	// 	&pb.CellStatusResp{
-	// 		UserId:    "RoomSvrMgr",
-	// 		Key:       room_tmp.Key,
-	// 		Timestamp: time.Now().String(),
-	// 		Status:    510,
-	// 		ResponseMsg: &pb.CellStatusResp_ErrorMsg{
-	// 			ErrorMsg: &pb.ErrorMsg{
-	// 				MsgInfo: "RoomClose",
-	// 				MsgDesp: "Room Close By Server with Request <UserID:" + req.Key + ">",
-	// 			},
-	// 		},
-	// 	})
+	go b.BroadCast(&pb.CellStatusResp{
+		UserId:    "RoomSvrMgr",
+		Key:       room_tmp.Key,
+		Timestamp: time.Now().String(),
+		Status:    510,
+		ResponseMsg: &pb.CellStatusResp_ErrorMsg{
+			ErrorMsg: &pb.ErrorMsg{
+				MsgInfo: "RoomClose",
+				MsgDesp: "Room Close By Server with Request <UserID:" + req.Key + ">",
+			},
+		},
+	})
 
 	log.Println("b.RoomList", b.Roomlist)
 	return &pb.RoomResp{

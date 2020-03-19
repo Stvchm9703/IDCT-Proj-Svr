@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -20,50 +21,51 @@ import (
 func (this *RoomStatusBackend) InitSocketServer() (*socketio.Server, error) {
 
 	server, err := socketio.NewServer(nil)
+
 	if err != nil {
 		log.Fatal(err)
 	}
 	server.OnConnect("/", func(s socketio.Conn) error {
 		s.SetContext("")
-		fmt.Println("NameSpace : /")
-		fmt.Println("connected:", s.ID())
-		fmt.Printf("Room Request : %#v \n", s.URL())
+		fmt.Println("[SocketIO][Connect]")
+		fmt.Println("\t- NameSpace : /")
+		fmt.Println("\t- connected:", s.ID())
+		fmt.Printf("\t- Room Request : \n\t\t%#v \n\n", s.URL())
 		return nil
 	})
 
-	// room server support
-	server.OnEvent("/room", "room_list", func(s socketio.Conn, msg string) []string {
-		fmt.Println("notice:", msg)
-		ls := []string{}
-		for _, v := range this.Roomlist {
-			ls = append(ls, proto.MarshalTextString(v))
-		}
-		// s.Emit("reply", ls)
-		return ls
-	})
-
-	server.OnEvent("/room", "join_room", func(s socketio.Conn, msg string) string {
+	server.OnEvent("/", "join_room", func(s socketio.Conn, msg string) string {
+		fmt.Printf("\n[Socket.IO][JoinRoom]\n\t- req-room:\t%v\n\n", msg)
 		for _, v := range this.Roomlist {
 			if msg == v.Key {
 				s.Join(v.Key)
 				return proto.MarshalTextString(v)
 			}
 		}
-		// s.Emit("reply", ls)
 		return "Not_Found"
 	})
 
-	server.OnEvent("/room", "update_state", func(s socketio.Conn, msg string) {
-		fmt.Println("notice:", msg)
-		s.Emit("reply", "have "+msg)
+	// chatroom
+	server.OnEvent("/", "chat_msg", func(s socketio.Conn, msg string) {
+		s.SetContext(msg)
+		fmt.Println("chat_msg:", msg)
+		room := s.Rooms()
+		fmt.Println("rooms_:\t", room)
+		ind := -1
+		for k := range room {
+			if strings.Contains(room[k], "Rm") {
+				ind = k
+			}
+		}
+		if ind == -1 {
+			return
+		}
+		if server.BroadcastToRoom("/", room[ind], "chat_msg_recv", msg) == false {
+			fmt.Printf("fall out? %v\n", room[ind])
+			s.Emit("chat_msg_recv", msg)
+		}
 	})
 
-	// chatroom
-	server.OnEvent("/chat", "msg", func(s socketio.Conn, msg string) {
-		s.SetContext(msg)
-		s.Emit("recv", msg)
-		// return "recv " + msg
-	})
 	server.OnEvent("/", "close", func(s socketio.Conn) string {
 		last := s.Context().(string)
 		s.Emit("bye", last)
@@ -75,6 +77,7 @@ func (this *RoomStatusBackend) InitSocketServer() (*socketio.Server, error) {
 	})
 	server.OnDisconnect("/", func(s socketio.Conn, reason string) {
 		fmt.Println("closed", reason)
+		s.Close()
 	})
 
 	return server, err
@@ -93,11 +96,13 @@ func (this *RoomStatusBackend) RunSocketServer() error {
 }
 
 func (this *RoomStatusBackend) BroadCast(msg *pb.CellStatusResp) error {
+	fmt.Println("Broadcast-msg")
 	if this.castServer == nil {
+		fmt.Println("Broadcast Not Inited")
 		return status.Error(codes.Internal, "Broadcast Not Inited")
 	}
-	msgpt := proto.MarshalTextString(msg)
-	this.castServer.BroadcastToRoom("/room", msg.Key, "SystMsg", msgpt)
+	msgpt, _ := proto.Marshal(msg)
+	fmt.Println(this.castServer.BroadcastToRoom("/", msg.Key, "syst_msg", (msgpt)))
 	return nil
 }
 
@@ -106,20 +111,20 @@ func (this *RoomStatusBackend) BroadCastRaw(msg *pb.CellStatusResp) error {
 		return status.Error(codes.Internal, "Broadcast Not Inited")
 	}
 	msgpt, _ := json.Marshal(msg)
-	this.castServer.BroadcastToRoom("/room", msg.Key, "SystMsg", msgpt)
+	this.castServer.BroadcastToRoom("/", msg.Key, "syst_msg", msgpt)
 	return nil
 }
 
 func (this *RoomStatusBackend) BroadCastShutdown() error {
 	// this.castServer.LeaveAllRooms("/room", )
-	roomlist := this.castServer.Rooms("/room")
+	roomlist := this.castServer.Rooms("/")
 
 	wg := sync.WaitGroup{}
 	wg.Add(len(roomlist))
 	for _, v := range roomlist {
 		go func(v string) {
-			this.castServer.BroadcastToRoom("/room", v, "Syst_Msg", "system_shutdown")
-			this.castServer.ClearRoom("/room", v)
+			this.castServer.BroadcastToRoom("/", v, "syst_msg", "system_shutdown")
+			this.castServer.ClearRoom("/", v)
 			wg.Done()
 		}(v)
 	}

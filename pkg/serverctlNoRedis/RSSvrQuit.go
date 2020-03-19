@@ -4,6 +4,7 @@ import (
 	pb "RoomStatus/proto"
 	"context"
 	"errors"
+	"time"
 
 	types "github.com/gogo/protobuf/types"
 )
@@ -21,30 +22,28 @@ func (b *RoomStatusBackend) QuitRoom(ctx context.Context, req *pb.RoomCreateReq)
 		return nil, errors.New("NoRoomPlayerJoined")
 	}
 	// !Broadcast
-	// tmpRoom.BroadCast("RoomSvrMgr",
-	// 	&pb.CellStatusResp{
-	// 		UserId:    "RoomSvrMgr",
-	// 		Key:       tmpRoom.Key,
-	// 		Timestamp: time.Now().String(),
-	// 		ResponseMsg: &pb.CellStatusResp_ErrorMsg{
-	// 			ErrorMsg: &pb.ErrorMsg{
-	// 				MsgInfo: "RoomWatcherQuit",
-	// 				MsgDesp: "RoomSvr:Watcher<" + req.UserId + "> is going to quit",
-	// 			}},
-	// 	})
+	go b.BroadCast(&pb.CellStatusResp{
+		UserId:    "RoomSvrMgr",
+		Key:       tmpRoom.Key,
+		Timestamp: time.Now().String(),
+		ResponseMsg: &pb.CellStatusResp_ErrorMsg{
+			ErrorMsg: &pb.ErrorMsg{
+				MsgInfo: "RoomWatcherQuit",
+				MsgDesp: "RoomSvr:Watcher<" + req.UserId + "> is going to quit",
+			}},
+	})
 	if tmpRoom.HostId == req.UserId || tmpRoom.DuelerId == req.UserId {
 		// !Broadcast
-		// tmpRoom.BroadCast("RoomSvrMgr",
-		// 	&pb.CellStatusResp{
-		// 		UserId:    "RoomSvrMgr",
-		// 		Key:       tmpRoom.Key,
-		// 		Timestamp: time.Now().String(),
-		// 		ResponseMsg: &pb.CellStatusResp_ErrorMsg{
-		// 			ErrorMsg: &pb.ErrorMsg{
-		// 				MsgInfo: "RoomHostQuit",
-		// 				MsgDesp: "RoomSvr:Host Player<" + req.UserId + "> is going to quit, this Room may close connect",
-		// 			}},
-		// 	})
+		go b.BroadCast(&pb.CellStatusResp{
+			UserId:    "RoomSvrMgr",
+			Key:       tmpRoom.Key,
+			Timestamp: time.Now().String(),
+			ResponseMsg: &pb.CellStatusResp_ErrorMsg{
+				ErrorMsg: &pb.ErrorMsg{
+					MsgInfo: "RoomHostQuit",
+					MsgDesp: "RoomSvr:Host Player<" + req.UserId + "> is going to quit, this Room may close connect",
+				}},
+		})
 		delRoom = true
 	}
 	// tmpRoom.DelGS(req.UserId)
