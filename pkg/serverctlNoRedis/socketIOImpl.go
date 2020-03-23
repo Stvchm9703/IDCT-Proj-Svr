@@ -25,6 +25,8 @@ func (this *RoomStatusBackend) InitSocketServer() (*socketio.Server, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Printf("\nserver-option\n\t%#v\n", server)
+
 	server.OnConnect("/", func(s socketio.Conn) error {
 		s.SetContext("")
 		fmt.Println("[SocketIO][Connect]")
@@ -73,7 +75,7 @@ func (this *RoomStatusBackend) InitSocketServer() (*socketio.Server, error) {
 		return last
 	})
 	server.OnError("/", func(s socketio.Conn, e error) {
-		fmt.Println("meet error:", e)
+		fmt.Printf("\n[Socket.IO][Error]\n\t error:%#v \n\tSocket Client %#v", e, s.ID())
 	})
 	server.OnDisconnect("/", func(s socketio.Conn, reason string) {
 		fmt.Println("closed", reason)
@@ -95,16 +97,16 @@ func (this *RoomStatusBackend) RunSocketServer() error {
 	// return nil
 }
 
-func (this *RoomStatusBackend) BroadCast(msg *pb.CellStatusResp) error {
-	fmt.Println("Broadcast-msg")
-	if this.castServer == nil {
-		fmt.Println("Broadcast Not Inited")
-		return status.Error(codes.Internal, "Broadcast Not Inited")
-	}
-	msgpt, _ := proto.Marshal(msg)
-	fmt.Println(this.castServer.BroadcastToRoom("/", msg.Key, "syst_msg", (msgpt)))
-	return nil
-}
+// func (this *RoomStatusBackend) BroadCast(msg *pb.CellStatusResp) error {
+// 	fmt.Println("Broadcast-msg")
+// 	if this.castServer == nil {
+// 		fmt.Println("Broadcast Not Inited")
+// 		return status.Error(codes.Internal, "Broadcast Not Inited")
+// 	}
+// 	msgpt, _ := proto.Marshal(msg)
+// 	fmt.Println(this.castServer.BroadcastToRoom("/", msg.Key, "syst_msg", (msgpt)))
+// 	return nil
+// }
 
 func (this *RoomStatusBackend) BroadCastRaw(msg *pb.CellStatusResp) error {
 	if this.castServer == nil {

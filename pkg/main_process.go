@@ -57,7 +57,8 @@ func ServerMainProcess(testing_config *cf.ConfTmp) {
 	}()
 
 	go func() {
-		panic(RMServer.RunSocketServer())
+		// panic(RMServer.RunSocketServer())
+		panic(RMServer.RunWebSocketServer())
 	}()
 
 	beforeGracefulStop(s, RMServer)

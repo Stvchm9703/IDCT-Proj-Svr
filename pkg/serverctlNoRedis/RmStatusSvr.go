@@ -9,7 +9,6 @@ import (
 	"sync"
 
 	socketio "github.com/googollee/go-socket.io"
-	"github.com/micro/go-micro/errors"
 	// ants "github.com/panjf2000/ants/v2"
 )
 
@@ -19,10 +18,11 @@ var _ pb.RoomStatusServer = (*RoomStatusBackend)(nil)
 //
 type RoomStatusBackend struct {
 	// pb.RoomStatusServer
-	mu         *sync.Mutex
-	CoreKey    string
-	Roomlist   []*pb.Room
-	castServer *socketio.Server
+	mu          *sync.Mutex
+	CoreKey     string
+	Roomlist    []*pb.Room
+	castServer  *socketio.Server
+	castServer1 *SocketHub
 }
 
 // New : Create new backend
@@ -33,25 +33,17 @@ func New(conf *cf.ConfTmp) *RoomStatusBackend {
 		CoreKey: ck,
 		mu:      &sync.Mutex{},
 	}
-	serv, err := g.InitSocketServer()
-	if err != nil {
-		panic(err)
-	}
-	g.castServer = serv
+	// serv, err := g.InitSocketServer()
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// g.castServer = serv
 	return &g
-}
-
-func (this *RoomStatusBackend) SetCastServer(s *socketio.Server) error {
-	if s == nil {
-		return errors.New("001", "Empty SocketIO server", 0001)
-	}
-	this.castServer = s
-	return nil
 }
 
 func (this *RoomStatusBackend) Shutdown() {
 	log.Println("in shtdown proc")
-	this.BroadCastShutdown()
+	// this.BroadCastShutdown()
 	this.CloseDB()
 	log.Println("endof shutdown proc:", this.CoreKey)
 }

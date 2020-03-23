@@ -6,7 +6,6 @@ require (
 	cloud.google.com/go v0.52.0 // indirect
 	github.com/BurntSushi/toml v0.3.1
 	github.com/alexflint/go-arg v1.2.0 // indirect
-	github.com/coreos/etcd v3.3.17+incompatible
 	github.com/couchbase/gomemcached v0.0.0-20200121175323-40b06a54819a // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20200131184339-0f454e2ecd6a // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -22,6 +21,7 @@ require (
 	github.com/golang/protobuf v1.3.3
 	github.com/google/flatbuffers v1.11.0
 	github.com/googollee/go-socket.io v1.4.3
+	github.com/gorilla/mux v1.7.3
 	github.com/gorilla/websocket v1.4.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway v1.12.1
