@@ -212,7 +212,7 @@ func (h *SocketHub) run() {
 			}
 
 		case cellResp := <-h.cellCast:
-			fmt.Printf("[WS:CellCast] Receive Cast\n\t- Message : %#v", cellResp)
+			fmt.Printf("[WS:CellCast] Receive Cast\n\t- Message : %#v\n", cellResp)
 			msgpt, _ := proto.Marshal(cellResp)
 			for cli := range h.clients {
 				if cli.roomKey == cellResp.Key {

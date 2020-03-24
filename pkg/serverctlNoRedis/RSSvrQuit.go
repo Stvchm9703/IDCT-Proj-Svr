@@ -1,6 +1,7 @@
 package serverctlNoRedis
 
 import (
+	"RoomStatus/common"
 	pb "RoomStatus/proto"
 	"context"
 	"errors"
@@ -10,14 +11,14 @@ import (
 )
 
 func (b *RoomStatusBackend) QuitRoom(ctx context.Context, req *pb.RoomCreateReq) (*types.Empty, error) {
+	common.PrintReqLog(ctx, "quit-room", req)
 	var tmpRoom *pb.Room
 	delRoom := false
-	// for _, v := range b.Roomlist {
-	// 	if k := v.GetGS(req.UserId); k != nil {
-	// 		tmpRoom = v
-	// 		break
-	// 	}
-	// }
+	for k := range b.Roomlist {
+		if (*b.Roomlist[k]).HostId == req.UserId || b.Roomlist[k].DuelerId == req.UserId {
+			tmpRoom = b.Roomlist[k]
+		}
+	}
 	if tmpRoom == nil {
 		return nil, errors.New("NoRoomPlayerJoined")
 	}
@@ -54,5 +55,5 @@ func (b *RoomStatusBackend) QuitRoom(ctx context.Context, req *pb.RoomCreateReq)
 		return nil, err
 	}
 
-	return nil, nil
+	return &types.Empty{}, nil
 }

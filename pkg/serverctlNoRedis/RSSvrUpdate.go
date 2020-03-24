@@ -5,6 +5,7 @@ import (
 	pb "RoomStatus/proto"
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 )
@@ -24,17 +25,38 @@ func (b *RoomStatusBackend) UpdateRoom(ctx context.Context, req *pb.CellStatusRe
 		return nil, errors.New("RoomNotExistInUpdate")
 	}
 
-	if len((*rmg).CellStatus) == 9 || (*rmg).Round == 9 {
-		log.Println("the game should be end")
-		return nil, errors.New("GameEnd")
-	}
+	// remark!!
+	// -1 is initial msg (testing)
 
 	reqRoom := req.GetCellStatus()
 	if reqRoom == nil {
 		log.Println("UnknownCellStatus")
 		return nil, errors.New("UnknownCellStatus")
 	}
+	if reqRoom.CellNum == -2 {
+		log.Println("Player Give Up")
+		msgp := &pb.CellStatusResp{
+			UserId:    req.UserId,
+			Key:       (*rmg).Key,
+			Timestamp: time.Now().String(),
+			Status:    200,
+			ResponseMsg: &pb.CellStatusResp_ErrorMsg{
+				ErrorMsg: &pb.ErrorMsg{
+					MsgInfo: "PlayerGiveUp",
+					MsgDesp: fmt.Sprintf("Player %s GiveUp", req.UserId),
+				},
+			},
+		}
+		go b.BroadCast(msgp)
+		return msgp, nil
+	}
 
+	if len((*rmg).CellStatus) == 10 {
+		log.Println("the game should be end")
+		return nil, errors.New("GameEnd")
+	}
+
+	fmt.Println(len(rmg.CellStatus))
 	keynum := len((*rmg).CellStatus)
 	if keynum > 0 {
 		cs := (*rmg).CellStatus[keynum-1]
