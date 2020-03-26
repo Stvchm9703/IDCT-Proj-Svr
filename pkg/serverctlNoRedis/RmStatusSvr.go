@@ -47,3 +47,14 @@ func (this *RoomStatusBackend) Shutdown() {
 	this.CloseDB()
 	log.Println("endof shutdown proc:", this.CoreKey)
 }
+
+// 	Impletement from GameCtl.pb.go(auto-gen file)
+// 		CreateCred(req *pb.CreateCredReq, srv pb.RoomStatus_CreateCredServer) error
+// 		CreateRoom(context.Context, *types.Empty) (*Room, error)
+// 		GetRoomList(context.Context, *RoomListRequest) (*RoomListResponse, error)
+// 		GetRoomCurrentInfo(context.Context, *RoomRequest) (*Room, error)
+// 		GetRoomStream(*RoomRequest, RoomStatus_GetRoomStreamServer) error
+// 		UpdateRoomStatus(context.Context, *CellStatus) (*types.Empty, error)
+// 		DeleteRoom(context.Context, *RoomRequest) (*types.Empty, error)
+
+// PrintReqLog
