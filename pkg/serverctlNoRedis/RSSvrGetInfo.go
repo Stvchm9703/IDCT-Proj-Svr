@@ -10,14 +10,14 @@ import (
 
 // GetRoomInfo :
 func (b *RoomStatusBackend) GetRoomInfo(ctx context.Context, req *pb.RoomReq) (*pb.RoomResp, error) {
-	common.PrintReqLog(ctx, req)
+	common.PrintReqLog(ctx, "GetRoom-Info", req)
 	for _, v := range b.Roomlist {
 		log.Println(v.Key)
 		if (v).Key == req.Key {
 			return &pb.RoomResp{
 				Timestamp: time.Now().String(),
 				ResponseMsg: &pb.RoomResp_RoomInfo{
-					RoomInfo: &v.Room,
+					RoomInfo: v,
 				},
 			}, nil
 		}

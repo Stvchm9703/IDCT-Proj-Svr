@@ -30,4 +30,4 @@ C:/Users/"Steven Chm"/Go/src ^
 
 
 REM sed -i.bak "s/empty.Empty/types.Empty/g" proto/GameCtl.pb.gw.go && rm proto/GameCtl.pb.gw.go.bak
-statik -m -f -src third_party/OpenAPI/
+REM statik -m -f -src third_party/OpenAPI/

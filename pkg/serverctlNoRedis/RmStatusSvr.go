@@ -7,7 +7,8 @@ import (
 	pb "RoomStatus/proto"
 	"log"
 	"sync"
-	"time"
+
+	socketio "github.com/googollee/go-socket.io"
 	// ants "github.com/panjf2000/ants/v2"
 )
 
@@ -17,9 +18,11 @@ var _ pb.RoomStatusServer = (*RoomStatusBackend)(nil)
 //
 type RoomStatusBackend struct {
 	// pb.RoomStatusServer
-	mu       *sync.Mutex
-	CoreKey  string
-	Roomlist []*RoomMgr
+	mu          *sync.Mutex
+	CoreKey     string
+	Roomlist    []*pb.Room
+	castServer  *socketio.Server
+	castServer1 *SocketHub
 }
 
 // New : Create new backend
@@ -30,30 +33,17 @@ func New(conf *cf.ConfTmp) *RoomStatusBackend {
 		CoreKey: ck,
 		mu:      &sync.Mutex{},
 	}
-	g.InitDB(&conf.Database)
+	// serv, err := g.InitSocketServer()
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// g.castServer = serv
 	return &g
 }
 
 func (this *RoomStatusBackend) Shutdown() {
 	log.Println("in shtdown proc")
-	/// TODO: send closing msg to all client
-	for _, v := range this.Roomlist {
-		log.Println("Server OS.sigKill")
-		v.BroadCast("RmSvrMgr",
-			&pb.CellStatusResp{
-				UserId:    "RmSvrMgr",
-				Key:       v.Key,
-				Status:    201,
-				Timestamp: time.Now().String(),
-				ResponseMsg: &pb.CellStatusResp_ErrorMsg{
-					ErrorMsg: &pb.ErrorMsg{
-						MsgInfo: "ConnEnd",
-						MsgDesp: "Server OS.sigKill",
-					},
-				},
-			})
-		v.ClearAll()
-	}
+	// this.BroadCastShutdown()
 	this.CloseDB()
 	log.Println("endof shutdown proc:", this.CoreKey)
 }

@@ -2,7 +2,6 @@ package common
 
 import (
 	"context"
-	"encoding/json"
 	"hash/fnv"
 	"io"
 	"log"
@@ -29,10 +28,6 @@ func SetLog(path string) io.Writer {
 	return wrt
 }
 
-func PrintReqLog(ctx context.Context, req interface{}) {
-	jsoon, _ := json.Marshal(ctx)
-	log.Println(string(jsoon))
-
-	jsoon, _ = json.Marshal(req)
-	log.Println(string(jsoon))
+func PrintReqLog(ctx context.Context, methodAddr string, req interface{}) {
+	log.Printf("[GRPC]\n -\tctx:\t%#v \n -\tmethodAddr:\t%#v \n -\tReqInfo:\t%#v\n", ctx, methodAddr, req)
 }

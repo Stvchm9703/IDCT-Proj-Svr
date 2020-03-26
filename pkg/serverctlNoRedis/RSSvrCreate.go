@@ -11,7 +11,7 @@ import (
 
 // CreateRoom :
 func (b *RoomStatusBackend) CreateRoom(ctx context.Context, req *pb.RoomCreateReq) (*pb.RoomResp, error) {
-	cm.PrintReqLog(ctx, req)
+	cm.PrintReqLog(ctx, "create-room", req)
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	for _, vr := range b.Roomlist {
@@ -54,12 +54,12 @@ func (b *RoomStatusBackend) CreateRoom(ctx context.Context, req *pb.RoomCreateRe
 		Cell:       -1,
 		CellStatus: nil,
 	}
-	rmTmp1 := RoomMgr{
-		Room:            rmTmp,
-		get_only_stream: make(map[string]*pb.RoomStatus_GetRoomStreamServer),
-	}
+	// rmTmp1 := RoomMgr{
+	// 	Room: rmTmp,
+	// 	// get_only_stream: make(map[string]*pb.RoomStatus_GetRoomStreamServer),
+	// }
 
-	b.Roomlist = append(b.Roomlist, &rmTmp1)
+	b.Roomlist = append(b.Roomlist, &rmTmp)
 	log.Println("Created Room : <", rmTmp)
 	return &pb.RoomResp{
 		Timestamp: time.Now().String(),

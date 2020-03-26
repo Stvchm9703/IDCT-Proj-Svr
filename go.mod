@@ -7,6 +7,7 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/denisenkom/go-mssqldb v0.0.0-20200131184339-0f454e2ecd6a // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/gin-gonic/gin v1.5.0
 	github.com/go-redis/redis v6.15.6+incompatible
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/gogo/gateway v1.1.0
@@ -16,6 +17,8 @@ require (
 	github.com/golang/mock v1.3.1
 	github.com/golang/protobuf v1.3.3
 	github.com/google/flatbuffers v1.11.0
+	github.com/googollee/go-socket.io v1.4.3
+	github.com/gorilla/websocket v1.4.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway v1.12.1
 	github.com/jinzhu/gorm v1.9.12
