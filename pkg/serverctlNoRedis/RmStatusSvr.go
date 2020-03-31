@@ -2,8 +2,8 @@ package serverctlNoRedis
 
 import (
 	// _ "RoomStatus"
-	cm "RoomStatus/common"
-	cf "RoomStatus/config"
+	cm "RoomStatus/pkg/common"
+	cf "RoomStatus/pkg/config"
 	pb "RoomStatus/proto"
 	"log"
 	"sync"

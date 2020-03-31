@@ -1,7 +1,7 @@
 package redis_test
 
 import (
-	cf "RoomStatus/config"
+	cf "RoomStatus/pkg/config"
 	pb "RoomStatus/proto"
 	rd "RoomStatus/pkg/store/redis"
 	"encoding/json"

@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"RoomStatus/config"
+	"RoomStatus/pkg/config"
 	"encoding/json"
 	"log"
 	"strconv"

@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"syscall"
 
-	cf "RoomStatus/config"
+	cf "RoomStatus/pkg/config"
 	pb "RoomStatus/proto"
 
 	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"

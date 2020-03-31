@@ -1,8 +1,8 @@
 package serverctlNoRedis
 
 import (
-	"RoomStatus/config"
 	aSvr "RoomStatus/pkg/authServer"
+	"RoomStatus/pkg/config"
 	"context"
 	"errors"
 	"log"

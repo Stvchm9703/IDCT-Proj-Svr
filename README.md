@@ -148,3 +148,53 @@ https://medium.com/getamis/istio-%E5%9F%BA%E7%A4%8E-grpc-%E8%B2%A0%E8%BC%89%E5%9
 ## grpc Auth 
 
 https://grpc.io/docs/guides/auth/
+
+
+
+# File structure
+
+```cmd
+[$project_root]
+|
+|----   [bin]
+|       binary built after run the `build_cli/build.bat` or `build_cli/build.sh`
+|
+|----   [build_cli]
+|       main execute file of room service and auth-service
+|
+|----   [insecure]
+|       the generated key pem pair, if there are no cert.pem and key.pem pair in this folders,
+|       the program may generate a new pair
+|
+|----   [pkg]
+|       service program source code 
+|       |
+|       |----   [common] 
+|       |       common function, e.g. Log Printing format, hash generate
+|       |
+|       |----   [config]
+|       |       configuration file defination
+|       |       
+|       |----   [store]
+|       |       dependencies struct defination  
+|       |
+|       |----   [authServer]
+|       |       authorization service, include check user, create user 
+|       |       inside all *.go file are service handler, and the server initialize process
+|       |       |
+|       |       |----   [cmd]
+|       |               the commond line interface of authorization service
+|       |
+|       |----   [serverctlNoRedis]
+|               room management service, include game logic, CRUD of the room 
+|               inside all *.go file are service handler, and the server initialize process
+|               |
+|               |----   [cmd]
+|                       the commond line interface of room service
+|
+|----   [proto]
+        gRPC service defination 
+        *.proto : messages and service defination
+        *.pb.go : generated code that ready to use
+
+```

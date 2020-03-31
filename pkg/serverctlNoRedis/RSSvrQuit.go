@@ -1,7 +1,7 @@
 package serverctlNoRedis
 
 import (
-	"RoomStatus/common"
+	"RoomStatus/pkg/common"
 	pb "RoomStatus/proto"
 	"context"
 	"errors"

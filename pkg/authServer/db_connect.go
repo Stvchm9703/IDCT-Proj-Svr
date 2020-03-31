@@ -1,7 +1,7 @@
 package authServer
 
 import (
-	"RoomStatus/config"
+	"RoomStatus/pkg/config"
 	"log"
 	"strconv"
 	"time"

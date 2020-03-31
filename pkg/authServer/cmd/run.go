@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	Cf "RoomStatus/config"
 	wb "RoomStatus/pkg/authServer"
 
 	"github.com/spf13/cobra"

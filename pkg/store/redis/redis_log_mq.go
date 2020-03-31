@@ -4,7 +4,7 @@
 package redis
 
 import (
-	"RoomStatus/config"
+	"RoomStatus/pkg/config"
 	"log"
 
 	"github.com/go-redis/redis"

@@ -150,6 +150,4 @@ service RoomStatus {
             body: "*"
         }; 
     }
-
-    
 }
