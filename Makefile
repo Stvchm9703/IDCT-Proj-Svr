@@ -72,10 +72,14 @@ install:
 		github.com/mwitkow/go-proto-validators/protoc-gen-govalidators \
 		github.com/rakyll/statik
 
-build: 
-	go build -o bin/roomstatus_server.exe main.try.go
+build:
+	.build_room
+	
+build_room: 
+	go build -o bin/_roomstatus build_cli/room_status.go
 
-
+build_auth:
+	go build -o bin/_auth build_cli/auth_server.go
 
 generate_vcred:
 	protoc \
