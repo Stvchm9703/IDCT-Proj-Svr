@@ -66,11 +66,12 @@ $(CURDIR)/vendor/ \
 
 install:
 	go get \
+		github.com/golang/protobuf/protoc-gen-go\
 		github.com/gogo/protobuf/protoc-gen-gogo \
 		github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
 		github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger \
-		github.com/mwitkow/go-proto-validators/protoc-gen-govalidators \
-		github.com/rakyll/statik
+		github.com/mwitkow/go-proto-validators/protoc-gen-govalidators 
+		# github.com/rakyll/statik
 
 build:
 	.build_room
