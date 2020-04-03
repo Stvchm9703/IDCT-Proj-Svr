@@ -2,3 +2,5 @@ build/
 .DS_Store
 vendor/
 tmp/
+bin/_roomstatus
+bin/_auth
